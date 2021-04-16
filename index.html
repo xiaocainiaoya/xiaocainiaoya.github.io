@@ -195,7 +195,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-04-16 23:04:58 / 修改时间：23:41:37" itemprop="dateCreated datePublished" datetime="2021-04-16T23:04:58+08:00">2021-04-16</time>
+              <time title="创建时间：2021-04-16 23:04:58 / 修改时间：23:45:15" itemprop="dateCreated datePublished" datetime="2021-04-16T23:04:58+08:00">2021-04-16</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -223,8 +223,8 @@
 
       
           <h4 id="动态代理导致注解未生效"><a href="#动态代理导致注解未生效" class="headerlink" title="动态代理导致注解未生效"></a>动态代理导致注解未生效</h4><p>​    今天在使用<code>mybatis-plus</code>作者苞米豆的另一个项目<code>lock4j</code>用于项目中的分布式锁，解决多实例情况下对接口进行上锁，使得业务上的共享资源在一个时间节点里只会被一个线程执行。</p>
-<p>​    <code>lock4j</code>和<code>mybatis-plus</code>差不对，秉承着人性化使用的初衷，<code>lock4j</code>使用上还是非常简单的，只需要在需要上锁的接口方法上使用<code>@Lock4j</code>进行标记并设置一些简单的超时参数即可。</p>
-<p>​    使用中发现有一个需要上锁的接口是一个私有方法(原本单机情况下，采用<code>ReentrantLock</code>)，所以改造时仅仅只是对改接口上添加<code>@Lock4j</code>注解。
+<p>​    <code>lock4j</code>和<code>mybatis-plus</code>差不多，秉承着人性化使用的初衷，<code>lock4j</code>使用上还是非常简单的，只需要在需要上锁的接口方法上使用<code>@Lock4j</code>进行标记并设置一些简单的超时参数即可。</p>
+<p>​    使用中发现有一个需要上锁的接口是一个私有方法(原本单机情况下，采用<code>ReentrantLock</code>)，所以改造时仅仅只是对改接口上添加<code>@Lock4j</code>注解。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/04/16/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/java/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E5%AF%BC%E8%87%B4%E6%B3%A8%E8%A7%A3%E6%9C%AA%E7%94%9F%E6%95%88/#more" rel="contents">
