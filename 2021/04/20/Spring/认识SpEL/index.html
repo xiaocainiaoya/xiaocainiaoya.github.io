@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="认识SpEL表达式前言 最近项目接入苞米豆的lock4j用于分布式的锁控制，良好的控制在多台服务器下请求分流导致的数据重复问题，使用上也比较简单，在需要分布式锁的方法上添加一个@Lock4j注解并添加相应的参数即可，在使用中发现其中有一个属性keys &#x3D; &amp;#123;&quot;#userId&quot;, &quot;#user.sex&quot;&amp;#125;，并且支持自定义重写分布式锁键的生成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xiaocainiaoya&#39;s blog">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2021/04/20/Spring/%E8%AE%A4%E8%AF%86SpEL/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="认识SpEL表达式前言 最近项目接入苞米豆的lock4j用于分布式的锁控制，良好的控制在多台服务器下请求分流导致的数据重复问题，使用上也比较简单，在需要分布式锁的方法上添加一个@Lock4j注解并添加相应的参数即可，在使用中发现其中有一个属性keys &#x3D; &amp;#123;&quot;#userId&quot;, &quot;#user.sex&quot;&amp;#125;，并且支持自定义重写分布式锁键的生成">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-20T12:09:19.682Z">
+<meta property="article:modified_time" content="2021-04-21T02:29:11.982Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2021/04/20/Spring/%E8%AE%A4%E8%AF%86SpEL/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title> | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-schedule">
+
+    <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/20/Spring/%E8%AE%A4%E8%AF%86SpEL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-20 20:09:19" itemprop="dateCreated datePublished" datetime="2021-04-20T20:09:19+08:00">2021-04-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-21 10:29:11" itemprop="dateModified" datetime="2021-04-21T10:29:11+08:00">2021-04-21</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="认识SpEL表达式"><a href="#认识SpEL表达式" class="headerlink" title="认识SpEL表达式"></a>认识SpEL表达式</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
+<p>最近项目接入苞米豆的<code>lock4j</code>用于分布式的锁控制，良好的控制在多台服务器下请求分流导致的数据重复问题，使用上也比较简单，在需要分布式锁的方法上添加一个<code>@Lock4j</code>注解并添加相应的参数即可，在使用中发现其中有一个属性<code>keys = &#123;&quot;#userId&quot;, &quot;#user.sex&quot;&#125;</code>，并且支持自定义重写分布式锁键的生成策略。在好奇心的驱使下，查看了默认实现的分布式锁键生成策略是通过<code>SpEL</code>的方式解析参数信息。</p>
+</blockquote>
+<span id="more"></span>
+
+<h4 id="SpEL概述"><a href="#SpEL概述" class="headerlink" title="SpEL概述"></a>SpEL概述</h4><p><code>Spring</code>表达式语言的全拼为<code>Spring Expression Language</code>，缩写为<code>SpEL</code>。并且<code>SpEL</code>属于<code>spring-core</code>模块，不直接与<code>Spring</code>绑定，是一个独立模块，不依赖于其他模块，可以单独使用。</p>
+<h4 id="核心接口"><a href="#核心接口" class="headerlink" title="核心接口"></a>核心接口</h4><ol>
+<li>解析器<code>ExpressionParser</code>，用于将字符串表达式转换为<code>Expression</code>表达式对象。</li>
+<li>表达式<code>Expression</code>，最后通过它的<code>getValute</code>方法对表达式进行计算取值。</li>
+<li>上下文<code>EvaluationContext</code>，通过上下文对象结合表达式来计算最后的结果。</li>
+</ol>
+<h4 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 创建解析器</span></span><br><span class="line">  ExpressionParser parser = <span class="keyword">new</span> SpelExpressionParser();</span><br><span class="line">  <span class="comment">// 解析表达式为Expression对象</span></span><br><span class="line">  Expression expression = parser.parseExpression(<span class="string">&quot;&#x27;Hello&#x27; + &#x27;World&#x27;&quot;</span>);</span><br><span class="line">  <span class="comment">// 计算求值</span></span><br><span class="line">  System.out.println(expression.getValue(context));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>进行一些简单的运算</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 创建解析器</span></span><br><span class="line">  ExpressionParser parser = <span class="keyword">new</span> SpelExpressionParser();</span><br><span class="line">  <span class="comment">// 解析表达式为Expression对象</span></span><br><span class="line">  <span class="comment">// 进行字符串的拼接</span></span><br><span class="line">  System.out.println(parser.parseExpression(<span class="string">&quot;&#x27;Hello&#x27; + &#x27;World&#x27;&quot;</span>).getValue(String.class));</span><br><span class="line">  <span class="comment">// 简单的运算</span></span><br><span class="line">  System.out.println(parser.parseExpression(<span class="string">&quot;1+2&quot;</span>).getValue());</span><br><span class="line">  <span class="comment">// 简单的比较</span></span><br><span class="line">  System.out.println(parser.parseExpression(<span class="string">&quot;1&gt;2&quot;</span>).getValue());</span><br><span class="line">  <span class="comment">// 稍微复杂一点的比较</span></span><br><span class="line">  System.out.println(parser.parseExpression(<span class="string">&quot;2&gt;1 and (!true)&quot;</span>).getValue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>通过<code>ParseContext</code>对象设置自定义的解析规则</strong>：这里设置表达式的解析前缀为<code>#&#123;</code>解析后缀为<code>&#125;</code>，最后通过表达式对象<code>expression.getValue()</code>获取到表达式中的值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">  ExpressionParser parser = <span class="keyword">new</span> SpelExpressionParser();</span><br><span class="line">  ParserContext parserContext = <span class="keyword">new</span> ParserContext() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isTemplate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getExpressionPrefix</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">&quot;#&#123;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getExpressionSuffix</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">&quot;&#125;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">  String template = <span class="string">&quot;#&#123;&#x27;Hello&#x27;&#125;#&#123;&#x27;World!&#x27;&#125;&quot;</span>;</span><br><span class="line">  Expression expression = parser.parseExpression(template, parserContext);</span><br><span class="line">  System.out.println(expression.getValue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>还有很多不同的取值方式，比如参数(上下文)是个对象，获取这个对象中的某个属性；或者参数是一个<code>List</code>获取某一个索引值；又或者是一个<code>Map</code>对象，根据某个<code>Key</code>获取对应的值等等。</p>
+<h4 id="实际应用"><a href="#实际应用" class="headerlink" title="实际应用"></a>实际应用</h4><p>​    如果平时有使用<code>Spring</code>框架应该都会有用到比如<code>@Value</code>注解，就是通过<code>SpEL</code>方式进行赋值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserFacade</span> </span>&#123;</span><br><span class="line">		</span><br><span class="line">  	<span class="comment">// 获取字符串tom </span></span><br><span class="line">    <span class="meta">@Value(&quot;#&#123;&#x27;tom&#x27;&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">  	</span><br><span class="line">  	<span class="comment">// 获取bean对象的属性</span></span><br><span class="line">    <span class="meta">@Value(&quot;#&#123;user.value&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在比如接触过<code>Spring Security</code>或者<code>Shiro</code>等身份验证和授权的框架中，对不同的角色有不同的接口权限，会使用到如下场景，其中对<code>@PreAuthorize(&quot;hasAuthority(&#39;ROLE_DMIN&#39;))</code>中<code>hasAuthority(&#39;ROLE_ADMIN&#39;)</code>就是通过<code>SpEL</code>进行参数解析后，对当前用户的角色进行校验。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/admin/user&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 拥有管理员权限可查看任何用户信息,否则只能查看自己的信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@PreAuthorize(&quot;hasAuthority(&#x27;ROLE_ADMIN&#x27;))</span></span><br><span class="line">    <span class="meta">@PostMapping(&quot;/getUserById/&#123;userId&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Result&lt;List&lt;SysUser&gt;&gt; getUserById(String userId) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;(userFacade.getUserById(userId));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="重构"><a href="#重构" class="headerlink" title="重构"></a>重构</h4><p>​    之前在项目中记录系统中一些敏感接口的请求日志信息，采用的是<code>AOP</code>的方式，在请求进入控制层之前拦截进入<code>AOP</code>的切面方法，但是记录的日志部分关键信息需要从请求的参数中获取，在之前的实现中是通过约定一种表达式，对应列表<code>List</code>、<code>Map</code>、<code>bean</code>对象的取值是自实现，且仅仅支持二级取值，确实在使用上有很大的缺陷。这种场景下，就可以使用<code>SpEL</code>进行方法参数解析，省了重复造轮子的过程，且使用上更为灵活。</p>
+<p><strong><code>SpEL</code>结合<code>AOP</code>重构请求日志保存</strong>，这边只做简单的通过<code>SpEL</code>方式进行对象等取值处理，不考虑具体实际场景中的复杂业务逻辑。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 测试控制层</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span>: xiaocainiaoya</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Date</span>: 2021/04/20 23:06:06</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;basic&quot;)</span></span><br><span class="line"><span class="meta">@Api(tags = &quot;测试&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BasicVersionController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ApiOperation(value=&quot;测试&quot;,notes=&quot;测试&quot;)</span></span><br><span class="line">    <span class="meta">@PostMapping(&quot;test&quot;)</span></span><br><span class="line">    <span class="meta">@ControllerMethodLog(name = &quot;测试保存请求日志&quot;, description = &quot;测试保存请求日志&quot;)</span></span><br><span class="line">    <span class="meta">@LogAssistParams(value=&#123;</span></span><br><span class="line"><span class="meta">            @LogAssistParam(logField=&quot;projectName&quot;,objField=&quot;#bidProjectInfo.id&quot;),</span></span><br><span class="line"><span class="meta">            @LogAssistParam(logField=&quot;id&quot;,objField=&quot;#bidProjectInfo.projectName&quot;)</span></span><br><span class="line"><span class="meta">    &#125;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RestResponse&lt;BidPackageInvitationVo&gt; <span class="title">test</span><span class="params">(<span class="meta">@RequestBody</span> ProjectInfo projectInfo)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>AOP</code>切面类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 拦截日志</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span>: xiaocainiaoya</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Date</span>: 2021/04/20 23:08:28</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OperationTestLogAspect</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Autowired</span></span><br><span class="line">   <span class="keyword">private</span> OperationLogFacade operationLogFacade;</span><br><span class="line"></span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * 此处的切点是注解的方式</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">   <span class="meta">@Pointcut(&quot;@annotation(cn.com.xiaocainiaoya.annotation.ControllerMethodLog)&quot;)</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">operationLog</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Around(&quot;operationLog()&quot;)</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Object <span class="title">around</span><span class="params">(ProceedingJoinPoint joinPoint)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">      OperationLog operationLog = <span class="keyword">new</span> OperationLog();</span><br><span class="line">      operationLog.setStatus(<span class="number">1</span>);<span class="comment">// 默认调用成功，异常时修改为调用失败</span></span><br><span class="line"></span><br><span class="line">      Object thing = <span class="keyword">null</span>;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">         <span class="comment">// 执行切入方法内容</span></span><br><span class="line">         thing = joinPoint.proceed();</span><br><span class="line">         operationLog.setOperEndTime(DateTime.now().toJdkDate());</span><br><span class="line">         <span class="keyword">return</span> thing;</span><br><span class="line">      &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">         log.error(e.getMessage(), e);</span><br><span class="line">         operationLog.setStatus(<span class="number">0</span>);<span class="comment">//发生异常时定义为调用失败</span></span><br><span class="line">         operationLog.setResultContext(e.getMessage());</span><br><span class="line">         <span class="keyword">throw</span> e;</span><br><span class="line">      &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">         insertOperationLog(operationLog, joinPoint, thing);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ParameterNameDiscoverer NAME_DISCOVERER = <span class="keyword">new</span> DefaultParameterNameDiscoverer();</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ExpressionParser PARSER = <span class="keyword">new</span> SpelExpressionParser();</span><br><span class="line"></span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">   *   插入操作日志</span></span><br><span class="line"><span class="comment">   *</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@Author</span>: xiaocainiaoya</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@Date</span>: 2021/04/20 23:11:28</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@param</span> operationLog 日志基础信息</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@param</span> joinPoint 拦截切入点信息</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@param</span> thing 拦截函数返回值</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@return</span>:</span></span><br><span class="line"><span class="comment">   **/</span></span><br><span class="line">   <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">insertOperationLog</span><span class="params">(OperationLog operationLog, ProceedingJoinPoint joinPoint, Object thing)</span> </span>&#123;</span><br><span class="line">      MethodSignature signature = (MethodSignature) joinPoint.getSignature();</span><br><span class="line">      ControllerMethodLog methodAnnotation = signature.getMethod().getAnnotation(ControllerMethodLog.class);</span><br><span class="line">      Api typeAnnotation = (Api) signature.getDeclaringType().getAnnotation(Api.class);</span><br><span class="line">      <span class="comment">//注释不完整不进行日志记录操作</span></span><br><span class="line">      <span class="keyword">if</span> (methodAnnotation == <span class="keyword">null</span> || typeAnnotation == <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      LogAssistParams logAssistParams = signature.getMethod().getAnnotation(LogAssistParams.class);</span><br><span class="line">      <span class="keyword">if</span>(methodAnnotation == <span class="keyword">null</span>)&#123;</span><br><span class="line">         <span class="keyword">return</span> ;</span><br><span class="line">      &#125;</span><br><span class="line">      LogAssistParam[] assistParams = logAssistParams.value();</span><br><span class="line">      <span class="keyword">if</span>(ObjectUtil.isNull(assistParams) || assistParams.length == <span class="number">0</span>)&#123;</span><br><span class="line">         <span class="keyword">return</span> ;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; assistParams.length; i++)&#123;</span><br><span class="line">         EvaluationContext context = <span class="keyword">new</span> MethodBasedEvaluationContext((Object) <span class="keyword">null</span>, signature.getMethod(), joinPoint.getArgs(), NAME_DISCOVERER);</span><br><span class="line">         String value = (String)PARSER.parseExpression(assistParams[i].objField()).getValue(context);</span><br><span class="line">         ReflectUtil.setFieldValue(operationLog, assistParams[i].logField(), value);</span><br><span class="line">      &#125;</span><br><span class="line">      operationLogFacade.insertSelective(operationLog);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2021/04/20/Spring/%E8%AE%A4%E8%AF%86SpEL/" title="">http://xiaocainiaoya.github.io/2021/04/20/Spring/认识SpEL/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/16/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/java/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E5%AF%BC%E8%87%B4%E6%B3%A8%E8%A7%A3%E6%9C%AA%E7%94%9F%E6%95%88/" rel="prev" title="this调用导致注解未生效问题">
+      <i class="fa fa-chevron-left"></i> this调用导致注解未生效问题
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A4%E8%AF%86SpEL%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">认识SpEL表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SpEL%E6%A6%82%E8%BF%B0"><span class="nav-number">1.2.</span> <span class="nav-text">SpEL概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%8E%A5%E5%8F%A3"><span class="nav-number">1.3.</span> <span class="nav-text">核心接口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="nav-number">1.4.</span> <span class="nav-text">简单使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8"><span class="nav-number">1.5.</span> <span class="nav-text">实际应用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E6%9E%84"><span class="nav-number">1.6.</span> <span class="nav-text">重构</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:987306440@qq.com" title="E-Mail → mailto:987306440@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fab fa-crosshairs fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
