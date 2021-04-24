@@ -6,7 +6,7 @@
   <link href="http://xiaocainiaoya.github.io/atom.xml" rel="self"/>
   
   <link href="http://xiaocainiaoya.github.io/"/>
-  <updated>2021-04-24T15:36:15.172Z</updated>
+  <updated>2021-04-24T15:35:48.416Z</updated>
   <id>http://xiaocainiaoya.github.io/</id>
   
   <author>
@@ -15,47 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title></title>
-    <link href="http://xiaocainiaoya.github.io/2021/04/24/%E9%A1%B5%E8%84%9A/"/>
-    <id>http://xiaocainiaoya.github.io/2021/04/24/%E9%A1%B5%E8%84%9A/</id>
-    <published>2021-04-24T14:58:33.082Z</published>
-    <updated>2021-04-24T15:36:15.172Z</updated>
-    
-    <content type="html"><![CDATA[<p>博客地址：<a href="https://xiaocainiaoya.github.io/">https://xiaocainiaoya.github.io/</a></p><p>联系方式：<a href="mailto:&#x78;&#105;&#97;&#x6f;&#x63;&#97;&#x69;&#x6e;&#105;&#97;&#111;&#121;&#x61;&#64;&#102;&#111;&#x78;&#109;&#97;&#x69;&#108;&#x2e;&#99;&#x6f;&#x6d;">&#x78;&#105;&#97;&#x6f;&#x63;&#97;&#x69;&#x6e;&#105;&#97;&#111;&#121;&#x61;&#64;&#102;&#111;&#x78;&#109;&#97;&#x69;&#108;&#x2e;&#99;&#x6f;&#x6d;</a></p><p><img src="https://i.loli.net/2021/04/24/uiEBICyMHcYS4TA.png" alt="扫码-removebg-preview.png"></p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;博客地址：&lt;a href=&quot;https://xiaocainiaoya.github.io/&quot;&gt;https://xiaocainiaoya.github.io/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;联系方式：&lt;a href=&quot;mailto:&amp;#x78;&amp;#105;&amp;#97;&amp;#x6f;&amp;</summary>
-      
-    
-    
-    
-    
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://xiaocainiaoya.github.io/2021/04/23/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/Vertx/Vertx%E5%85%A5%E9%97%A8/"/>
-    <id>http://xiaocainiaoya.github.io/2021/04/23/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/Vertx/Vertx%E5%85%A5%E9%97%A8/</id>
-    <published>2021-04-23T12:24:59.814Z</published>
-    <updated>2021-04-23T12:57:44.386Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="Vertx入门"><a href="#Vertx入门" class="headerlink" title="Vertx入门"></a>Vertx入门</h1><h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><blockquote><p>最近遇到<code>git</code>本地合并不产生<code>merge</code>记录的问题，想找个项目测试下，故在公司私服的<code>gitlab</code>上找之前的一个测试<code>git</code>使用项目(<code>gitlab</code>是后来迁过去的，最早项目组使用<code>svn</code>)，无意中发现有一个工程是使用<code>vertx</code>，简单的看了下代码，感觉使用上和<code>netty</code>有点类似。</p></blockquote><h2 id="二、基本概念"><a href="#二、基本概念" class="headerlink" title="二、基本概念"></a>二、基本概念</h2><p><code>Vert.x</code>是<code>Eclipse</code>基金会下面的一个开源项目，<code>Vert.x</code>的基本定位是一个事件驱动的编程框架，通过<code>Vert.x</code>使用者可以用相对低的成本就享受到<code>NIO</code>带来的高性能。<code>Vert.x</code>对异步处理和事件驱动做了一些合理抽象，第三方可以基于这些抽象提供扩展组件；<code>Vert.x</code>目前是见过最功能最强大，第三方库依赖最少的<code>Java</code>框架，它只依赖<code>Netty4</code>以及<code>Jacskon</code>，由于基于<code>JVM</code>，所以<code>Vert.x</code>可以用其他语言来实现你的业务。默认官方维护的语言是<code>Groovy</code>，<code>JavaScript</code>以及<code>JRuby</code>。</p><h2 id="三、简单入门"><a href="#三、简单入门" class="headerlink" title="三、简单入门"></a>三、简单入门</h2><h3 id="2-1-组成"><a href="#2-1-组成" class="headerlink" title="2.1 组成"></a>2.1 组成</h3>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;h1 id=&quot;Vertx入门&quot;&gt;&lt;a href=&quot;#Vertx入门&quot; class=&quot;headerlink&quot; title=&quot;Vertx入门&quot;&gt;&lt;/a&gt;Vertx入门&lt;/h1&gt;&lt;h2 id=&quot;一、前言&quot;&gt;&lt;a href=&quot;#一、前言&quot; class=&quot;headerlink&quot; titl</summary>
-      
-    
-    
-    
-    
-  </entry>
   
   <entry>
     <title>认识SpEL</title>
