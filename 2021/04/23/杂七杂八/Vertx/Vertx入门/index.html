@@ -21,21 +21,19 @@
     var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="数据库索引字段过长​    问题：在业务场景中，某些敏感数据需加密之后保存到数据库，而加密字段刚好又是频繁触发查询的字段。在一次插入数据时引发唯一索引异常。原因是索引长度小于数据库字段长度，在比对数据唯一性时截取了该字段的前面部分长度，导致匹配成功，抛出唯一索引异常。 ​    方案：这种情况下不能随意调整索引的长度，这涉及到全局的修改。故通过新增一个字段保存改加密字段MD5值，并将索引挂在这个新">
+  <meta name="description" content="Vertx入门一、前言 最近遇到git本地合并不产生merge记录的问题，想找个项目测试下，故在公司私服的gitlab上找之前的一个测试git使用项目(gitlab是后来迁过去的，最早项目组使用svn)，无意中发现有一个工程是使用vertx，简单的看了下代码，感觉使用上和netty有点类似。  二、基本概念Vert.x是Eclipse基金会下面的一个开源项目，Vert.x的基本定位是一个事件驱动的">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数据库索引字段过长">
-<meta property="og:url" content="http://xiaocainiaoya.github.io/2021/04/13/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95%E5%AD%97%E6%AE%B5%E8%BF%87%E9%95%BF/index.html">
+<meta property="og:title" content="xiaocainiaoya&#39;s blog">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2021/04/23/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/Vertx/Vertx%E5%85%A5%E9%97%A8/index.html">
 <meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
-<meta property="og:description" content="数据库索引字段过长​    问题：在业务场景中，某些敏感数据需加密之后保存到数据库，而加密字段刚好又是频繁触发查询的字段。在一次插入数据时引发唯一索引异常。原因是索引长度小于数据库字段长度，在比对数据唯一性时截取了该字段的前面部分长度，导致匹配成功，抛出唯一索引异常。 ​    方案：这种情况下不能随意调整索引的长度，这涉及到全局的修改。故通过新增一个字段保存改加密字段MD5值，并将索引挂在这个新">
+<meta property="og:description" content="Vertx入门一、前言 最近遇到git本地合并不产生merge记录的问题，想找个项目测试下，故在公司私服的gitlab上找之前的一个测试git使用项目(gitlab是后来迁过去的，最早项目组使用svn)，无意中发现有一个工程是使用vertx，简单的看了下代码，感觉使用上和netty有点类似。  二、基本概念Vert.x是Eclipse基金会下面的一个开源项目，Vert.x的基本定位是一个事件驱动的">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-04-13T13:51:58.000Z">
-<meta property="article:modified_time" content="2021-04-14T06:07:44.459Z">
+<meta property="article:published_time" content="2021-04-23T12:24:59.814Z">
+<meta property="article:modified_time" content="2021-04-23T12:57:44.386Z">
 <meta property="article:author" content="xiaocainiaoya">
-<meta property="article:tag" content="数据库">
-<meta property="article:tag" content="问题和方案">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://xiaocainiaoya.github.io/2021/04/13/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95%E5%AD%97%E6%AE%B5%E8%BF%87%E9%95%BF/">
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2021/04/23/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/Vertx/Vertx%E5%85%A5%E9%97%A8/">
 
 
 <script id="page-configurations">
@@ -48,7 +46,7 @@
   };
 </script>
 
-  <title>数据库索引字段过长 | xiaocainiaoya's blog</title>
+  <title> | xiaocainiaoya's blog</title>
   
 
 
@@ -175,7 +173,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95%E5%AD%97%E6%AE%B5%E8%BF%87%E9%95%BF/">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/23/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/Vertx/Vertx%E5%85%A5%E9%97%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -188,7 +186,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          数据库索引字段过长
+          
         </h1>
 
         <div class="post-meta">
@@ -197,28 +195,9 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2021-04-13T21:51:58+08:00">2021-04-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-14 14:07:44" itemprop="dateModified" datetime="2021-04-14T14:07:44+08:00">2021-04-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/" itemprop="url" rel="index"><span itemprop="name">问题和方案</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
+              <time title="创建时间：2021-04-23 20:24:59 / 修改时间：20:57:44" itemprop="dateCreated datePublished" datetime="2021-04-23T20:24:59+08:00">2021-04-23</time>
             </span>
 
           
@@ -239,9 +218,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h5 id="数据库索引字段过长"><a href="#数据库索引字段过长" class="headerlink" title="数据库索引字段过长"></a>数据库索引字段过长</h5><p>​    <strong>问题</strong>：在业务场景中，某些敏感数据需加密之后保存到数据库，而加密字段刚好又是频繁触发查询的字段。在一次插入数据时引发唯一索引异常。原因是索引长度小于数据库字段长度，在比对数据唯一性时截取了该字段的前面部分长度，导致匹配成功，抛出唯一索引异常。</p>
-<p>​    <strong>方案</strong>：这种情况下不能随意调整索引的长度，这涉及到全局的修改。故通过新增一个字段保存改加密字段<code>MD5</code>值，并将索引挂在这个新增字段上，这样既保证了索引的唯一性，又可以不用修改索引长度。</p>
-
+        <h1 id="Vertx入门"><a href="#Vertx入门" class="headerlink" title="Vertx入门"></a>Vertx入门</h1><h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><blockquote>
+<p>最近遇到<code>git</code>本地合并不产生<code>merge</code>记录的问题，想找个项目测试下，故在公司私服的<code>gitlab</code>上找之前的一个测试<code>git</code>使用项目(<code>gitlab</code>是后来迁过去的，最早项目组使用<code>svn</code>)，无意中发现有一个工程是使用<code>vertx</code>，简单的看了下代码，感觉使用上和<code>netty</code>有点类似。</p>
+</blockquote>
+<h2 id="二、基本概念"><a href="#二、基本概念" class="headerlink" title="二、基本概念"></a>二、基本概念</h2><p><code>Vert.x</code>是<code>Eclipse</code>基金会下面的一个开源项目，<code>Vert.x</code>的基本定位是一个事件驱动的编程框架，通过<code>Vert.x</code>使用者可以用相对低的成本就享受到<code>NIO</code>带来的高性能。<code>Vert.x</code>对异步处理和事件驱动做了一些合理抽象，第三方可以基于这些抽象提供扩展组件；<code>Vert.x</code>目前是见过最功能最强大，第三方库依赖最少的<code>Java</code>框架，它只依赖<code>Netty4</code>以及<code>Jacskon</code>，由于基于<code>JVM</code>，所以<code>Vert.x</code>可以用其他语言来实现你的业务。默认官方维护的语言是<code>Groovy</code>，<code>JavaScript</code>以及<code>JRuby</code>。</p>
+<h2 id="三、简单入门"><a href="#三、简单入门" class="headerlink" title="三、简单入门"></a>三、简单入门</h2><h3 id="2-1-组成"><a href="#2-1-组成" class="headerlink" title="2.1 组成"></a>2.1 组成</h3>
     </div>
     <div>
       
@@ -264,7 +245,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://xiaocainiaoya.github.io/2021/04/13/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95%E5%AD%97%E6%AE%B5%E8%BF%87%E9%95%BF/" title="数据库索引字段过长">http://xiaocainiaoya.github.io/2021/04/13/问题和方案/数据库/索引字段过长/</a>
+    <a href="http://xiaocainiaoya.github.io/2021/04/23/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/Vertx/Vertx%E5%85%A5%E9%97%A8/" title="">http://xiaocainiaoya.github.io/2021/04/23/杂七杂八/Vertx/Vertx入门/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -274,20 +255,19 @@
 
 
       <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"><i class="fa fa-tag"></i> 数据库</a>
-              <a href="/tags/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/" rel="tag"><i class="fa fa-tag"></i> 问题和方案</a>
-          </div>
 
         
 
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2021/04/13/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/java/%E7%94%B1%E6%8B%86%E7%AE%B1%E5%BC%95%E5%8F%91bug/" rel="next" title="由拆箱引发NPE">
-      由拆箱引发NPE <i class="fa fa-chevron-right"></i>
+    <a href="/2021/04/20/Spring/%E8%AE%A4%E8%AF%86SpEL/" rel="prev" title="认识SpEL">
+      <i class="fa fa-chevron-left"></i> 认识SpEL
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/24/%E9%A1%B5%E8%84%9A/" rel="next" title="">
+       <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -347,7 +327,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B4%A2%E5%BC%95%E5%AD%97%E6%AE%B5%E8%BF%87%E9%95%BF"><span class="nav-number">1.</span> <span class="nav-text">数据库索引字段过长</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Vertx%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">Vertx入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%89%8D%E8%A8%80"><span class="nav-number">1.1.</span> <span class="nav-text">一、前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.2.</span> <span class="nav-text">二、基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8"><span class="nav-number">1.3.</span> <span class="nav-text">三、简单入门</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E7%BB%84%E6%88%90"><span class="nav-number">1.3.1.</span> <span class="nav-text">2.1 组成</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
