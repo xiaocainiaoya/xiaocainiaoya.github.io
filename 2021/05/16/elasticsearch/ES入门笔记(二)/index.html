@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Elasticsearch入门笔记(二)基本使用1. 数据类型1.1字符串类型1.1.1 text文本数据类型，使用之后该类型字段的值会被分词，生成倒排索引，用于全文检索。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elasticsearch入门笔记(二)">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2021/05/16/elasticsearch/ES%E5%85%A5%E9%97%A8%E7%AC%94%E8%AE%B0(%E4%BA%8C)/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="Elasticsearch入门笔记(二)基本使用1. 数据类型1.1字符串类型1.1.1 text文本数据类型，使用之后该类型字段的值会被分词，生成倒排索引，用于全文检索。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/05/12/TfWvHkzdpNU8nO2.png">
+<meta property="article:published_time" content="2021-05-16T13:51:58.000Z">
+<meta property="article:modified_time" content="2021-05-16T14:18:46.193Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="elasticsearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/05/12/TfWvHkzdpNU8nO2.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2021/05/16/elasticsearch/ES%E5%85%A5%E9%97%A8%E7%AC%94%E8%AE%B0(%E4%BA%8C)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Elasticsearch入门笔记(二) | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/05/16/elasticsearch/ES%E5%85%A5%E9%97%A8%E7%AC%94%E8%AE%B0(%E4%BA%8C)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Elasticsearch入门笔记(二)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-05-16 21:51:58 / 修改时间：22:18:46" itemprop="dateCreated datePublished" datetime="2021-05-16T21:51:58+08:00">2021-05-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticsearch/" itemprop="url" rel="index"><span itemprop="name">elasticsearch</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Elasticsearch入门笔记-二"><a href="#Elasticsearch入门笔记-二" class="headerlink" title="Elasticsearch入门笔记(二)"></a>Elasticsearch入门笔记(二)</h1><h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><h3 id="1-数据类型"><a href="#1-数据类型" class="headerlink" title="1. 数据类型"></a>1. 数据类型</h3><h4 id="1-1字符串类型"><a href="#1-1字符串类型" class="headerlink" title="1.1字符串类型"></a>1.1字符串类型</h4><h5 id="1-1-1-text"><a href="#1-1-1-text" class="headerlink" title="1.1.1 text"></a>1.1.1 text</h5><p>文本数据类型，使用之后该类型字段的值会被分词，生成倒排索引，用于全文检索。</p>
+<span id="more"></span>
+
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;describe&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;analyzer&quot;</span>: <span class="string">&quot;ik_smart&quot;, // 指定分词器</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;text&quot;,         // 设置类型为text</span></span><br><span class="line">        <span class="meta">&quot;fielddata&quot;</span>: <span class="string">true,      // 默认为false，该字段会启用内存空间进行一些排序、聚合操作</span></span><br><span class="line">        <span class="meta">&quot;fields&quot;</span>: <span class="string">&#123;             // 多类型，若某个字段既要满足能被搜索，又要满足能排序、聚合</span></span><br><span class="line">          <span class="meta">&quot;sort&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">            <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;keyword&quot;</span></span><br><span class="line">          <span class="attr">&#125;</span></span><br><span class="line">        <span class="attr">&#125;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="1-1-2-keyword"><a href="#1-1-2-keyword" class="headerlink" title="1.1.2 keyword"></a>1.1.2 keyword</h5><p> 关键字类型，该字段不会被分词，只能按确切的值进行搜索，可以进行排序、聚合、过滤。一般使用在唯一性字段邮箱地址、<code>Mac</code>地址、身份证号之类不需要被分词的字段。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;author&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;ignore_above&quot;</span>: <span class="string">1024, // 指定查询的最大长度，超过则不会进行索引</span></span><br><span class="line">        <span class="meta">&quot;norms&quot;</span>: <span class="string">true         // 在进行查询评分时，是否需要考虑字段长度，默认为false</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="1-2数字类型"><a href="#1-2数字类型" class="headerlink" title="1.2数字类型"></a>1.2数字类型</h4><p>支持<code>long</code>、<code>integer</code>、<code>short</code>、<code>byte</code>、<code>double</code>、<code>float</code>、<code>half_float</code>(半精度浮点数)、<code>scaled_float</code>(带缩放因子浮点数)</p>
+<p>scaled_float 举例：</p>
+<p>在索引时会将原始值*缩放因子后四舍五入得到一个新值，将这个新值作为索引值(查询时返回的还是原值)</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;author&quot;</span>:<span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;keyword&quot;</span></span><br><span class="line">      <span class="attr">&#125;,</span></span><br><span class="line">      <span class="meta">&quot;price&quot;</span>:<span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;scaled_float&quot;,</span></span><br><span class="line">        <span class="meta">&quot;scaling_factor&quot;</span>: <span class="string">100  # 需指定缩放因子</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>添加两条数据</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">book/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;price&quot;</span>: <span class="string">10.1111 # 实际的索引值为1011</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">PUT</span> <span class="string">book/_doc/2</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;price&quot;</span>: <span class="string">11.1111 # 实际的索引值为1111</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>查询语句</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">GET</span> <span class="string">book/_doc/_search</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;query&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;match&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    	<span class="meta">&quot;price&quot;</span>: <span class="string">11.2222 # 11.2222 * 100再四舍五入后的值为1122,匹配不到文档</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="1-3布尔类型"><a href="#1-3布尔类型" class="headerlink" title="1.3布尔类型"></a>1.3布尔类型</h4><p>布尔值，可以识别字符串的布尔值<code>&quot;true&quot;</code>，<code>&quot;false&quot;</code>，<code>true</code>，<code>false</code>。</p>
+<h4 id="1-4日期类型"><a href="#1-4日期类型" class="headerlink" title="1.4日期类型"></a>1.4日期类型</h4><p>日期类型，由于在<code>json</code>中是没有具体的日期类型的表达，所以可以是日期格式化后的字符串，可以是毫秒数。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;publish_date&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;date&quot;,</span></span><br><span class="line">        <span class="meta">&quot;format&quot;</span>: <span class="string">&quot;yyyy-mm-dd||yyyy/mm/dd||epoch_millis&quot; //指定了三种格式的日期</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">PUT</span> <span class="string">library/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;describe&quot;</span>: <span class="string">&quot;aaa&quot;,</span></span><br><span class="line">  <span class="meta">&quot;publish_date&quot;</span>: <span class="string">&quot;2021-11-14&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加失败，日期格式不对</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">library/_doc/2</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;describe&quot;</span>: <span class="string">&quot;aaa&quot;,</span></span><br><span class="line">  <span class="meta">&quot;publish_date&quot;</span>: <span class="string">&quot;2021-11-14 14:20:20&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="1-5范围类型"><a href="#1-5范围类型" class="headerlink" title="1.5范围类型"></a>1.5范围类型</h4><p>范围类型，表示一个区间，若指定该类型，字段值为一个对象。需使用到<code>gt</code>、<code>gle</code>、<code>lt</code>、<code>lte</code>等逻辑标识符表示。<code>integer_range</code>，<code>long_range</code>，<code>float_range</code>，<code>double_range</code>，<code>date_range</code>，<code>ip_range</code>(ip地址的范围)。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;price&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;integer_range&quot;</span></span><br><span class="line">      <span class="attr">&#125;,</span></span><br><span class="line">      <span class="meta">&quot;my_date&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;date_range&quot;,</span></span><br><span class="line">        <span class="meta">&quot;format&quot;</span>: <span class="string">&quot;yyyy-mm-dd&quot;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">PUT</span> <span class="string">library/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;price&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;gt&quot;</span>: <span class="string">1,</span></span><br><span class="line">    <span class="meta">&quot;lt&quot;</span>: <span class="string">10</span></span><br><span class="line">  <span class="attr">&#125;,</span></span><br><span class="line">  <span class="meta">&quot;my_date&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;gte&quot;</span>: <span class="string">&quot;2021-01-21&quot;,</span></span><br><span class="line">    <span class="meta">&quot;lte&quot;</span>: <span class="string">&quot;2021-05-22&quot;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="1-6地理类型"><a href="#1-6地理类型" class="headerlink" title="1.6地理类型"></a>1.6地理类型</h4><h5 id="1-6-1-geo-point"><a href="#1-6-1-geo-point" class="headerlink" title="1.6.1 geo_point"></a>1.6.1 geo_point</h5><p>表示一个坐标点。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建点结构</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;location&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;geo_point&quot;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 1.通过对象指定经纬度</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;location&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;lat&quot;</span>: <span class="string">30,</span></span><br><span class="line">    <span class="meta">&quot;lon&quot;</span>: <span class="string">108</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2.通过字符串“经度,维度”指定</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;location&quot;</span>: <span class="string">&quot;30,108&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3.通过geohash指定</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;location&quot;</span>: <span class="string">&quot;wmkf9t74wmkf&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 4.通过数组[维度, 经度]指定</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;location&quot;</span>: <span class="string">[108, 30]</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">GET</span> <span class="string">map/_doc/1</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="1-6-2-geo-shape"><a href="#1-6-2-geo-shape" class="headerlink" title="1.6.2 geo_shape"></a>1.6.2 geo_shape</h5><p>地理形状数据类型，使用<code>geoJson</code>表示。</p>
+<table>
+<thead>
+<tr>
+<th>geoJson</th>
+<th>ElasticSearch Type</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Point</td>
+<td>point</td>
+<td>单个地理坐标</td>
+</tr>
+<tr>
+<td>LineString</td>
+<td>lineString</td>
+<td>两点或多点组成任意线</td>
+</tr>
+<tr>
+<td>Polygon</td>
+<td>polygon</td>
+<td>一个闭合的多边形，其第一个点和最后一个点必须匹配。因此需要n+1个顶点来创建一个n边多边形，且最少4个顶点(构成三角形)</td>
+</tr>
+<tr>
+<td>MultiPoint</td>
+<td>multipoint</td>
+<td>一组未连接但可能相关的点</td>
+</tr>
+<tr>
+<td>MultiLineString</td>
+<td>multilinestring</td>
+<td>一组独立的线</td>
+</tr>
+<tr>
+<td>MultiPolygon</td>
+<td>multipolygon</td>
+<td>一组独立的多边形</td>
+</tr>
+<tr>
+<td>N/A</td>
+<td>envelope</td>
+<td>通过仅指定左上角和右下角构成的边界矩形</td>
+</tr>
+<tr>
+<td>N/A</td>
+<td>circle</td>
+<td>由中心点和半径指定的圆，默认单位为m</td>
+</tr>
+</tbody></table>
+<p><strong>例子</strong></p>
+<blockquote>
+<p>在线制作geojson -&gt; <a target="_blank" rel="noopener" href="http://geojson.io/">http://geojson.io/</a></p>
+</blockquote>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. point 单坐标,由[维度, 经度]组成</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;location&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;point&quot;,</span></span><br><span class="line">    <span class="meta">&quot;coordinates&quot;</span>: <span class="string">[108, 30]</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. lineString 地理线</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;location&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">  <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;lineString&quot;,</span></span><br><span class="line">  <span class="meta">&quot;coordinates&quot;</span>: <span class="string">[</span></span><br><span class="line">    <span class="meta">[108,</span> <span class="string">30],</span></span><br><span class="line">    <span class="meta">[120,</span> <span class="string">30]</span></span><br><span class="line">  <span class="attr">]</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. polygon 闭合多边形，首位需要一致</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;location&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;polygon&quot;,</span></span><br><span class="line">    <span class="meta">&quot;coordinates&quot;</span>: <span class="string">[</span></span><br><span class="line">      <span class="attr">[</span></span><br><span class="line">      	<span class="meta">[108,</span> <span class="string">30],[120, 30],[120, 90],[108, 90],[108, 30]</span></span><br><span class="line">      <span class="attr">]</span></span><br><span class="line">    <span class="attr">]</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 第一个数组表示多边形外边界，第二个数组表示内边界</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;location&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;polygon&quot;,</span></span><br><span class="line">    <span class="meta">&quot;coordinates&quot;</span>: <span class="string">[</span></span><br><span class="line">      <span class="attr">[[106,28],[117,28],[117,34],[106,34],[106,28]],</span></span><br><span class="line">      <span class="attr">[[108,29],[115,29],[115,33],[108,33],[108,29]]</span></span><br><span class="line">    <span class="attr">]</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="comment"># 4. multiPoint 多个点</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;location&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;multiPoint&quot;,</span></span><br><span class="line">    <span class="meta">&quot;coordinates&quot;</span>: <span class="string">[</span></span><br><span class="line">    	<span class="meta">[108,</span> <span class="string">30], [108, 31]</span></span><br><span class="line">    <span class="attr">]</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 5. multilinestring 多条线</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;location&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;multilinestring&quot;,</span></span><br><span class="line">    <span class="meta">&quot;coordinates&quot;</span>: <span class="string">[</span></span><br><span class="line">      <span class="meta">[[108,</span> <span class="string">30],[120, 30]],</span></span><br><span class="line">      <span class="meta">[[109,</span> <span class="string">30],[121, 30]],</span></span><br><span class="line">      <span class="meta">[[110,</span> <span class="string">30],[122, 30]]</span></span><br><span class="line">    <span class="attr">]</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 6. multiPolygon 多个多边形</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;location&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;multipolygon&quot;,</span></span><br><span class="line">    <span class="meta">&quot;coordinates&quot;</span>: <span class="string">[</span></span><br><span class="line">      <span class="attr">[</span></span><br><span class="line">      	<span class="meta">[[108,</span> <span class="string">30],[120, 30],[120, 90],[108, 90],[108, 30]]</span></span><br><span class="line">      <span class="attr">],</span></span><br><span class="line">      <span class="attr">[</span></span><br><span class="line">        <span class="attr">[[106,28],[117,28],[117,34],[106,34],[106,28]],</span></span><br><span class="line">        <span class="attr">[[108,29],[115,29],[115,33],[108,33],[108,29]]</span></span><br><span class="line">      <span class="attr">]</span></span><br><span class="line">    <span class="attr">]</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 7.envelope，指定形状的左上角和右下角的坐标，以表示边界矩形：</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line">  <span class="attr">&#123;</span></span><br><span class="line">    <span class="meta">&quot;location&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;envelope&quot;,</span></span><br><span class="line">      <span class="meta">&quot;coordinates&quot;</span>: <span class="string">[</span></span><br><span class="line">     	 <span class="attr">[110,39],[114,37]</span></span><br><span class="line">      <span class="attr">]</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="comment"># 8. circle，添加一个圆，指定半径和中心点坐标</span></span><br><span class="line"><span class="comment"># 好像6版本之后不支持circle了，插入报错 circle geometry is not supported</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">map/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;location&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;circle&quot;,</span></span><br><span class="line">    <span class="meta">&quot;coordinates&quot;</span>: <span class="string">[110, 39],</span></span><br><span class="line">    <span class="meta">&quot;radius&quot;</span>: <span class="string">&quot;100km&quot;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="1-7特殊类型"><a href="#1-7特殊类型" class="headerlink" title="1.7特殊类型"></a>1.7特殊类型</h4><h5 id="1-7-1-IP类型"><a href="#1-7-1-IP类型" class="headerlink" title="1.7.1 IP类型"></a>1.7.1 IP类型</h5><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;ipAddress&quot;</span>:<span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;ip&quot;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">PUT</span> <span class="string">library/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;address&quot;</span>:<span class="string">&quot;192.168.1.1&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="comment"># 可以通过网段搜索</span></span><br><span class="line"><span class="attr">GET</span> <span class="string">library/_search</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;query&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;term&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;ipAddress&quot;</span>: <span class="string">&quot;192.168.0.0/16&quot;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="1-8复合类型"><a href="#1-8复合类型" class="headerlink" title="1.8复合类型"></a>1.8复合类型</h4><h5 id="1-8-1数组"><a href="#1-8-1数组" class="headerlink" title="1.8.1数组"></a>1.8.1数组</h5><p>默认情况下任何字段都可以包含一个或多个值，当包含多个值时，就表示是一个数组，唯一要求是数组中的每个值的类型一致，不指定的情况下，以第一个值的类型为准。</p>
+<h5 id="1-8-2对象类型"><a href="#1-8-2对象类型" class="headerlink" title="1.8.2对象类型"></a>1.8.2对象类型</h5><p>一个文档的一个属性可以是一个对象，这个对象的某一个属性可以在包含一个对象。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;tom&quot;,</span></span><br><span class="line">  <span class="meta">&quot;class&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;一班&quot;,</span></span><br><span class="line">    <span class="meta">&quot;location&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;province&quot;</span>: <span class="string">&quot;福建省&quot;,</span></span><br><span class="line">      <span class="meta">&quot;city&quot;</span>: <span class="string">&quot;福州市&quot;,</span></span><br><span class="line">      <span class="meta">&quot;county&quot;</span>: <span class="string">&quot;闽侯县&quot;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="1-8-3嵌套类型"><a href="#1-8-3嵌套类型" class="headerlink" title="1.8.3嵌套类型"></a>1.8.3嵌套类型</h5><p><code>nested</code>类型。若文档的属性是一个对象数组。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">user/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;address&quot;</span>: <span class="string">[</span></span><br><span class="line">  <span class="attr">&#123;</span></span><br><span class="line">    <span class="meta">&quot;id&quot;</span>: <span class="string">1,</span></span><br><span class="line">    <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;福建&quot;</span></span><br><span class="line">  <span class="attr">&#125;,</span></span><br><span class="line">  <span class="attr">&#123;</span></span><br><span class="line">    <span class="meta">&quot;id&quot;</span>: <span class="string">2,</span></span><br><span class="line">    <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;北京&quot;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">]</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>以上例子，若使用对象类型保存，由于<code>luncene</code>没有内部对象的概念，所以<code>es</code>会将以上数据扁平化为简单的字段和值列表。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;address.id&quot;</span>: <span class="string">[1, 2],</span></span><br><span class="line">  <span class="meta">&quot;address.name&quot;</span>: <span class="string">[&quot;福建&quot;, &quot;北京&quot;]</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>这时若查询语句为查找<code>id=2,name=&quot;福建&quot;</code>也会被查询到。使用<code>nested</code>类型之后，将数组中的每一个对象作为独立文档来索引。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="attr">&#123;</span></span><br><span class="line">    <span class="meta">&quot;address.id&quot;</span>: <span class="string">1,</span></span><br><span class="line">    <span class="meta">&quot;address.name&quot;</span>: <span class="string">&quot;福建&quot;</span></span><br><span class="line">  <span class="attr">&#125;,</span></span><br><span class="line">  <span class="attr">&#123;</span></span><br><span class="line">    <span class="meta">&quot;address.id&quot;</span>: <span class="string">2,</span></span><br><span class="line">    <span class="meta">&quot;address.name&quot;</span>: <span class="string">&quot;北京&quot;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-索引操作"><a href="#2-索引操作" class="headerlink" title="2.索引操作"></a>2.索引操作</h3><h4 id="2-1创建索引"><a href="#2-1创建索引" class="headerlink" title="2.1创建索引"></a>2.1创建索引</h4><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2021/05/12/TfWvHkzdpNU8nO2.png"></p>
+<h4 id="2-2删除索引"><a href="#2-2删除索引" class="headerlink" title="2.2删除索引"></a>2.2删除索引</h4><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">DELETE</span> <span class="string">library</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3修改索引"><a href="#2-3修改索引" class="headerlink" title="2.3修改索引"></a>2.3修改索引</h4><p>可以修改索引的属性<code>Settings</code>，比如索引的分片数、副本数、路由、读写权限等。</p>
+<p><strong>修改索引分片数和副本数都为2</strong></p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;settings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;number_of_shards&quot;</span>: <span class="string">2,</span></span><br><span class="line">    <span class="meta">&quot;number_of_replicas&quot;</span>: <span class="string">2</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-4复制索引"><a href="#2-4复制索引" class="headerlink" title="2.4复制索引"></a>2.4复制索引</h4><p>复制索引时只会复制其中的数据，不会复制<code>setting</code>中的信息</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">POST</span> <span class="string">_reindex</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;source&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;index&quot;</span>: <span class="string">&quot;library&quot;</span></span><br><span class="line">  <span class="attr">&#125;,</span></span><br><span class="line">  <span class="meta">&quot;dest&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;index&quot;</span>: <span class="string">&quot;library2&quot;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-5-索引别名"><a href="#2-5-索引别名" class="headerlink" title="2.5 索引别名"></a>2.5 索引别名</h4><p>索引别名可以指向一个或者多个索引，也就是说多个索引可以共用一个别名。比如<code>library_log_20210514</code>和<code>library_log_20210515</code>两个索引都对它们设置索引别名为<code>library_log</code>。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">POST</span> <span class="string">_aliases</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;actions&quot;</span>: <span class="string">[</span></span><br><span class="line">    <span class="attr">&#123;</span></span><br><span class="line">      <span class="meta">&quot;add&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;index&quot;</span>: <span class="string">&quot;library_log_20210514&quot;,</span></span><br><span class="line">        <span class="meta">&quot;alias&quot;</span>: <span class="string">&quot;library_log&quot;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;,</span></span><br><span class="line">    <span class="attr">&#123;</span></span><br><span class="line">      <span class="meta">&quot;add&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;index&quot;</span>: <span class="string">&quot;library_log_20210515&quot;,</span></span><br><span class="line">        <span class="meta">&quot;alias&quot;</span>: <span class="string">&quot;library_log&quot;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">]</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置之后就可以通过一个名称来进行全文检索</span></span><br><span class="line"><span class="attr">GET</span> <span class="string">library_log/_search</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>通过别名创建视图</strong>，为<code>library</code>中作者是<code>tom</code>创建一个视图。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">POST</span> <span class="string">_aliases</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;actions&quot;</span>: <span class="string">[</span></span><br><span class="line">    <span class="attr">&#123;</span></span><br><span class="line">      <span class="meta">&quot;add&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;index&quot;</span>: <span class="string">&quot;library&quot;,</span></span><br><span class="line">        <span class="meta">&quot;alias&quot;</span>: <span class="string">&quot;library_alias&quot;,</span></span><br><span class="line">        <span class="meta">&quot;filter&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">          <span class="meta">&quot;term&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">            <span class="meta">&quot;author&quot;</span>: <span class="string">&quot;tom&quot;</span></span><br><span class="line">          <span class="attr">&#125;</span></span><br><span class="line">        <span class="attr">&#125;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">]</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>索引别名其实类似关系数据库中视图的概念，只提供读操作，不能进行写操作。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 获取所有别名</span></span><br><span class="line"><span class="attr">GET</span>  <span class="string">_cat/aliases</span></span><br></pre></td></tr></table></figure>
+
+<p>在真是环境中，索引的设计不可能呢一步到位，随着需求、业务的扩展，可能会修改索引的<code>mapping</code>的字段类型、或者是<code>setting</code>中的配置信息，若简单采用<code>reindex</code>操作，在实施运维操作更新这段时间内，有可能导致数据不可访问，所以可以通过指定别名的方式进行索引迁移。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 创建新索引结构</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">library_new</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line"> <span class="meta">...</span> <span class="string">// 索引结构等等</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 使用reindex进行索引数据迁移</span></span><br><span class="line"><span class="attr">POST</span>  <span class="string">_reindex</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;source&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;index&quot;</span>: <span class="string">&quot;library&quot;</span></span><br><span class="line">  <span class="attr">&#125;,</span></span><br><span class="line">  <span class="meta">&quot;dest&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;index&quot;</span>: <span class="string">&quot;library_new&quot;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 最后在修改索引别名</span></span><br><span class="line"><span class="attr">POST</span> <span class="string">_aliases?pretty</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">	<span class="attr">&quot;actions&quot;&quot;[</span></span><br><span class="line">    <span class="attr">&#123;</span></span><br><span class="line">      <span class="meta">&quot;remove&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;index&quot;</span>: <span class="string">&quot;library&quot;,</span></span><br><span class="line">        <span class="meta">&quot;alias&quot;</span>: <span class="string">&quot;library&quot;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;,</span></span><br><span class="line">    <span class="attr">&#123;</span></span><br><span class="line">      <span class="meta">&quot;add&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;index&quot;</span>: <span class="string">&quot;library_new&quot;,</span></span><br><span class="line">        <span class="meta">&quot;alias&quot;</span>: <span class="string">&quot;library&quot;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">	<span class="attr">]</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-6关闭-开启索引"><a href="#2-6关闭-开启索引" class="headerlink" title="2.6关闭/开启索引"></a>2.6关闭/开启索引</h4><p>索引关闭后只能获取索引的<code>setting</code>信息，不能进行读写。</p>
+<p>关闭索引：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">POST</span> <span class="string">book/_close</span></span><br></pre></td></tr></table></figure>
+
+<p>打开索引：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">POST</span> <span class="string">book/_open</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-文档操作"><a href="#3-文档操作" class="headerlink" title="3.文档操作"></a>3.文档操作</h3><h4 id="3-1新增文档"><a href="#3-1新增文档" class="headerlink" title="3.1新增文档"></a>3.1新增文档</h4><p><code>6.*</code>版本之后一个索引只允许一个类型，所以路径上固定<code>索引名/_doc/id(可选)</code>，可以指定<code>id</code>，不指定会自动生成。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 指定id</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">library/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;c++入门&quot;,</span></span><br><span class="line">  <span class="meta">&quot;author&quot;</span>: <span class="string">&quot;tom&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 不指定id，由es生成</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">library/_doc</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;c入门&quot;,</span></span><br><span class="line">  <span class="meta">&quot;author&quot;</span>: <span class="string">&quot;marry&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>返回参数解析，其中<code>_shards</code>节点中<code>total</code>为2但是只有一个分片成功的原因是，我的环境是单机单节点，但是刚刚设置的时候又设置了两个分片，其实这种设置是不符合逻辑的。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;_index&quot;</span> : <span class="string">&quot;library&quot;,  // 对应的索引</span></span><br><span class="line">  <span class="meta">&quot;_type&quot;</span> : <span class="string">&quot;_doc&quot;,			 // 文档类型</span></span><br><span class="line">  <span class="meta">&quot;_id&quot;</span> : <span class="string">&quot;1&quot;,					 // 创建的文档id</span></span><br><span class="line">  <span class="meta">&quot;_version&quot;</span> : <span class="string">2,				 // 文档版本</span></span><br><span class="line">  <span class="meta">&quot;result&quot;</span> : <span class="string">&quot;created&quot;,  // 操作状态，有created、updated </span></span><br><span class="line">  <span class="meta">&quot;_shards&quot;</span> : <span class="string">&#123;          // 分片上的执行状态</span></span><br><span class="line">    <span class="meta">&quot;total&quot;</span> : <span class="string">2,				 // 分片数量</span></span><br><span class="line">    <span class="meta">&quot;successful&quot;</span> : <span class="string">1,    // 执行成功分片数量</span></span><br><span class="line">    <span class="meta">&quot;failed&quot;</span> : <span class="string">0         // 执行失败分片数量</span></span><br><span class="line">  <span class="attr">&#125;,</span></span><br><span class="line">  <span class="meta">&quot;_seq_no&quot;</span> : <span class="string">2,         // 索引写操作版本</span></span><br><span class="line">  <span class="meta">&quot;_primary_term&quot;</span> : <span class="string">1    // 文档所在分片</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>​    在<code>6.7</code>之前使用<code>_version</code>来做并发控制，每一个文档都维护各自的<code>_version</code>字段，每次多这个文档的写操作都会自增这个字段，当写操作之后<code>_version</code>字段进行自增后小于存储中的<code>_version</code>时，写操作所提交的内容会被拒绝。</p>
+<p>​    在<code>6.7</code>之后使用<code>_seq_no</code>和<code>_primary_term</code>来做并发控制，<code>seq_no</code>类似于<code>_version</code>字段，但是它的生命周期是整个索引，而<code>_version</code>的生命周期是某一个文档。</p>
+<h4 id="3-2修改文档"><a href="#3-2修改文档" class="headerlink" title="3.2修改文档"></a>3.2修改文档</h4><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 指定id进行更新，这种更新会覆盖旧文档</span></span><br><span class="line"><span class="comment"># 原文档有name和author字段，经过以下更新后只剩name字段</span></span><br><span class="line"><span class="attr">PUT</span> <span class="string">library/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;c++入门&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"><span class="comment"># 更新指定字段</span></span><br><span class="line"><span class="attr">POST</span> <span class="string">library/_update/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;script&quot;</span>:<span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;lang&quot;</span>: <span class="string">&quot;painless&quot;,</span></span><br><span class="line"><span class="comment">    # 设置name为参数params中的name</span></span><br><span class="line">    <span class="meta">&quot;source&quot;</span>: <span class="string">&quot;ctx._source.name=params.name&quot;,</span></span><br><span class="line">    <span class="meta">&quot;params&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;java入门&quot;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>更新指定文档通过脚本的方式更新，<code>ctx</code>可以获取到上下对象，即通过<code>GET library/_doc/1</code>获取到的数据。上下文对象中的<code>_source</code>节点就是存储的数据。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;_index&quot;</span> : <span class="string">&quot;library&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;_type&quot;</span> : <span class="string">&quot;_doc&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;_id&quot;</span> : <span class="string">&quot;1&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;_version&quot;</span> : <span class="number">5</span>,</span><br><span class="line">  <span class="attr">&quot;_seq_no&quot;</span> : <span class="number">5</span>,</span><br><span class="line">  <span class="attr">&quot;_primary_term&quot;</span> : <span class="number">1</span>,</span><br><span class="line">  <span class="attr">&quot;found&quot;</span> : <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">&quot;_source&quot;</span> : &#123;</span><br><span class="line">    <span class="attr">&quot;name&quot;</span> : <span class="string">&quot;java入门&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也可以通过条件进行更新操作。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">POST</span> <span class="string">library/_update_by_query</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;script&quot;</span>:<span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;lang&quot;</span>: <span class="string">&quot;painless&quot;,</span></span><br><span class="line">    <span class="meta">&quot;source&quot;</span>: <span class="string">&quot;ctx._source.name=params.name&quot;,</span></span><br><span class="line">    <span class="meta">&quot;params&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;java入门&quot;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;,</span></span><br><span class="line">  <span class="meta">&quot;query&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;term&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;c++&quot;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-3删除文档"><a href="#3-3删除文档" class="headerlink" title="3.3删除文档"></a>3.3删除文档</h4><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 指定文档</span></span><br><span class="line"><span class="attr">DELETE</span> <span class="string">library/_doc/1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据查询条件删除</span></span><br><span class="line"><span class="attr">POST</span> <span class="string">library/_delete_by_query</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;query&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;term&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;name&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;value&quot;</span>: <span class="string">&quot;java&quot;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-4批量操作"><a href="#3-4批量操作" class="headerlink" title="3.4批量操作"></a>3.4批量操作</h4><p>在<code>es</code>中通过<code>Bluk api</code>来执行批量操作。</p>
+<p>1.可以通过<code>Kibana</code>来访问<code>Bluk</code>接口。批量操作的数据语法为一行操作(<code>auction</code>)，一行数据。</p>
+<p>2.也可以通过请求直接执行。</p>
+<blockquote>
+<p>curl -XPOST “<a target="_blank" rel="noopener" href="http://localhost:9200/library/_bulk&quot;">http://localhost:9200/library/_bulk&quot;</a> -H “content-type:application/json” –data-binary @es-pipeline.json</p>
+</blockquote>
+<p><strong>注意：</strong>结尾要空出一行。</p>
+<p>否则会报错:</p>
+<blockquote>
+<p>{“error”:{“root_cause”:[{“type”:”illegal_argument_exception”,”reason”:”The bulk request must be terminated by a newline [\n]”}],”type”:”illegal_argument_exception”,”reason”:”The bulk request must be terminated by a newline [\n]”},”status”:400}%</p>
+</blockquote>
+<p><strong>注意：</strong>执行时需要添加<code>-H &quot;content-type:application/json&quot;</code></p>
+<p>否则会报错</p>
+<blockquote>
+<p>{“error”:”Content-Type header [application/x-www-form-urlencoded] is not supported”,”status”:406}%</p>
+</blockquote>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">POST</span> <span class="string">_bulk</span></span><br><span class="line"><span class="meta">&#123;&quot;index&quot;</span>: <span class="string">&#123;&quot;_index&quot;: &quot;library&quot;, &quot;_id&quot;: &quot;1&quot;&#125;&#125;</span></span><br><span class="line"><span class="meta">&#123;&quot;name&quot;</span>: <span class="string">&quot;c++入门&quot;&#125;</span></span><br><span class="line"><span class="meta">&#123;&quot;index&quot;</span>: <span class="string">&#123;&quot;_index&quot;: &quot;library&quot;, &quot;_id&quot;: &quot;2&quot;&#125;&#125;</span></span><br><span class="line"><span class="meta">&#123;&quot;name&quot;</span>: <span class="string">&quot;java入门&quot;&#125;</span></span><br><span class="line"><span class="meta">&#123;&quot;index&quot;</span>: <span class="string">&#123;&quot;_index&quot;: &quot;library&quot;, &quot;_id&quot;: &quot;3&quot;&#125;&#125;</span></span><br><span class="line"><span class="meta">&#123;&quot;name&quot;</span>: <span class="string">&quot;pyton入门&quot;&#125;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-5查询文档"><a href="#3-5查询文档" class="headerlink" title="3.5查询文档"></a>3.5查询文档</h4><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 通过id获取文档</span></span><br><span class="line"><span class="attr">GET</span> <span class="string">library/_doc/1</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-6-数据迁移"><a href="#3-6-数据迁移" class="headerlink" title="3.6 数据迁移"></a>3.6 数据迁移</h4><p>​    在别名那里顺便提了<code>reindex</code>，通过该关键字进行索引间的数据拷贝，只拷贝数据，不拷贝<code>mapping</code>和<code>setting</code>信息。</p>
+<h3 id="4-关键字"><a href="#4-关键字" class="headerlink" title="4. 关键字"></a>4. 关键字</h3><h5 id="4-1-analyzer-search-analyzer"><a href="#4-1-analyzer-search-analyzer" class="headerlink" title="4.1 analyzer/search_analyzer"></a>4.1 analyzer/search_analyzer</h5><p>通过<code>analyzer</code>指定分词器，在查询时若没有通过<code>search_analyzer</code>指定分词器，默认使用该索引的<code>analyzer</code>分词器来进行分词。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;decr&quot;</span>:<span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>:<span class="string">&quot;text&quot;,</span></span><br><span class="line">        <span class="meta">&quot;analyzer&quot;</span>: <span class="string">&quot;ik_smart&quot;  // 指定分词器</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="4-2-normailizer"><a href="#4-2-normailizer" class="headerlink" title="4.2 normailizer"></a>4.2 normailizer</h5><p>预处理，在查询前进行数据预处理。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;settings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;analysis&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;normalizer&quot;</span>: <span class="string">&#123;               // 创建一个预处理</span></span><br><span class="line">        <span class="meta">&quot;lowerNor&quot;</span>: <span class="string">&#123;               // 创建一个名为lowerNor的预处理器</span></span><br><span class="line">          <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;custom&quot;,         // 类型为自定义</span></span><br><span class="line">          <span class="meta">&quot;filter&quot;</span>: <span class="string">[&quot;lowercase&quot;]   // 过滤器:大小写转换</span></span><br><span class="line">        <span class="attr">&#125;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;,</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;name&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;keyword&quot;, </span></span><br><span class="line">        <span class="meta">&quot;normalizer&quot;</span>: <span class="string">&quot;lowerNor&quot;</span></span><br><span class="line">      <span class="attr">&#125;,</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="4-3-coerce"><a href="#4-3-coerce" class="headerlink" title="4.3 coerce"></a>4.3 coerce</h5><p>设置不进行类型转换。默认情况下，若指定字段类型为<code>integer</code>，插入数据时若插入为字符串<code>&quot;10&quot;</code>，也会插入成功。若不需要该类型自动转换，则标记该字段为<code>false</code></p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">user</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;id&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;,</span></span><br><span class="line">        <span class="meta">&quot;coerce&quot;</span>: <span class="string">false</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="4-4-enabled-index"><a href="#4-4-enabled-index" class="headerlink" title="4.4 enabled/index"></a>4.4 enabled/index</h5><p><code>enabled</code>表示若某字段仅存储，不需要进行全文检索。默认为<code>true</code>表示需要进行检索。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">user</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;name&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;enabled&quot;</span>: <span class="string">true</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">PUT</span> <span class="string">user/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;tom&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询结果为空</span></span><br><span class="line"><span class="attr">GET</span> <span class="string">library/_search</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;query&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;term&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;tom&quot;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>index</code>指定一个字段是否被索引。<code>true</code>表示字段会被索引。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;publish_date&quot;</span>:<span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;date&quot;,</span></span><br><span class="line">        <span class="meta">&quot;index&quot;</span>: <span class="string">false</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">PUT</span> <span class="string">library/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;publish_date&quot;</span>: <span class="string">&quot;2020&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 直接报错 </span></span><br><span class="line"><span class="comment"># failed to create query: Cannot search on field [publish_date] since it is not indexed.</span></span><br><span class="line"><span class="attr">GET</span> <span class="string">library/_search</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;query&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;term&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;publish_date&quot;</span>: <span class="string">&quot;2020&quot;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="4-5-ignore-above"><a href="#4-5-ignore-above" class="headerlink" title="4.5 ignore_above"></a>4.5 ignore_above</h5><p>用于<code>keyword</code>类型，表示指定分词和索引字符串的最大长度，超过该长度将不会被索引。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;author&quot;</span>:<span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;keyword&quot;,</span></span><br><span class="line">        <span class="meta">&quot;ignore_above&quot;</span>: <span class="string">10</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="4-6-ignore-malformed"><a href="#4-6-ignore-malformed" class="headerlink" title="4.6 ignore_malformed"></a>4.6 ignore_malformed</h5><p>忽略不匹配类型数据。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">user</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;name&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;,</span></span><br><span class="line">        <span class="meta">&quot;ignore_malformed&quot;</span>: <span class="string">true // 标记允许</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">PUT</span> <span class="string">user/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;abc&quot;       // 不是integer乐西</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">GET</span> <span class="string">user/_doc/1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 返回结果</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;_index&quot;</span> : <span class="string">&quot;user&quot;,</span></span><br><span class="line">  <span class="meta">&quot;_type&quot;</span> : <span class="string">&quot;_doc&quot;,</span></span><br><span class="line">  <span class="meta">&quot;_id&quot;</span> : <span class="string">&quot;1&quot;,</span></span><br><span class="line">  <span class="meta">&quot;_version&quot;</span> : <span class="string">1,</span></span><br><span class="line">  <span class="meta">&quot;_seq_no&quot;</span> : <span class="string">0,</span></span><br><span class="line">  <span class="meta">&quot;_primary_term&quot;</span> : <span class="string">1,</span></span><br><span class="line">  <span class="meta">&quot;_ignored&quot;</span> : <span class="string">[</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span></span><br><span class="line">  <span class="attr">],</span></span><br><span class="line">  <span class="meta">&quot;found&quot;</span> : <span class="string">true,</span></span><br><span class="line">  <span class="meta">&quot;_source&quot;</span> : <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;name&quot;</span> : <span class="string">&quot;abc&quot;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="4-7-null-value"><a href="#4-7-null-value" class="headerlink" title="4.7 null_value"></a>4.7 null_value</h5><p>在 <code>es </code>中，值为 <code>nul</code> 的字段不索引也不可以被搜索，<code>null_value</code> 可以让值为<code>null </code>的字段显式的可索引、可搜索。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;name&quot;</span>:<span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;keyword&quot;,</span></span><br><span class="line">        <span class="meta">&quot;null_value&quot;</span>: <span class="string">&quot;nameNull&quot;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">PUT</span> <span class="string">library/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;name&quot;</span>: <span class="string">null,</span></span><br><span class="line">  <span class="meta">&quot;author&quot;</span>: <span class="string">&quot;tom&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 通过null_value指定的值来进行查询。</span></span><br><span class="line"><span class="attr">GET</span> <span class="string">users/_search</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;query&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;term&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;name&quot;</span>: <span class="string">&quot;nameNull&quot;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="4-8-fields"><a href="#4-8-fields" class="headerlink" title="4.8 fields"></a>4.8 fields</h5><p><code>fields</code>参数可以让同一字段有多种不同的索引方式</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;describe&quot;</span>:<span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;text&quot;,</span></span><br><span class="line">        <span class="meta">&quot;analyzer&quot;</span>: <span class="string">&quot;ik_smart&quot;, </span></span><br><span class="line">        <span class="meta">&quot;fields&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">          <span class="meta">&quot;raw&quot;</span>:<span class="string">&#123;</span></span><br><span class="line">            <span class="meta">&quot;type&quot;</span>:<span class="string">&quot;keyword&quot;</span></span><br><span class="line">          <span class="attr">&#125;</span></span><br><span class="line">        <span class="attr">&#125;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">PUT</span> <span class="string">library/_doc/1</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;describe&quot;</span>:<span class="string">&quot;这是一本中国人写的书&quot;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">GET</span> <span class="string">library/_search</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;query&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;term&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;describe&quot;</span>: <span class="string">&quot;这是&quot;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">GET</span> <span class="string">library/_search</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;query&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;term&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;describe.raw&quot;</span>: <span class="string">&quot;这是一本中国人写的书&quot;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="4-9-Dynamic-templates"><a href="#4-9-Dynamic-templates" class="headerlink" title="4.9.Dynamic_templates"></a>4.9.Dynamic_templates</h5><p>映射模板，默认情况下，由<code>es</code>根据默认规则对数据进行预判对应的类型，若需要自定义规则，可以使用<code>Dynamic_templates</code>。</p>
+<h5 id="4-10-dynamic"><a href="#4-10-dynamic" class="headerlink" title="4.10 dynamic"></a>4.10 dynamic</h5><p>用于检测新发现的字段。</p>
+<ul>
+<li>true: 默认，新发现的字段添加到映射中。</li>
+<li>false: 必须显示指定新字段</li>
+<li>strict:若检测到新字段，抛出异常。</li>
+</ul>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PUT</span> <span class="string">library</span></span><br><span class="line"><span class="attr">&#123;</span></span><br><span class="line">  <span class="meta">&quot;mappings&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">    <span class="meta">&quot;dynamic&quot;</span>: <span class="string">false,</span></span><br><span class="line">    <span class="meta">&quot;properties&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">      <span class="meta">&quot;username&quot;</span>: <span class="string">&#123;</span></span><br><span class="line">        <span class="meta">&quot;type&quot;</span>: <span class="string">&quot;keyword&quot;</span></span><br><span class="line">      <span class="attr">&#125;</span></span><br><span class="line">    <span class="attr">&#125;</span></span><br><span class="line">  <span class="attr">&#125;</span></span><br><span class="line"><span class="attr">&#125;</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2021/05/16/elasticsearch/ES%E5%85%A5%E9%97%A8%E7%AC%94%E8%AE%B0(%E4%BA%8C)/" title="Elasticsearch入门笔记(二)">http://xiaocainiaoya.github.io/2021/05/16/elasticsearch/ES入门笔记(二)/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/elasticsearch/" rel="tag"><i class="fa fa-tag"></i> elasticsearch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/10/elasticsearch/ES%E5%85%A5%E9%97%A8%E7%AC%94%E8%AE%B0(%E4%B8%80)/" rel="prev" title="Elasticsearch入门笔记(一)">
+      <i class="fa fa-chevron-left"></i> Elasticsearch入门笔记(一)
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Elasticsearch%E5%85%A5%E9%97%A8%E7%AC%94%E8%AE%B0-%E4%BA%8C"><span class="nav-number">1.</span> <span class="nav-text">Elasticsearch入门笔记(二)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">基本使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.</span> <span class="nav-text">1. 数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">1.1字符串类型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-1-1-text"><span class="nav-number">1.1.1.1.1.</span> <span class="nav-text">1.1.1 text</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-1-2-keyword"><span class="nav-number">1.1.1.1.2.</span> <span class="nav-text">1.1.2 keyword</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2%E6%95%B0%E5%AD%97%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">1.2数字类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3%E5%B8%83%E5%B0%94%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">1.3布尔类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4%E6%97%A5%E6%9C%9F%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">1.4日期类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5%E8%8C%83%E5%9B%B4%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.5.</span> <span class="nav-text">1.5范围类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-6%E5%9C%B0%E7%90%86%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.6.</span> <span class="nav-text">1.6地理类型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-6-1-geo-point"><span class="nav-number">1.1.1.6.1.</span> <span class="nav-text">1.6.1 geo_point</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-6-2-geo-shape"><span class="nav-number">1.1.1.6.2.</span> <span class="nav-text">1.6.2 geo_shape</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-7%E7%89%B9%E6%AE%8A%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.7.</span> <span class="nav-text">1.7特殊类型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-7-1-IP%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.7.1.</span> <span class="nav-text">1.7.1 IP类型</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-8%E5%A4%8D%E5%90%88%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.8.</span> <span class="nav-text">1.8复合类型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-8-1%E6%95%B0%E7%BB%84"><span class="nav-number">1.1.1.8.1.</span> <span class="nav-text">1.8.1数组</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-8-2%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.8.2.</span> <span class="nav-text">1.8.2对象类型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-8-3%E5%B5%8C%E5%A5%97%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.8.3.</span> <span class="nav-text">1.8.3嵌套类型</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%B4%A2%E5%BC%95%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.2.</span> <span class="nav-text">2.索引操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1%E5%88%9B%E5%BB%BA%E7%B4%A2%E5%BC%95"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">2.1创建索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2%E5%88%A0%E9%99%A4%E7%B4%A2%E5%BC%95"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">2.2删除索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3%E4%BF%AE%E6%94%B9%E7%B4%A2%E5%BC%95"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">2.3修改索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4%E5%A4%8D%E5%88%B6%E7%B4%A2%E5%BC%95"><span class="nav-number">1.1.2.4.</span> <span class="nav-text">2.4复制索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-%E7%B4%A2%E5%BC%95%E5%88%AB%E5%90%8D"><span class="nav-number">1.1.2.5.</span> <span class="nav-text">2.5 索引别名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6%E5%85%B3%E9%97%AD-%E5%BC%80%E5%90%AF%E7%B4%A2%E5%BC%95"><span class="nav-number">1.1.2.6.</span> <span class="nav-text">2.6关闭&#x2F;开启索引</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%96%87%E6%A1%A3%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.3.</span> <span class="nav-text">3.文档操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1%E6%96%B0%E5%A2%9E%E6%96%87%E6%A1%A3"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">3.1新增文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2%E4%BF%AE%E6%94%B9%E6%96%87%E6%A1%A3"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">3.2修改文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3%E5%88%A0%E9%99%A4%E6%96%87%E6%A1%A3"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">3.3删除文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4%E6%89%B9%E9%87%8F%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.3.4.</span> <span class="nav-text">3.4批量操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5%E6%9F%A5%E8%AF%A2%E6%96%87%E6%A1%A3"><span class="nav-number">1.1.3.5.</span> <span class="nav-text">3.5查询文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-6-%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB"><span class="nav-number">1.1.3.6.</span> <span class="nav-text">3.6 数据迁移</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%85%B3%E9%94%AE%E5%AD%97"><span class="nav-number">1.1.4.</span> <span class="nav-text">4. 关键字</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-1-analyzer-search-analyzer"><span class="nav-number">1.1.4.0.1.</span> <span class="nav-text">4.1 analyzer&#x2F;search_analyzer</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2-normailizer"><span class="nav-number">1.1.4.0.2.</span> <span class="nav-text">4.2 normailizer</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-3-coerce"><span class="nav-number">1.1.4.0.3.</span> <span class="nav-text">4.3 coerce</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-4-enabled-index"><span class="nav-number">1.1.4.0.4.</span> <span class="nav-text">4.4 enabled&#x2F;index</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-5-ignore-above"><span class="nav-number">1.1.4.0.5.</span> <span class="nav-text">4.5 ignore_above</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-6-ignore-malformed"><span class="nav-number">1.1.4.0.6.</span> <span class="nav-text">4.6 ignore_malformed</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-7-null-value"><span class="nav-number">1.1.4.0.7.</span> <span class="nav-text">4.7 null_value</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-8-fields"><span class="nav-number">1.1.4.0.8.</span> <span class="nav-text">4.8 fields</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-9-Dynamic-templates"><span class="nav-number">1.1.4.0.9.</span> <span class="nav-text">4.9.Dynamic_templates</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-10-dynamic"><span class="nav-number">1.1.4.0.10.</span> <span class="nav-text">4.10 dynamic</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
