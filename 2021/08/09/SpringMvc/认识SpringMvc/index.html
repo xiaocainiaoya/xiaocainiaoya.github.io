@@ -29,7 +29,7 @@
 <meta property="og:description" content="认识SpringMvc认识SpringMvc​    SpringMvc是基于spring在web领域进行开发的框架，使得业务开发者无需关心Servlet组件的逻辑处理，让业务开发者仅需要关心业务逻辑的处理。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-08-09T14:46:11.000Z">
-<meta property="article:modified_time" content="2021-08-15T06:55:39.310Z">
+<meta property="article:modified_time" content="2021-08-23T14:53:31.057Z">
 <meta property="article:author" content="xiaocainiaoya">
 <meta property="article:tag" content="java">
 <meta property="article:tag" content="spring">
@@ -196,7 +196,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-08-15 14:55:39" itemprop="dateModified" datetime="2021-08-15T14:55:39+08:00">2021-08-15</time>
+                <time title="修改时间：2021-08-23 22:53:31" itemprop="dateModified" datetime="2021-08-23T22:53:31+08:00">2021-08-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -204,7 +204,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                  <a href="/categories/springmvc/" itemprop="url" rel="index"><span itemprop="name">springmvc</span></a>
                 </span>
             </span>
 
@@ -228,6 +228,8 @@
       
         <h3 id="认识SpringMvc"><a href="#认识SpringMvc" class="headerlink" title="认识SpringMvc"></a>认识SpringMvc</h3><h2 id="认识SpringMvc-1"><a href="#认识SpringMvc-1" class="headerlink" title="认识SpringMvc"></a>认识SpringMvc</h2><p>​    <code>SpringMvc</code>是基于<code>spring</code>在<code>web</code>领域进行开发的框架，使得业务开发者无需关心<code>Servlet</code>组件的逻辑处理，让业务开发者仅需要关心业务逻辑的处理。<span id="more"></span></p>
 <p>​    由于在我较为整体的学习<code>SpringMvc</code>源码时，市面上已经比较倾向于前后端分离的开发模式，已经少有这种传统的<code>jsp</code>的模板结构的模式了。所以基本上只会记录从请求到前端控制器<code>DispatcherServlet</code>以及<code>HandlerMapping</code>、<code>HandlerAdapter</code>等的处理，并不会记录视图解析器等与视图相关内容。</p>
+<!--more-->
+
 <p><strong>以下先简单罗列后续会比较重点介绍的部分。</strong></p>
 <ul>
 <li><code>DispathcerServlet</code>：前端控制器，实际是它就是一个<code>servlet</code>。若你学过最原生的写法，不依赖于任何<code>mvc</code>框架，应该是继承一个<code>HttpServlet</code>后，重写它的<code>service</code>方法，然后再通过请求方式的不同等进行不同的路由跳转或者重定向等操作。实际上<code>DispatcherServlet</code>也以此为主要逻辑，它就是控制请求的分发。</li>
@@ -298,8 +300,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/07/07/Spring/BeanFactoryProcessor/" rel="prev" title="">
-      <i class="fa fa-chevron-left"></i> 
+    <a href="/2021/07/07/Spring/BeanFactoryProcessor/" rel="prev" title="BeanFactoryProcessor">
+      <i class="fa fa-chevron-left"></i> BeanFactoryProcessor
     </a></div>
       <div class="post-nav-item">
     <a href="/2021/08/15/SpringMvc/HandlerMapping/" rel="next" title="HandlerMapping">
@@ -384,7 +386,7 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
