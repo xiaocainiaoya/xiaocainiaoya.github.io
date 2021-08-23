@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="认识SpringMvc认识SpringMvc​    SpringMvc是基于spring在web领域进行开发的框架，使得业务开发者无需关心Servlet组件的逻辑处理，让业务开发者仅需要关心业务逻辑的处理。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="认识SpringMvc">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2021/08/09/SpringMvc/%E8%AE%A4%E8%AF%86SpringMvc/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="认识SpringMvc认识SpringMvc​    SpringMvc是基于spring在web领域进行开发的框架，使得业务开发者无需关心Servlet组件的逻辑处理，让业务开发者仅需要关心业务逻辑的处理。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-08-09T14:46:11.000Z">
+<meta property="article:modified_time" content="2021-08-15T06:55:39.310Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="spring">
+<meta property="article:tag" content="springmvc">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2021/08/09/SpringMvc/%E8%AE%A4%E8%AF%86SpringMvc/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>认识SpringMvc | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/08/09/SpringMvc/%E8%AE%A4%E8%AF%86SpringMvc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          认识SpringMvc
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-08-09 22:46:11" itemprop="dateCreated datePublished" datetime="2021-08-09T22:46:11+08:00">2021-08-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-15 14:55:39" itemprop="dateModified" datetime="2021-08-15T14:55:39+08:00">2021-08-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="认识SpringMvc"><a href="#认识SpringMvc" class="headerlink" title="认识SpringMvc"></a>认识SpringMvc</h3><h2 id="认识SpringMvc-1"><a href="#认识SpringMvc-1" class="headerlink" title="认识SpringMvc"></a>认识SpringMvc</h2><p>​    <code>SpringMvc</code>是基于<code>spring</code>在<code>web</code>领域进行开发的框架，使得业务开发者无需关心<code>Servlet</code>组件的逻辑处理，让业务开发者仅需要关心业务逻辑的处理。<span id="more"></span></p>
+<p>​    由于在我较为整体的学习<code>SpringMvc</code>源码时，市面上已经比较倾向于前后端分离的开发模式，已经少有这种传统的<code>jsp</code>的模板结构的模式了。所以基本上只会记录从请求到前端控制器<code>DispatcherServlet</code>以及<code>HandlerMapping</code>、<code>HandlerAdapter</code>等的处理，并不会记录视图解析器等与视图相关内容。</p>
+<p><strong>以下先简单罗列后续会比较重点介绍的部分。</strong></p>
+<ul>
+<li><code>DispathcerServlet</code>：前端控制器，实际是它就是一个<code>servlet</code>。若你学过最原生的写法，不依赖于任何<code>mvc</code>框架，应该是继承一个<code>HttpServlet</code>后，重写它的<code>service</code>方法，然后再通过请求方式的不同等进行不同的路由跳转或者重定向等操作。实际上<code>DispatcherServlet</code>也以此为主要逻辑，它就是控制请求的分发。</li>
+<li><code>Handler</code>：处理器(具体的业务逻辑)，在项目启动时会将<code>@Controller</code>中的一个个<code>@RequestMapping</code>方法都抽象为这个接口的结构。</li>
+<li><code>HandlerMapping</code>：处理器映射器，当请求来临时，根据请求的<code>url</code>等结构，寻找具体的<code>Handler</code>。</li>
+<li><code>HanderApdater</code>：处理器适配器，会将<code>Handler</code>包装为处理器适配器，从而支持多种类型的处理器，通过它根据适配的结构调用正在的处理器的业务逻辑方法，完成功能处理。</li>
+</ul>
+<h4 id="1-spring、springmvc、springboot间父子容器的问题？"><a href="#1-spring、springmvc、springboot间父子容器的问题？" class="headerlink" title="1. spring、springmvc、springboot间父子容器的问题？"></a>1. <strong>spring、springmvc、springboot间父子容器的问题？</strong></h4><p><strong>对于传统的<code>springmvc</code>项目而言，可以通过<code>web.xml</code>文件配置来配置</strong></p>
+<ol>
+<li><p>仅配置了<code>&lt;servlet&gt;</code>(<code>DispatcherServlet</code>)。这时在启动项目时，在对<code>DispatcherServlet</code>进行初始化时，调用父类<code>FrameworkServlet</code>的<code>initWebApplicationContext</code>方法，在该方法中的设置父容器，是获取不到<code>spring</code>容器的，所以这种情况下整个项目仅有<code>springmvc</code>容器。</p>
+</li>
+<li><p>若配置了<code>&lt;listener&gt;</code>(<code>ContextLoaderListener</code>)和<code>&lt;servlet&gt;</code>(<code>DispatcherServlet</code>)，这时项目启动时，先通过监听器加载<code>spring</code>容器，待完成<code>spring</code>容器加载后，才会通过<code>DispatcherServlet</code>进行<code>springmvc</code>容器的加载。(<strong>为什么在加载<code>spring</code>容器的过程中不会加载<code>DispatcherServlet</code>：</strong>这时<code>spring</code>并不会识别到<code>DispatcherServlet</code>)，在<code>springmvc</code>容器加载时，可以获取到<code>spring</code>容器，并设置为<code>springmvc</code>容器的父容器。</p>
+</li>
+<li><p>仅配置<code>&lt;listener&gt;</code>(<code>ContextLoaderListener</code>)，这种情况就没得说了，如果不加载<code>DispathcerServlet</code>那根本就不是<code>springmvc</code>项目。</p>
+</li>
+</ol>
+<p><strong>注意：</strong>以上第二种情况，需特别注意若是使用中出现事务、或者<code>AOP</code>等处理，需保证父子容器中都有对应的处理。</p>
+<p><strong><code>springboot</code>是如何处理<code>springmvc</code>中的父子容器问题？</strong></p>
+<p>​    我认为<code>springmvc</code>的这种父子容器思想(子容器可以访问父容器，父容器不可访问子容器)，是可以有效的进行框架层级边界的划分，比如<code>service</code>层一般放在<code>spring</code>容器中，而<code>web</code>层(<code>controller/Action</code>)等放在<code>springmvc</code>容器中，所以如果需要跟换<code>web</code>层框架，比如将<code>springmvc</code>更换为<code>struct</code>，仅仅只需要将<code>spring-servlet.xml</code>文件替换为<code>struct</code>的配置文件即可。</p>
+<p>​    在<code>springboot</code>中，并没有延续<code>springmvc</code>的这种父子容器思想，从设计结构来说，<code>DispatcherServlet</code>的父接口中有<code>ApplicationContextAware</code>接口，也就是说，如果在<code>spring</code>容器初始化过程中，将<code>DispatcherServlet</code>识别为<code>bean</code>，那么就会通过后置接口为<code>DispatcherServlet</code>设置容器，所以真正调用<code>DispatcherServlet</code>的初始化方法时，<code>this.webApplicationContext</code>已经通过后置接口赋值，就就不会重新创建一个新的容器，<code>springboot</code>就是通过这种方式，来控制整个上下文仅使用一个容器。</p>
+<h4 id="2-springmvc和servlet之间的关系？"><a href="#2-springmvc和servlet之间的关系？" class="headerlink" title="2. springmvc和servlet之间的关系？"></a>2. springmvc和servlet之间的关系？</h4><p>​    <code>web</code>端开发实际上就是客户端和服务端进行交换数据，而交换数据的过程中不可避免的需要经过建立连接、传输数据、业务逻辑处理、返回数据、关闭连接的过程。而在日常开发过程中，业务开发者并不需要关心整个过程，业务开发者只需要关注业务逻辑处理这一环节。这是因为<code>tomcat</code>处理了这些动作。</p>
+<p>在<code>springmvc</code>中，通过<code>web.xml</code>配置文件来配置<code>DispatcherServlet</code>。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>SpringMVC<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.springframework.web.servlet.DispatcherServlet</span><br><span class="line">	<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">param-value</span>&gt;</span>classpath*:/spring/SpringMVC-servlet.xml<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">load-on-startup</span>&gt;</span>1<span class="tag">&lt;/<span class="name">load-on-startup</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>SpringMVC<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--这里配置说明拦截了所有请求--&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>实际上<code>DispatcherServlet</code>就是一个<code>servlet</code>，这个配置文件配置了<code>DispathcerServlet</code>这个<code>Servlet</code>需要拦截的<code>url</code>地址，显然这个配置的是<code>/</code>，也就是入站的所有地址。也就是说当客户端发起请求时，先进入<code>tomcat</code>，由<code>tomcat</code>为其建立连接后将请求等信息传递给<code>DispatcherServlet</code>这个<code>servlet</code>。由这个<code>DispatcherServlet</code>来处理请求的分发，在<code>SpringMvc</code>中称它为前端控制器。</p>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2021/08/09/SpringMvc/%E8%AE%A4%E8%AF%86SpringMvc/" title="认识SpringMvc">http://xiaocainiaoya.github.io/2021/08/09/SpringMvc/认识SpringMvc/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"><i class="fa fa-tag"></i> java</a>
+              <a href="/tags/spring/" rel="tag"><i class="fa fa-tag"></i> spring</a>
+              <a href="/tags/springmvc/" rel="tag"><i class="fa fa-tag"></i> springmvc</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/07/07/Spring/BeanFactoryProcessor/" rel="prev" title="">
+      <i class="fa fa-chevron-left"></i> 
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/08/15/SpringMvc/HandlerMapping/" rel="next" title="HandlerMapping">
+      HandlerMapping <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A4%E8%AF%86SpringMvc"><span class="nav-number">1.</span> <span class="nav-text">认识SpringMvc</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A4%E8%AF%86SpringMvc-1"><span class="nav-number"></span> <span class="nav-text">认识SpringMvc</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-spring%E3%80%81springmvc%E3%80%81springboot%E9%97%B4%E7%88%B6%E5%AD%90%E5%AE%B9%E5%99%A8%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-number">0.1.</span> <span class="nav-text">1. spring、springmvc、springboot间父子容器的问题？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-springmvc%E5%92%8Cservlet%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB%EF%BC%9F"><span class="nav-number">0.2.</span> <span class="nav-text">2. springmvc和servlet之间的关系？</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">31</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
