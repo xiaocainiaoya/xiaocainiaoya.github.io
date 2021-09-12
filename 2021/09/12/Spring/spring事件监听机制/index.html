@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="spring事件监听机制介绍​    spring事件监听机制实际上就是一个典型的观察者模式，在观察者模式的基础之上进行的抽象和处理。使得开发者可以根据自己的业务特点依附于spring容器进行事件的注册、发布、处理。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring事件监听机制">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2021/09/12/Spring/spring%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E6%9C%BA%E5%88%B6/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="spring事件监听机制介绍​    spring事件监听机制实际上就是一个典型的观察者模式，在观察者模式的基础之上进行的抽象和处理。使得开发者可以根据自己的业务特点依附于spring容器进行事件的注册、发布、处理。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-09-12T05:09:33.000Z">
+<meta property="article:modified_time" content="2021-09-12T06:34:39.142Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2021/09/12/Spring/spring%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E6%9C%BA%E5%88%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>spring事件监听机制 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/09/12/Spring/spring%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E6%9C%BA%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          spring事件监听机制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-09-12 13:09:33 / 修改时间：14:34:39" itemprop="dateCreated datePublished" datetime="2021-09-12T13:09:33+08:00">2021-09-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/srping/" itemprop="url" rel="index"><span itemprop="name">srping</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="spring事件监听机制"><a href="#spring事件监听机制" class="headerlink" title="spring事件监听机制"></a>spring事件监听机制</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>​    <code>spring</code>事件监听机制实际上就是一个典型的观察者模式，在观察者模式的基础之上进行的抽象和处理。使得开发者可以根据自己的业务特点依附于<code>spring</code>容器进行事件的注册、发布、处理。</p>
+<span id="more"></span>
+
+<h2 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h2><p>1.创建一个类继承于顶层事件类<code>ApplicationEvent</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SendNotificationEvent</span> <span class="keyword">extends</span> <span class="title">ApplicationEvent</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> SendNotificationVo sendNotificationVo;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SendNotificationEvent</span><span class="params">(ApplicationContext source, SendNotificationVo sendNotificationVo)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(source);</span><br><span class="line">        <span class="keyword">this</span>.sendNotificationVo = sendNotificationVo;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.监听到对应的事件后的业务处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EventListenerHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@EventListener</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendNotificationEventListener</span><span class="params">(SendNotificationEvent event)</span> </span>&#123;</span><br><span class="line">        SendNotificationVo sendNotificationVo = event.getSendNotificationVo();</span><br><span class="line">        <span class="comment">// 具体的监听到事件之后的业务处理。。</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>3.调用点发送具体的事件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    SendNotificationVo sendNotificationVo = SendNotificationVo.builder()</span><br><span class="line">            .id(<span class="string">&quot;123&quot;</span>)</span><br><span class="line">            .name(<span class="string">&quot;tom&quot;</span>)</span><br><span class="line">            .status(<span class="string">&quot;200&quot;</span>).build();</span><br><span class="line">    SendNotificationEvent event = <span class="keyword">new</span> SendNotificationEvent(springApplicationUtil.applicationContext, sendNotificationVo);</span><br><span class="line">    springApplicationUtil.applicationContext.publishEvent(event);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：</strong>以上就是最简单的<code>spring</code>事件监听的使用。在具体的应用场景中，并不会这么简单的使用，因为若在业务逻辑上需要解耦，大部分还是希望是异步的方式进行事件的处理，然而在默认的情况下，这种模式是同步机制，也就是说待到具体的事件监听处理完成之后，才会继续执行调用点的业务逻辑。</p>
+<h2 id="异步方式"><a href="#异步方式" class="headerlink" title="异步方式"></a>异步方式</h2><h3 id="1-广播器异步"><a href="#1-广播器异步" class="headerlink" title="1.广播器异步"></a>1.广播器异步</h3><p>​    在<code>spring</code>的事件监听机制中已经考虑到异步的情况，所以在事件发送器发送事件时，会判断是否存在广播器，当存在广播器时，会将具体的监听执行逻辑转移到广播器对应的线程池中。来跟踪一下源码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ApplicationEventPublisher</span> </span>&#123;</span><br><span class="line">		</span><br><span class="line">    <span class="function"><span class="keyword">default</span> <span class="keyword">void</span> <span class="title">publishEvent</span><span class="params">(ApplicationEvent event)</span> </span>&#123;</span><br><span class="line">        publishEvent((Object) event);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 具体子类实现接口</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">publishEvent</span><span class="params">(Object event)</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体的实现在<code>AbstractApplicationContext</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">publishEvent</span><span class="params">(Object event)</span> </span>&#123;</span><br><span class="line">    publishEvent(event, <span class="keyword">null</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">publishEvent</span><span class="params">(Object event, <span class="meta">@Nullable</span> ResolvableType eventType)</span> </span>&#123;</span><br><span class="line">    Assert.notNull(event, <span class="string">&quot;Event must not be null&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Decorate event as an ApplicationEvent if necessary</span></span><br><span class="line">    ApplicationEvent applicationEvent;</span><br><span class="line">    <span class="keyword">if</span> (event <span class="keyword">instanceof</span> ApplicationEvent) &#123;</span><br><span class="line">        applicationEvent = (ApplicationEvent) event;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        applicationEvent = <span class="keyword">new</span> PayloadApplicationEvent&lt;&gt;(<span class="keyword">this</span>, event);</span><br><span class="line">        <span class="keyword">if</span> (eventType == <span class="keyword">null</span>) &#123;</span><br><span class="line">            eventType = ((PayloadApplicationEvent&lt;?&gt;) applicationEvent).getResolvableType();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Multicast right now if possible - or lazily once the multicaster is initialized</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.earlyApplicationEvents != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.earlyApplicationEvents.add(applicationEvent);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 获取广播器, 并调用广播器对应的发送事件处理</span></span><br><span class="line">        getApplicationEventMulticaster().multicastEvent(applicationEvent, eventType);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Publish event via parent context as well...</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.parent != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.parent <span class="keyword">instanceof</span> AbstractApplicationContext) &#123;</span><br><span class="line">            ((AbstractApplicationContext) <span class="keyword">this</span>.parent).publishEvent(event, eventType);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">this</span>.parent.publishEvent(event);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>默认仅有一个广播器的实现<code>SimpleApplicationEventMulticaster</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">multicastEvent</span><span class="params">(<span class="keyword">final</span> ApplicationEvent event, <span class="meta">@Nullable</span> ResolvableType eventType)</span> </span>&#123;</span><br><span class="line">    ResolvableType type = (eventType != <span class="keyword">null</span> ? eventType : resolveDefaultEventType(event));</span><br><span class="line">    <span class="comment">// 获取对应的广播器线程池</span></span><br><span class="line">    Executor executor = getTaskExecutor();</span><br><span class="line">    <span class="comment">// 获取这个event对应类型的所有监听器</span></span><br><span class="line">    <span class="keyword">for</span> (ApplicationListener&lt;?&gt; listener : getApplicationListeners(event, type)) &#123;</span><br><span class="line">        <span class="comment">// 若是配置了线程池, 则将监听任务转移到线程池中执行</span></span><br><span class="line">        <span class="keyword">if</span> (executor != <span class="keyword">null</span>) &#123;</span><br><span class="line">            executor.execute(() -&gt; invokeListener(listener, event));</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 若是没有配置线程池, 执行执行监听任务, 所以在默认情况下与具体的业务逻辑是同步执行。</span></span><br><span class="line">            invokeListener(listener, event);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体事件监听的执行逻辑</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">invokeListener</span><span class="params">(ApplicationListener&lt;?&gt; listener, ApplicationEvent event)</span> </span>&#123;</span><br><span class="line">    ErrorHandler errorHandler = getErrorHandler();</span><br><span class="line">    <span class="keyword">if</span> (errorHandler != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 具体执行监听逻辑</span></span><br><span class="line">            doInvokeListener(listener, event);</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Throwable err) &#123;</span><br><span class="line">            errorHandler.handleError(err);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">        doInvokeListener(listener, event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doInvokeListener</span><span class="params">(ApplicationListener listener, ApplicationEvent event)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 实际上就是ApplicationListener的onApplicationEvent方法</span></span><br><span class="line">        listener.onApplicationEvent(event);</span><br><span class="line">    &#125;<span class="keyword">catch</span> (ClassCastException ex) &#123;</span><br><span class="line">        String msg = ex.getMessage();</span><br><span class="line">        <span class="keyword">if</span> (msg == <span class="keyword">null</span> || matchesClassCastMessage(msg, event.getClass())) &#123;</span><br><span class="line">            Log logger = LogFactory.getLog(getClass());</span><br><span class="line">            <span class="keyword">if</span> (logger.isTraceEnabled()) &#123;</span><br><span class="line">                logger.trace(<span class="string">&quot;Non-matching event type for listener: &quot;</span> + listener, ex);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> ex;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>刚刚上面介绍的最简单的使用方式中采用的<code>@EventListener</code>的方式来标记监听器的位置，实际上在初始化这个<code>bean</code>对象时，扫描到<code>@EventListener</code>后会将这个对应的方式转化为<code>ApplicationListenerMethodAdapter</code>类，该类中包含了<code>bean</code>名称、类名称、监听处理<code>method</code>等等，待到接收到事件时，通过反射调用对应的监听处理方法。</p>
+<h3 id="2-Async注解异步"><a href="#2-Async注解异步" class="headerlink" title="2.@Async注解异步"></a>2.@Async注解异步</h3><p>​    虽然在事件发送器中内置了广播器线程池，但是若不进行配置，则它还是同步的方式执行，在它同步执行的基础上，若是利用<code>spring</code>的异步机制，也可以达到异步的效果。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EventListenerHandler</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Async</span></span><br><span class="line">    <span class="meta">@EventListener</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendNotificationEventListener</span><span class="params">(SendNotificationEvent event)</span> </span>&#123;</span><br><span class="line">        SendNotificationVo sendNotificationVo = event.getSendNotificationVo();</span><br><span class="line">        <span class="comment">// 具体的监听到事件之后的业务处理。。</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这种情况下，在<code>spring</code>容器初始化时，扫描到这个<code>bean</code>对象并进行初始化时，会为这个<code>bean</code>创建一个代理类，由这个代理类来执行相应的异步逻辑。</p>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>以上看似已经解决的异步的问题，但是在实际的使用过程中又发现如果事件发送点存在事务管理，就会导致事件中获取不到事件发送点的某些数据。(由于事件监听处理触发时，事件发送点还未提交事务。)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 伪代码, 在事件监听的处理中, 通过id=123可能存在获取不到这条数据的情况</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span>: xiaocainiaoya</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Date</span>: 2021/09/12 13:54:31</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span>:</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    SendNotificationVo sendNotificationVo = SendNotificationVo.builder()</span><br><span class="line">            .id(<span class="string">&quot;123&quot;</span>)</span><br><span class="line">            .name(<span class="string">&quot;tom&quot;</span>)</span><br><span class="line">            .status(<span class="string">&quot;200&quot;</span>).build();</span><br><span class="line">    mapper.insert(sendNotificationVo);</span><br><span class="line">    SendNotificationEvent event = <span class="keyword">new</span> SendNotificationEvent(springApplicationUtil.applicationContext, sendNotificationVo);</span><br><span class="line">    springApplicationUtil.applicationContext.publishEvent(event);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是、但是、但是这种情况<code>spring</code>也考虑到了，<code>spring</code>监听机制中通过使用<code>@TransactionalEventListener</code></p>
+<p>来解决这个问题。<code>@TransactionalEventListener</code>它的元注解为<code>@EventListener</code>，所以本质上也是个<code>@EventListener</code>注解。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target(&#123;ElementType.METHOD, ElementType.ANNOTATION_TYPE&#125;)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="comment">// 元注解</span></span><br><span class="line"><span class="meta">@EventListener</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> TransactionalEventListener &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">      * 事件触发阶段: 比如事务提交之前、事务提交之后等, 默认是在事务提交之后</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">    <span class="function">TransactionPhase <span class="title">phase</span><span class="params">()</span> <span class="keyword">default</span> TransactionPhase.AFTER_COMMIT</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">      * 若调用点无事务管理也触发, 默认情况下若调用点无事务接管, 该监听处理不会触发</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">fallbackExecution</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">      * Alias for &#123;<span class="doctag">@link</span> #classes&#125;.</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">    <span class="meta">@AliasFor(annotation = EventListener.class, attribute = &quot;classes&quot;)</span></span><br><span class="line">    Class&lt;?&gt;[] value() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">      * The event classes that this listener handles.</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">    <span class="meta">@AliasFor(annotation = EventListener.class, attribute = &quot;classes&quot;)</span></span><br><span class="line">    Class&lt;?&gt;[] classes() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">condition</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>刚刚上面说到在<code>spring</code>扫描到对应的监听器处理<code>bean</code>时，会根据方法上标记的注解将监听器转换为对应的处理类。根据不同的两个注解<code>@TransactionalEventListener</code>和<code>EventListener</code>对应两个不同的生成监听类工厂<code>DefaultEventListenerFactory</code>和<code>TransactionalEventListenerFactory</code>，由它们来创建具体的监听处理类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">processBean</span><span class="params">(<span class="keyword">final</span> String beanName, <span class="keyword">final</span> Class&lt;?&gt; targetType)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.nonAnnotatedClasses.contains(targetType) &amp;&amp; AnnotationUtils.isCandidateClass(targetType, EventListener.class) &amp;&amp; !isSpringContainerClass(targetType)) &#123;</span><br><span class="line">        Map&lt;Method, EventListener&gt; annotatedMethods = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 从bean的class对象中找出含有@EventListener注解的方法, 存在Map&lt;Method, EventListener&gt;中</span></span><br><span class="line">            <span class="comment">// @TransactionListener方法也会被匹配, 因为它的元注解是@EventListener</span></span><br><span class="line">            annotatedMethods = MethodIntrospector.selectMethods(targetType,</span><br><span class="line">                    (MethodIntrospector.MetadataLookup&lt;EventListener&gt;) method -&gt;</span><br><span class="line">                            AnnotatedElementUtils.findMergedAnnotation(method, EventListener.class));</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">            <span class="comment">// An unresolvable type in a method signature, probably from a lazy bean - let&#x27;s ignore it.</span></span><br><span class="line">            <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">                logger.debug(<span class="string">&quot;Could not resolve methods for bean with name &#x27;&quot;</span> + beanName + <span class="string">&quot;&#x27;&quot;</span>, ex);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (CollectionUtils.isEmpty(annotatedMethods)) &#123;</span><br><span class="line">            <span class="keyword">this</span>.nonAnnotatedClasses.add(targetType);</span><br><span class="line">            <span class="keyword">if</span> (logger.isTraceEnabled()) &#123;</span><br><span class="line">                logger.trace(<span class="string">&quot;No @EventListener annotations found on bean class: &quot;</span> + targetType.getName());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// Non-empty set of methods</span></span><br><span class="line">            ConfigurableApplicationContext context = <span class="keyword">this</span>.applicationContext;</span><br><span class="line">            Assert.state(context != <span class="keyword">null</span>, <span class="string">&quot;No ApplicationContext set&quot;</span>);</span><br><span class="line">            List&lt;EventListenerFactory&gt; factories = <span class="keyword">this</span>.eventListenerFactories;</span><br><span class="line">            Assert.state(factories != <span class="keyword">null</span>, <span class="string">&quot;EventListenerFactory List not initialized&quot;</span>);</span><br><span class="line">            <span class="keyword">for</span> (Method method : annotatedMethods.keySet()) &#123;</span><br><span class="line">                <span class="comment">// 获取监听工厂, 这里有两个工厂:DefaultEventListenerFactory和TransactionalEventListenerFactory</span></span><br><span class="line">                <span class="keyword">for</span> (EventListenerFactory factory : factories) &#123;</span><br><span class="line">                    <span class="comment">// 判断这个被标记的方法适配哪个工厂</span></span><br><span class="line">                    <span class="keyword">if</span> (factory.supportsMethod(method)) &#123;</span><br><span class="line">                        Method methodToUse = AopUtils.selectInvocableMethod(method, context.getType(beanName));</span><br><span class="line">                        <span class="comment">// 使用工厂创建对应的监听器对象</span></span><br><span class="line">                        ApplicationListener&lt;?&gt; applicationListener = factory.createApplicationListener(beanName, targetType, methodToUse);</span><br><span class="line">                        <span class="keyword">if</span> (applicationListener <span class="keyword">instanceof</span> ApplicationListenerMethodAdapter) &#123;</span><br><span class="line">                            ((ApplicationListenerMethodAdapter) applicationListener).init(context, <span class="keyword">this</span>.evaluator);</span><br><span class="line">                        &#125;</span><br><span class="line">                        context.addApplicationListener(applicationListener);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">                logger.debug(annotatedMethods.size() + <span class="string">&quot; @EventListener methods processed on bean &#x27;&quot;</span> + beanName + <span class="string">&quot;&#x27;: &quot;</span> + annotatedMethods);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>而这两个工厂生成出来的监听类，实际上是两个适配器，<code>ApplicationListenerMethodAdapter</code>和<code>ApplicationListenerMethodTransactionalAdapter</code>，由这两个适配器来执行相应的处理逻辑。这里要感叹下<code>spring</code>设计的精妙，一环扣一环，扩展性极强。</p>
+<p>这里分析下<code>ApplicationListenerMethodTransactionalAdapter</code>中对应的监听触发方法<code>onApplicationEvent</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onApplicationEvent</span><span class="params">(ApplicationEvent event)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (TransactionSynchronizationManager.isSynchronizationActive() &amp;&amp; TransactionSynchronizationManager.isActualTransactionActive()) &#123;</span><br><span class="line">        <span class="comment">// publish事件时: 创建一个TransactionSynchronization对象, 这个对象持有event</span></span><br><span class="line">        <span class="comment">// 创建TransactionSynchronizationEventAdapter</span></span><br><span class="line">        TransactionSynchronization transactionSynchronization = createTransactionSynchronization(event);</span><br><span class="line">        <span class="comment">// 注册到事务管理器中</span></span><br><span class="line">        TransactionSynchronizationManager.registerSynchronization(transactionSynchronization);</span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.annotation.fallbackExecution()) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.annotation.phase() == TransactionPhase.AFTER_ROLLBACK &amp;&amp; logger.isWarnEnabled()) &#123;</span><br><span class="line">            logger.warn(<span class="string">&quot;Processing &quot;</span> + event + <span class="string">&quot; as a fallback execution on AFTER_ROLLBACK phase&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 反射调用进行事件的处理</span></span><br><span class="line">        processEvent(event);</span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// No transactional event execution at all</span></span><br><span class="line">        <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">            logger.debug(<span class="string">&quot;No transaction is active - skipping &quot;</span> + event);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>本以为采用这种方式之后，就解决了对应的异步+调用点事务的问题。在测试中发现：若采用广播器实现异步，极大可能获取不到调用点事务内数据；而采用<code>@Async</code>实现异步百分百可以获取到调用点事务内数据。</p>
+<p>简单跟踪发现：</p>
+<ul>
+<li>广播器方式实现异步，是将<code>onApplicationEvent</code>方法的触发丢入线程池。</li>
+<li><code>@Async</code>方式实现异步，走下方<code>else</code>逻辑，在事件发送器中走同步逻辑，是直接执行<code>onApplicationEvent</code>。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">multicastEvent</span><span class="params">(<span class="keyword">final</span> ApplicationEvent event, <span class="meta">@Nullable</span> ResolvableType eventType)</span> </span>&#123;</span><br><span class="line">    ResolvableType type = (eventType != <span class="keyword">null</span> ? eventType : resolveDefaultEventType(event));</span><br><span class="line">    Executor executor = getTaskExecutor();</span><br><span class="line">    <span class="keyword">for</span> (ApplicationListener&lt;?&gt; listener : getApplicationListeners(event, type)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (executor != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// invokeListener()返回最后的逻辑是去调用ApplicationListener.onApplicationEvent()</span></span><br><span class="line">            executor.execute(() -&gt; invokeListener(listener, event));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            invokeListener(listener, event);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的是否对<code>onApplicationEvent</code>方法执行执行起到了关键性的作用，因为在事务监听处理器适配器中会判断是否是否存在事务。第一种情况，由线程池内线程来执行该方法，这时事务是绑定在原线程上，所以会导致这个判断结果为<code>false</code>。第二种情况，由时间发送线程执行该方法，这时与事务在同一线程，则这个判断的结果为<code>true</code>，将对应的事件处理方法注册到事务管理器中，待到执行改事件监听处理方法时，是异步进行处理的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onApplicationEvent</span><span class="params">(ApplicationEvent event)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (TransactionSynchronizationManager.isSynchronizationActive() &amp;&amp; TransactionSynchronizationManager.isActualTransactionActive()) &#123;</span><br><span class="line">		<span class="comment">// 省略以下代码</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>​    整体使用下来，发现其中的道道还是很多的，这需要对所有的组合情况、问题情况、原理都掌握的情况下，否则随意组合，可能在某一场景下能达到需要的效果，但是就像是埋下了定时炸弹。当然了<code>spring</code>的事件监听机制毕竟只是基于内存，若对应的生产环境并没有升级停机钩子处理，或者是金丝雀升级等方式，需停机升级，有可能会导致部分监听未执行的情况，所以建议生产环境还是通过一些<code>mq</code>组件进行发布监听事件的处理。</p>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2021/09/12/Spring/spring%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E6%9C%BA%E5%88%B6/" title="spring事件监听机制">http://xiaocainiaoya.github.io/2021/09/12/Spring/spring事件监听机制/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/08/30/Spring/Spring%E6%B3%A8%E8%A7%A3/" rel="prev" title="Spring注解">
+      <i class="fa fa-chevron-left"></i> Spring注解
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#spring%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E6%9C%BA%E5%88%B6"><span class="nav-number">1.</span> <span class="nav-text">spring事件监听机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="nav-number">1.2.</span> <span class="nav-text">简单使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E6%AD%A5%E6%96%B9%E5%BC%8F"><span class="nav-number">1.3.</span> <span class="nav-text">异步方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%B9%BF%E6%92%AD%E5%99%A8%E5%BC%82%E6%AD%A5"><span class="nav-number">1.3.1.</span> <span class="nav-text">1.广播器异步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Async%E6%B3%A8%E8%A7%A3%E5%BC%82%E6%AD%A5"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.@Async注解异步</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1"><span class="nav-number">1.4.</span> <span class="nav-text">事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.5.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
