@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="[TOC] 背景​    最近正式环境出现一起事故，业务端经过一些列的业务逻辑之后，使用wkhtmltopdf工具进行html转换为pdf，但出现生成完成之后(正常结束，并未发生异常)业务端再次获取这个pdf文件时，出现文件不存在问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Arthas的基本使用">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2021/11/18/Springboot/Arthas%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="[TOC] 背景​    最近正式环境出现一起事故，业务端经过一些列的业务逻辑之后，使用wkhtmltopdf工具进行html转换为pdf，但出现生成完成之后(正常结束，并未发生异常)业务端再次获取这个pdf文件时，出现文件不存在问题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-11-18T12:46:11.000Z">
+<meta property="article:modified_time" content="2021-11-18T12:20:22.804Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="springboot">
+<meta property="article:tag" content="工具">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2021/11/18/Springboot/Arthas%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Arthas的基本使用 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/11/18/Springboot/Arthas%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Arthas的基本使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-11-18 20:46:11 / 修改时间：20:20:22" itemprop="dateCreated datePublished" datetime="2021-11-18T20:46:11+08:00">2021-11-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>[TOC]</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>​    最近正式环境出现一起事故，业务端经过一些列的业务逻辑之后，使用<code>wkhtmltopdf</code>工具进行<code>html</code>转换为<code>pdf</code>，但出现生成完成之后(正常结束，并未发生异常)业务端再次获取这个<code>pdf</code>文件时，出现文件不存在问题。<span id="more"></span></p>
+<h2 id="排查"><a href="#排查" class="headerlink" title="排查"></a>排查</h2><p>​    经过一系列的排查，最终锁定在<code>wkhtmltopdf</code>工具是否正常生成<code>pdf</code>文件，请看如下代码，这里通过<code>wkhtmltopdf</code>提供的工具类<code>pdf.saveAsDirect(ftpDir + &quot;/&quot; + path);</code>进行<code>pdf</code>的生成，但并未对返回的结果进行判断，所以猜测这里根本没有生成<code>pdf</code>文件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">uploadToPdfDirect</span><span class="params">(WrapperConfig config, String sourceString, String path)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Pdf pdf = <span class="keyword">new</span> Pdf(config);</span><br><span class="line">        pdf.setAllowMissingAssets();</span><br><span class="line">        pdf.addPageFromString(sourceString);</span><br><span class="line">        pdf.addParam(pageInfo);</span><br><span class="line">        pdf.saveAsDirect(ftpDir + <span class="string">&quot;/&quot;</span> + path);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException | InterruptedException e) &#123;</span><br><span class="line">        log.error(<span class="string">&quot;wkHtmlToPdf发生异常：&#123;&#125;&quot;</span>, e.getMessage());</span><br><span class="line">        <span class="comment">// 捕获到InterruptedException异常后恢复中断状态</span></span><br><span class="line">        Thread.currentThread().interrupt();</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;wkHtmlToPdf发生异常：&quot;</span> + e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据猜测希望将代码修改为：(本想借助<code>Arthas</code>将代码修改以下代码，但由于线上一直产生数据，事故面积越来越大，来不及研究<code>Arthas</code>的使用，只能走繁琐的流程，进行发包替换正式环境的包)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">uploadToPdfDirect</span><span class="params">(WrapperConfig config, String sourceString, String path)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Pdf pdf = <span class="keyword">new</span> Pdf(config);</span><br><span class="line">        pdf.setAllowMissingAssets();</span><br><span class="line">        pdf.addPageFromString(sourceString);</span><br><span class="line">        pdf.addParam(pageInfo);</span><br><span class="line">        <span class="comment">// 对生成的结果进行判断, 到底有没有生成对应文件</span></span><br><span class="line">        File file = pdf.saveAsDirect(ftpDir + <span class="string">&quot;/&quot;</span> + path);</span><br><span class="line">        <span class="keyword">if</span>(!file.exists())&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> BusinessException(<span class="string">&quot;文件生成失败&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException | InterruptedException e) &#123;</span><br><span class="line">        log.error(<span class="string">&quot;wkHtmlToPdf发生异常：&#123;&#125;&quot;</span>, e.getMessage());</span><br><span class="line">        <span class="comment">// 捕获到InterruptedException异常后恢复中断状态</span></span><br><span class="line">        Thread.currentThread().interrupt();</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;wkHtmlToPdf发生异常：&quot;</span> + e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="正题"><a href="#正题" class="headerlink" title="正题"></a>正题</h2><p>​    经过漫长的发版流程等待，等到正式环境替换包已经是大半夜。经过测试，确实是<code>pdf</code>文件未生成(如果会使用<code>Arthas</code>，这个时候应该就已经解决问题)。这里要说明下，到目前为止只知道这种方式会生成失败，至于在什么情况下生成失败就不得而知了，因为开发环境、测试环境、预发布环境都是正常生成。痛定思痛，决定学习一下<code>Arthas</code>的使用。</p>
+<h3 id="1-使用"><a href="#1-使用" class="headerlink" title="1.使用"></a>1.使用</h3><p>简单的使用流程：</p>
+<ol>
+<li><p>找到需要进行添加代码的类全路径后进行反编译到某个文件夹中。</p>
+<blockquote>
+<p>jad –source-only com.xxx.service.v3.xxxService &gt; /tmp/xxxService.java</p>
+</blockquote>
+<p>这里是由<code>.class</code>反编译为<code>.java</code>文件，所以阅读上没有那么友好，其实刚出现问题的时候就想到使用<code>Arthas</code>，但是被这个反编译出来的代码劝退了，反编译出来的代码甚至有指令重排，不太敢修改这个反编译文件。</p>
+</li>
+<li><p>修改这个反编译文件</p>
+<blockquote>
+<p>vim /tmp/UserController.java</p>
+</blockquote>
+<p>这里实际上是要先退出<code>arthas</code>，第一次使用的时候还以为<code>arthas</code>命令行可以直接操作文件，实际上应该退出<code>arthas</code>使用<code>linux</code>命令的方式进行文件修改。</p>
+</li>
+<li><p>查找这个类对应的类加载器</p>
+<blockquote>
+<p>sc -d *xxxService | grep classLoadHash</p>
+<p>classLoadHash 6bc26251</p>
+</blockquote>
+<p>这里得到这个类的加载器的哈希值为<code>6bc26251</code></p>
+</li>
+<li><p>使用这个类加载器将修改后的文件编译为<code>.class</code>文件</p>
+<blockquote>
+<p>mc -c 6bc26251 /tmp/xxxService.java -d /tmp</p>
+</blockquote>
+<p>这时会在<code>/tmp</code>文件夹下生成一个以包结构为文件路径的<code>.class</code>文件。</p>
+</li>
+<li><p>进行热更新</p>
+<blockquote>
+<p>redefine /tmp/com/xxx/service/v3/xxxService.class</p>
+</blockquote>
+<p>当看到提示<code>redefine success, size: 1</code>说明替换成功，就可以进行具体的测试。</p>
+</li>
+</ol>
+<p>以上这种方式，出现问题的概率极大，因为要修改反编译文件，且反编译文件好像进行了一些指令重排，导致阅读上比较困难，实际上以上的前四步骤就是为了得到修改之后的<code>.class</code>文件，那么实际上我们可以借助于<code>idea</code>进行处理。</p>
+<ol>
+<li>找到线上代码的标签，拉取修改文件分支。</li>
+<li>检出这个分支，进行特定文件的修改后，直接使用<code>idea</code>工具进行文件的编译。这时就可以通过<code>target</code>文件夹获取到对应修改文件的<code>.class</code>文件。</li>
+<li>将这个<code>.class</code>文件上传到对应服务器。</li>
+<li>直接热更新这个文件。(也就是上述的第5步)</li>
+</ol>
+<h3 id="2-示例"><a href="#2-示例" class="headerlink" title="2.示例"></a>2.示例</h3><ol>
+<li>在某个接口的服务层添加一个日志打印信息。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> RequireFileVo <span class="title">getFiles</span><span class="params">(ParamVo ParamVo, Integer pageNum, Integer pageSize)</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">&quot;pageSize:&#123;&#125;&quot;</span>, pageSize);</span><br><span class="line">        <span class="comment">// 以下为很复杂的业务逻辑</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><p>通过<code>idea</code>对整个服务进行编译后，获取到该文件的<code>.class</code>文件。</p>
+</li>
+<li><p>上传到服务器中，由于服务是运行在<code>docker</code>中，所以上传到服务器后移动文件到<code>docker</code>与宿主机的挂载目录中。</p>
+</li>
+<li><p>从挂载目录移动到简单目录。(测试的时候使用的挂载目录路径比较长，就移动到简单一点的目录比如<code>/tmp</code>)</p>
+</li>
+<li><p>使用<code>redefine</code>命令后看到<code>redefine success, size: 1</code>表示成功</p>
+</li>
+<li><p>测试，通过<code>postman</code>调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2021</span>-<span class="number">11</span>-<span class="number">18</span> <span class="number">10</span>:<span class="number">43</span>:<span class="number">30.491</span> [TraceId=92aeb19c3e8ce62b,SpanId=92aeb19c3e8ce62b,ParentSpanId=] [http-nio-<span class="number">20065</span>-exec-<span class="number">5</span>] INFO  c.b.g.b.s.v.s.xxxService-pageSize:<span class="number">10</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="其他基础功能"><a href="#其他基础功能" class="headerlink" title="其他基础功能"></a>其他基础功能</h2><ul>
+<li><strong>reset</strong>：重置增强类，此命令会将<code>arthas</code>增强过的类都重置为增强之前的情况。</li>
+<li><strong>quit</strong>：退出，<code>quit</code>只是退出<code>archas</code>的<code>session</code>，实际上目标进程<code>arthas server</code>还在运行中。</li>
+<li><strong>stop</strong>：彻底退出<code>arthas</code>，使用此命令后，实际上会执行一次<code>reset</code>命令。</li>
+</ul>
+<p><strong>注意：</strong>要区别于<code>quit</code>和<code>stop</code>两个退出之间的区别。</p>
+<blockquote>
+<p> 通过线程<code>id</code>查看线程的具体信息，比如查看线程<code>id</code>为1的线程的具体信息：<code>thread 1</code></p>
+</blockquote>
+<p>**1.<code>watch</code>**：查看类里面的某个方法的返回值和入参(实际上只能看参数类型, 是否有值, 并不能看值是多少)</p>
+<blockquote>
+<p>命令 + 类完全限定名 + 需要检测的方法 + 表达式 + (额外参数)</p>
+<p>watch com.xxx.xxx.service.v3.xxxService  getFiles “{params, returnObj}” -x 2</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">额外参数：</span><br><span class="line">-x 指定输出结果(默认为<span class="number">1</span>) 这里为<span class="number">2</span>层</span><br><span class="line">-b 表示在方法调用之前</span><br><span class="line">-e 表示在方法出异常时</span><br><span class="line">-s 表示在方法返回之后</span><br><span class="line">-f 表示在方法结束之后(正常返回和异常返回)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">表达式核心变量列表：</span><br><span class="line">loader      本次调用类所在的 ClassLoader</span><br><span class="line">clazz       本次调用类的 Class 引用</span><br><span class="line">method      本次调用方法反射引用</span><br><span class="line">target      本次调用类的实例</span><br><span class="line">params      本次调用参数列表，这是一个数组，如果方法是无参方法则为空数组</span><br><span class="line">returnObj   本次调用返回的对象。当且仅当 isReturn==<span class="keyword">true</span> 成立时候有效，表明方法调用是以正常返回的方式结束。如果当前方法无返回值 <span class="keyword">void</span>，则值为 <span class="keyword">null</span></span><br><span class="line">throwExp    本次调用抛出的异常。当且仅当 isThrow==<span class="keyword">true</span> 成立时有效，表明方法调用是以抛出异常的方式结束。</span><br><span class="line">isBefore    辅助判断标记，当前的通知节点有可能是在方法一开始就通知，此时 isBefore==<span class="keyword">true</span> 成立，同时 isThrow==<span class="keyword">false</span> 和 isReturn==<span class="keyword">false</span>，因为在方法刚开始时，还无法确定方法调用将会如何结束。</span><br><span class="line">isThrow     辅助判断标记，当前的方法调用以抛异常的形式结束。</span><br><span class="line">isReturn    辅助判断标记，当前的方法调用以正常返回的形式结束。</span><br></pre></td></tr></table></figure>
+
+<p>**2.<code>trace</code>**：方法内部的调用路径，并输出方法路径上的每个节点耗时</p>
+<blockquote>
+<p>命令 + 类完全限定名 + 需要检测的方法</p>
+<p>trace com.xxx.xxx.service.v3.xxxService  getFiles</p>
+</blockquote>
+<p><strong>3.heapdump</strong>：生成快照信息</p>
+<blockquote>
+<p>heapdump (–live) 生成文件路径/xxx.hprof</p>
+</blockquote>
+<p><strong>–live</strong>：只<code>dump</code>活着的对象</p>
+<p>我是使用<code>jdk</code>自带的<code>jvisualvm</code>来打开<code>xx.hprof</code>文件进行分析。<code>jdk</code>自带的<code>jvisualvm</code>在<code>~/home/bin</code>目录下。顺便记录下<code>mac</code>系统查看<code>jdk home</code>所在位置的方式：执行<code>/usr/libexec/java_home -V</code></p>
+<p><strong>4.sysprop</strong>：查看<code>Sysetm properties</code>信息</p>
+<p>可以指定单个 </p>
+<blockquote>
+<p>sysprop @appId</p>
+</blockquote>
+<p>或者使用<code>grep</code>进行过滤</p>
+<blockquote>
+<p>sysprop | grep @appId </p>
+</blockquote>
+<p>再或者直接添加一个新的键值对</p>
+<blockquote>
+<p>sysprop timeout 50</p>
+</blockquote>
+<p><strong>5.sysenv</strong>：查看环境变量(使用上和<code>sysprop</code>一致)</p>
+<p>注意：系统变量通过<code>System.getProperty()</code>，环境变量通过<code>System.getEnv()</code>。系统变量可以通过<code>-D</code>的方式在启动时添加，环境变量</p>
+<p><strong>6.jvm</strong>：可以查看<code>jvm</code>虚拟机的一些信息</p>
+<p><strong>7.sc</strong>：可以查看已经加载的类，如果类是接口，可以获取到已加载的所有实现类，通过<code>-d</code>参数可以打印类加载的具体信息。并且支持通配符查找类。</p>
+<blockquote>
+<p>sc -d xxx</p>
+</blockquote>
+<p><strong>8.sm</strong>：查找具体的函数</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>文档地址[<a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/]">https://arthas.aliyun.com/doc/]</a></p>
+<p>git地址(<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a>)</p>
+<p>使用教程地址(<a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/arthas-tutorials.html?language=cn&amp;id=arthas-advanced">https://arthas.aliyun.com/doc/arthas-tutorials.html?language=cn&amp;id=arthas-advanced</a>)</p>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2021/11/18/Springboot/Arthas%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/" title="Arthas的基本使用">http://xiaocainiaoya.github.io/2021/11/18/Springboot/Arthas的基本使用/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/springboot/" rel="tag"><i class="fa fa-tag"></i> springboot</a>
+              <a href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag"><i class="fa fa-tag"></i> 工具</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/09/12/Spring/spring%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E6%9C%BA%E5%88%B6/" rel="prev" title="spring事件监听机制">
+      <i class="fa fa-chevron-left"></i> spring事件监听机制
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E6%9F%A5"><span class="nav-number">2.</span> <span class="nav-text">排查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">正题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%BD%BF%E7%94%A8"><span class="nav-number">3.1.</span> <span class="nav-text">1.使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.2.</span> <span class="nav-text">2.示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E5%9F%BA%E7%A1%80%E5%8A%9F%E8%83%BD"><span class="nav-number">4.</span> <span class="nav-text">其他基础功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%90%8E"><span class="nav-number">5.</span> <span class="nav-text">最后</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">34</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
