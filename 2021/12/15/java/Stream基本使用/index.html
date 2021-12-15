@@ -21,30 +21,35 @@
     var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="穷则独善其身，达则兼济天下">
-<meta property="og:type" content="website">
-<meta property="og:title" content="xiaocainiaoya&#39;s blog">
-<meta property="og:url" content="http://xiaocainiaoya.github.io/index.html">
+  <meta name="description" content="一、介绍​    jdk8中引入的函数式lambda表示式，同时引入了Stream流，这种流可以堆集合进行一些复杂查找、过滤、映射、规约等操作。一个stream是由三部分组成，数据源流 -&gt;零个或多个中间操作 -&gt; 零个或一个终止操作。中间操作是对数据的加工处理并且中间操作是懒lazy操作，并不会马上启动，需要等待终止操作允许到才会开始执行。  Stream分为终端操作和中间操作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Stream基本使用">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2021/12/15/java/Stream%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/index.html">
 <meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
-<meta property="og:description" content="穷则独善其身，达则兼济天下">
+<meta property="og:description" content="一、介绍​    jdk8中引入的函数式lambda表示式，同时引入了Stream流，这种流可以堆集合进行一些复杂查找、过滤、映射、规约等操作。一个stream是由三部分组成，数据源流 -&gt;零个或多个中间操作 -&gt; 零个或一个终止操作。中间操作是对数据的加工处理并且中间操作是懒lazy操作，并不会马上启动，需要等待终止操作允许到才会开始执行。  Stream分为终端操作和中间操作。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2021/12/15/1SnxVPmy6G8sfth.png">
+<meta property="article:published_time" content="2021-12-15T13:51:58.000Z">
+<meta property="article:modified_time" content="2021-12-15T07:57:33.064Z">
 <meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="java">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2021/12/15/1SnxVPmy6G8sfth.png">
 
-<link rel="canonical" href="http://xiaocainiaoya.github.io/">
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2021/12/15/java/Stream%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>xiaocainiaoya's blog</title>
+  <title>Stream基本使用 | xiaocainiaoya's blog</title>
   
 
 
@@ -154,9 +159,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
@@ -172,10 +178,9 @@
       <meta itemprop="name" content="xiaocainiaoya's blog">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/15/java/Stream%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/" class="post-title-link" itemprop="url">Stream基本使用</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          Stream基本使用
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -198,6 +203,13 @@
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
 
         </div>
       </header>
@@ -208,7 +220,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h2><p>​    <code>jdk8</code>中引入的函数式<code>lambda</code>表示式，同时引入了<code>Stream</code>流，这种流可以堆集合进行一些复杂查找、过滤、映射、规约等操作。一个<code>stream</code>是由三部分组成，<code>数据源流 -&gt;零个或多个中间操作 -&gt; 零个或一个终止操作</code>。中间操作是对数据的加工处理并且中间操作是懒<code>lazy</code>操作，并不会马上启动，需要等待终止操作允许到才会开始执行。</p>
+        <h2 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h2><p>​    <code>jdk8</code>中引入的函数式<code>lambda</code>表示式，同时引入了<code>Stream</code>流，这种流可以堆集合进行一些复杂查找、过滤、映射、规约等操作。一个<code>stream</code>是由三部分组成，<code>数据源流 -&gt;零个或多个中间操作 -&gt; 零个或一个终止操作</code>。中间操作是对数据的加工处理并且中间操作是懒<code>lazy</code>操作，并不会马上启动，需要等待终止操作允许到才会开始执行。</p>
 <p><img src="https://s2.loli.net/2021/12/15/1SnxVPmy6G8sfth.png" alt="stream.png"></p>
 <p><code>Stream</code>分为终端操作和中间操作。</p>
 <ul>
@@ -328,750 +340,59 @@
 
 
 
-      
     </div>
     <div>
       
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
     </div>
     
     
     
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/11/18/Springboot/Arthas%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/11/18/Springboot/Arthas%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/" class="post-title-link" itemprop="url">Arthas的基本使用</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-11-18 20:46:11 / 修改时间：20:26:21" itemprop="dateCreated datePublished" datetime="2021-11-18T20:46:11+08:00">2021-11-18</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[TOC]</p>
-<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>​    最近正式环境出现一起事故，业务端经过一些列的业务逻辑之后，使用<code>wkhtmltopdf</code>工具进行<code>html</code>转换为<code>pdf</code>，但出现生成完成之后(正常结束，并未发生异常)业务端再次获取这个<code>pdf</code>文件时，出现文件不存在问题。
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/11/18/Springboot/Arthas%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2021/12/15/java/Stream%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/" title="Stream基本使用">http://xiaocainiaoya.github.io/2021/12/15/java/Stream基本使用/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"><i class="fa fa-tag"></i> java</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/09/13/Springboot/springboot%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/09/13/Springboot/springboot%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B/" class="post-title-link" itemprop="url">springboot启动过程</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-09-13 22:51:58 / 修改时间：14:39:21" itemprop="dateCreated datePublished" datetime="2021-09-13T22:51:58+08:00">2021-09-13</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/09/12/Spring/spring%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E6%9C%BA%E5%88%B6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/09/12/Spring/spring%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E6%9C%BA%E5%88%B6/" class="post-title-link" itemprop="url">spring事件监听机制</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-09-12 13:09:33" itemprop="dateCreated datePublished" datetime="2021-09-12T13:09:33+08:00">2021-09-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-09-13 14:28:27" itemprop="dateModified" datetime="2021-09-13T14:28:27+08:00">2021-09-13</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/srping/" itemprop="url" rel="index"><span itemprop="name">srping</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="spring事件监听机制"><a href="#spring事件监听机制" class="headerlink" title="spring事件监听机制"></a>spring事件监听机制</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>​    <code>spring</code>事件监听机制实际上就是一个典型的观察者模式，在观察者模式的基础之上进行的抽象和处理。使得开发者可以根据自己的业务特点依附于<code>spring</code>容器进行事件的注册、发布、处理。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/09/12/Spring/spring%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E6%9C%BA%E5%88%B6/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/08/30/Spring/Spring%E6%B3%A8%E8%A7%A3/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/08/30/Spring/Spring%E6%B3%A8%E8%A7%A3/" class="post-title-link" itemprop="url">Spring注解</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-08-30 22:08:50 / 修改时间：22:55:43" itemprop="dateCreated datePublished" datetime="2021-08-30T22:08:50+08:00">2021-08-30</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/srping/" itemprop="url" rel="index"><span itemprop="name">srping</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Spring注解"><a href="#Spring注解" class="headerlink" title="Spring注解"></a>Spring注解</h1><h2 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h2><p>​    <code>spring</code>为了减少过多<code>xml</code>的配置，减轻开发者的配置负担，提供了通过注解的方式进行<code>bean</code>对象的加载。并且在单一注解的基础上增加了一些模式上的约定。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/08/30/Spring/Spring%E6%B3%A8%E8%A7%A3/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/11/18/Springboot/Arthas%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/" rel="prev" title="Arthas的基本使用">
+      <i class="fa fa-chevron-left"></i> Arthas的基本使用
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
   
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/08/19/SpringMvc/Handler/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/08/19/SpringMvc/Handler/" class="post-title-link" itemprop="url">HandlerMethod</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-08-19 21:24:33" itemprop="dateCreated datePublished" datetime="2021-08-19T21:24:33+08:00">2021-08-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-08-23 22:53:16" itemprop="dateModified" datetime="2021-08-23T22:53:16+08:00">2021-08-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/springmvc/" itemprop="url" rel="index"><span itemprop="name">springmvc</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="HandlerMethod"><a href="#HandlerMethod" class="headerlink" title="HandlerMethod"></a>HandlerMethod</h3><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>​    <code>HandlerMethod</code>是一个基于方法的处理器结构，包含了处理器方法所对应的类和处理器方法，并提供了一些方法参数的访问接口。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/08/19/SpringMvc/Handler/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/08/18/SpringMvc/HandlerAdapter/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/08/18/SpringMvc/HandlerAdapter/" class="post-title-link" itemprop="url">HandlerAdapter</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-08-18 22:12:53" itemprop="dateCreated datePublished" datetime="2021-08-18T22:12:53+08:00">2021-08-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-08-23 22:58:54" itemprop="dateModified" datetime="2021-08-23T22:58:54+08:00">2021-08-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/springmvc/" itemprop="url" rel="index"><span itemprop="name">springmvc</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="HandlerAdapter"><a href="#HandlerAdapter" class="headerlink" title="HandlerAdapter"></a>HandlerAdapter</h3><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>​    <code>HandlerAdapter</code>是<code>Handler</code>的适配器，每种类型的<code>Handler</code>都对应一个<code>HandlerAdapter</code>。</p>
-<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>在顶层接口<code>HandlerAdapter</code>的实现中，基本上都是直接具体的实现。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/08/18/SpringMvc/HandlerAdapter/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/08/15/SpringMvc/DispatcherServlet/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/08/15/SpringMvc/DispatcherServlet/" class="post-title-link" itemprop="url">DispatcherServlet</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-08-15 14:56:09" itemprop="dateCreated datePublished" datetime="2021-08-15T14:56:09+08:00">2021-08-15</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-08-23 22:53:23" itemprop="dateModified" datetime="2021-08-23T22:53:23+08:00">2021-08-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/springmvc/" itemprop="url" rel="index"><span itemprop="name">springmvc</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="DispatcherServlet"><a href="#DispatcherServlet" class="headerlink" title="DispatcherServlet"></a>DispatcherServlet</h3><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>​    <code>DispatcherServlet</code>是一个<code>Servlet</code>，在<code>springmvc</code>中被称为前端控制器，根据请求的路径、类型等进行请求的分发。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/08/15/SpringMvc/DispatcherServlet/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/08/15/SpringMvc/HandlerMapping/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/08/15/SpringMvc/HandlerMapping/" class="post-title-link" itemprop="url">HandlerMapping</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-08-15 14:56:09" itemprop="dateCreated datePublished" datetime="2021-08-15T14:56:09+08:00">2021-08-15</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-08-23 22:53:00" itemprop="dateModified" datetime="2021-08-23T22:53:00+08:00">2021-08-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/springmvc/" itemprop="url" rel="index"><span itemprop="name">springmvc</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="HandlerMapping"><a href="#HandlerMapping" class="headerlink" title="HandlerMapping"></a>HandlerMapping</h3><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>​    <code>HandlerMapping</code>处理器映射器，是<code>SpringMvc</code>的核心组件之一，用来根据请求的<code>request</code>信息查询对应的<code>Handler</code>，在<code>web</code>环境中，每个请求都需要一个对应的<code>Handler</code>来处理，所以当接收到一个请求，需要哪一个<code>Handler</code>来处理，<code>HandlerMapping</code>的作用就是找到处理的那个<code>Handler</code>。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/08/15/SpringMvc/HandlerMapping/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/08/09/SpringMvc/%E8%AE%A4%E8%AF%86SpringMvc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/08/09/SpringMvc/%E8%AE%A4%E8%AF%86SpringMvc/" class="post-title-link" itemprop="url">认识SpringMvc</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-08-09 22:46:11" itemprop="dateCreated datePublished" datetime="2021-08-09T22:46:11+08:00">2021-08-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-08-23 22:53:31" itemprop="dateModified" datetime="2021-08-23T22:53:31+08:00">2021-08-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/springmvc/" itemprop="url" rel="index"><span itemprop="name">springmvc</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="认识SpringMvc"><a href="#认识SpringMvc" class="headerlink" title="认识SpringMvc"></a>认识SpringMvc</h3><h2 id="认识SpringMvc-1"><a href="#认识SpringMvc-1" class="headerlink" title="认识SpringMvc"></a>认识SpringMvc</h2><p>​    <code>SpringMvc</code>是基于<code>spring</code>在<code>web</code>领域进行开发的框架，使得业务开发者无需关心<code>Servlet</code>组件的逻辑处理，让业务开发者仅需要关心业务逻辑的处理。
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/08/09/SpringMvc/%E8%AE%A4%E8%AF%86SpringMvc/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
 
 
 
@@ -1123,6 +444,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">一、介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">二、使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E7%BB%88%E7%AB%AF%E6%93%8D%E4%BD%9C"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 终端操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-%E7%9F%AD%E8%B7%AF%E6%93%8D%E4%BD%9C"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 短路操作</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-1-1-%E5%8C%B9%E9%85%8D"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">2.1.1.1 匹配</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-%E9%9D%9E%E7%9F%AD%E8%B7%AF%E6%93%8D%E4%BD%9C"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2 非短路操作</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-2-1-%E9%81%8D%E5%8E%86"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">2.1.2.1 遍历</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-2-2-%E8%81%9A%E5%90%88"><span class="nav-number">2.1.2.2.</span> <span class="nav-text">2.1.2.2 聚合</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-2-3-%E8%A7%84%E7%BA%A6"><span class="nav-number">2.1.2.3.</span> <span class="nav-text">2.1.2.3 规约</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-2-4-%E6%94%B6%E9%9B%86"><span class="nav-number">2.1.2.4.</span> <span class="nav-text">2.2.2.4 收集</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E4%B8%AD%E9%97%B4%E6%93%8D%E4%BD%9C"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 中间操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-%E6%9C%89%E7%8A%B6%E6%80%81"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 有状态</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-1-1-%E6%8E%92%E5%BA%8F"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">2.2.1.1 排序</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-1-2-%E5%8E%BB%E9%87%8D"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">2.2.1.2 去重</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-1-3-%E5%88%87%E7%89%87"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">2.2.1.3 切片</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-%E6%97%A0%E7%8A%B6%E6%80%81"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 无状态</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-2-1-%E6%98%A0%E5%B0%84"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">2.2.2.1 映射</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-2-%E8%BF%87%E6%BB%A4"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.2.2.2 过滤</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-2-3-%E6%B6%88%E8%B4%B9"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">2.2.2.3 消费</span></a></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
