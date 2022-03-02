@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="webService初试背景​    最近工作上需要将一些业务数据推送到各个门户网站，而各个门户网站上接收数据的方式不一样，有webservice和http两种方式，初次使用webservice，记录一下踩得一些坑。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="webService初试">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2022/03/02/java/webservice%E5%88%9D%E8%AF%95/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="webService初试背景​    最近工作上需要将一些业务数据推送到各个门户网站，而各个门户网站上接收数据的方式不一样，有webservice和http两种方式，初次使用webservice，记录一下踩得一些坑。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/03/02/BTNvykhem238QDE.png">
+<meta property="article:published_time" content="2022-03-02T13:51:58.000Z">
+<meta property="article:modified_time" content="2022-03-02T07:13:45.414Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/03/02/BTNvykhem238QDE.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2022/03/02/java/webservice%E5%88%9D%E8%AF%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>webService初试 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/03/02/java/webservice%E5%88%9D%E8%AF%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          webService初试
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-03-02 21:51:58 / 修改时间：15:13:45" itemprop="dateCreated datePublished" datetime="2022-03-02T21:51:58+08:00">2022-03-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="webService初试"><a href="#webService初试" class="headerlink" title="webService初试"></a>webService初试</h1><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>​    最近工作上需要将一些业务数据推送到各个门户网站，而各个门户网站上接收数据的方式不一样，有<code>webservice</code>和<code>http</code>两种方式，初次使用<code>webservice</code>，记录一下踩得一些坑。<span id="more"></span></p>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><h3 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h3><p>​    使用<code>hutool</code>中的<code>SoapClient</code>配合<code>SoapUi</code>工具进行使用。</p>
+<ol>
+<li><p>使用<code>SoapUi</code>工具解析<code>WSDL</code>地址，得到这个地址提供的方法，再进入相应的方法，得到请求这个方法的<code>xml</code>结构。</p>
+<p><img src="https://s2.loli.net/2022/03/02/BTNvykhem238QDE.png" alt="Snipaste_2022-03-02_14-40-27.png"></p>
+<p>例子中: 这个<code>WSDL</code>提供了四个调用方法，然后点击<code>Request1</code>弹出右边部分。右边部分为对这个方法发起请求的<code>xml</code>结构，这时只需要通过<code>hutool</code>工具类<code>SoapClient</code>创建一个一致的<code>xml</code>请求结构后发起请求即可。</p>
+<ol start="2">
+<li><p>直接上代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">  SoapClient client = SoapClient.create(<span class="string">&quot;url&quot;</span>)</span><br><span class="line">    .setCharset(Charset.forName(<span class="string">&quot;utf-8&quot;</span>))</span><br><span class="line">    .setMethod(<span class="string">&quot;调用的方法名&quot;</span>, <span class="string">&quot;命名空间&quot;</span>)</span><br><span class="line">    .setParam(<span class="string">&quot;参数名称&quot;</span>, <span class="string">&quot;参数值&quot;</span>);</span><br><span class="line">  <span class="comment">// 打印请求数据</span></span><br><span class="line">  log.info(<span class="string">&quot;webService请求: \n&#123;&#125;&quot;</span>, client.getMsgStr(<span class="keyword">false</span>));</span><br><span class="line">  client.send();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>以上就完成了<code>webService</code>的调用，使用上还是比较简单，主要是第一次使用<code>webService</code>，到处磕磕碰碰。</p>
+</li>
+</ol>
+<p><strong>1.SoapUI解析错误</strong></p>
+<p>部分门户使用<code>SoapUI</code>直接解析对应的<code>http://xxx/xxx.asmx?wsdl</code>地址，出现以下报错：</p>
+<p><code>     Error loading [http://htgs.ccgp.gov.cn/GS8/services/Gs8WebService?wsdl]:     org.apache.xmlbeans.XmlException: org.apache.xmlbeans.XmlException: error:     The element type &quot;hr&quot; must be terminated by the matching end-tag </code>。</p>
+<p>解决方案为通过浏览器进入这个地址，将这个页面中的内容保存为<code>xx.wsdl</code>文件，使用<code>SoapUI</code>加载这个文件。</p>
+<p><strong>1. 使用postman调用</strong></p>
+<p>在通过代码进行<code>webService</code>请求之前，实际上应该通过<code>SoapUI</code>发起请求，看是否能调用成功。(请求方式为上图右部分的绿色按钮)。但是有一个接口，由于使用<code>http://xx</code>地址解析失败后采用<code>xx.wsdl</code>文件的方式解析，这个接口一直不能发起请求。</p>
+<p>解决方案为使用<code>postman</code>发起请求。设置头信息中<code>text/xml; charset=UTF-8</code>，然后<code>body</code>请求体中的参数修改为<code>raw</code>后选择<code>XML(text/xml)</code>后就可以发起对<code>webService</code>服务的请求。</p>
+<p><strong>3.请求数据</strong></p>
+<p>假设发起请求要携带的参数值为：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">user_name</span>&gt;</span>zanshang<span class="tag">&lt;/<span class="name">user_name</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">user_age</span>&gt;</span>15<span class="tag">&lt;/<span class="name">user_age</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>那么实际上是需要将这个参数值填入到对应位置，实际发起的请求中是需要将<code>&lt;</code>和<code>&gt;</code>等字符进行编码化。<code>&amp;lt;</code>和<code>&amp;gt;</code>。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">&amp;lt;</span>body<span class="symbol">&amp;gt;</span></span><br><span class="line">	<span class="symbol">&amp;lt;</span>user_name<span class="symbol">&amp;gt;</span>zanshang<span class="symbol">&amp;lt;</span>/user_name<span class="symbol">&amp;gt;</span></span><br><span class="line">	<span class="symbol">&amp;lt;</span>user_age<span class="symbol">&amp;gt;</span>15<span class="symbol">&amp;lt;</span>/user_age<span class="symbol">&amp;gt;</span></span><br><span class="line"><span class="symbol">&amp;lt;</span>/body<span class="symbol">&amp;gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>4.请求地址中?wsdl</strong></p>
+<p>对<code>webService</code>的请求地址中是否需要<code>?wsdl</code>，就目前而言部分接口是需要，部分接口是不需要。这就使得调用是不知道需不需要带上，遇到过一个问题是这个接口实际上是不需要携带，但我在请求时携带了，然后请求返回的内容是这个访问地址的内容，还一直以为是请求的参数或者是姿势不对，排查了好久才找到问题。</p>
+<p><strong>5.返回处理</strong></p>
+<p>最让我觉得难受的是<code>webService</code>请求之后处理，因为对接了好几个门户网站，每个门户都返回一种不同的结构。情况非常多：</p>
+<p><strong>异常情况：</strong>A门户的异常返回的是重定向页面的内容还包含了图片的<code>base64</code>串。B门户调用过于频繁也是返回一个重定向页面的内容。</p>
+<p><strong>正常情况：</strong>A门户是在一种<code>xml</code>结构中的里层嵌入一个<code>json</code>串。B门户是在<code>xml</code>中用<code>![[DATA]]</code>的方式嵌入一个<code>xml</code>结构数据。然而AB门户的外层<code>xml</code>结构都不一致。</p>
+<p>综上基本上每个门户的请求参数和返回都需要进行定制化，无法抽象出来达到通用。</p>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2022/03/02/java/webservice%E5%88%9D%E8%AF%95/" title="webService初试">http://xiaocainiaoya.github.io/2022/03/02/java/webservice初试/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"><i class="fa fa-tag"></i> java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/01/10/git/git%E8%AE%B0%E5%BD%95/" rel="prev" title="git记录">
+      <i class="fa fa-chevron-left"></i> git记录
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#webService%E5%88%9D%E8%AF%95"><span class="nav-number">1.</span> <span class="nav-text">webService初试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7"><span class="nav-number">2.0.1.</span> <span class="nav-text">工具</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
