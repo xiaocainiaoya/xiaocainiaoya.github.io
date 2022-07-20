@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="redis学习笔记(二)主从复制​    主从复制是将一台redis服务器设置为主服务器master，复制到其他多台从服务slave上，主服务器负责读写操作，从服务器只能读。数据的复制只能是主服务器到从服务器。当主服务器宕机时，可以让从服务器接管主服务器接管，保证系统不至于停机，否则在主服务器重启到恢复数据的这个过程中，服务一直处于停机状态。主从服务器之间通过心跳的机制检查服务器间的连接状态 主从">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis学习笔记(二)">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2022/07/12/%E7%BC%93%E5%AD%98/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%BA%8C)/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="redis学习笔记(二)主从复制​    主从复制是将一台redis服务器设置为主服务器master，复制到其他多台从服务slave上，主服务器负责读写操作，从服务器只能读。数据的复制只能是主服务器到从服务器。当主服务器宕机时，可以让从服务器接管主服务器接管，保证系统不至于停机，否则在主服务器重启到恢复数据的这个过程中，服务一直处于停机状态。主从服务器之间通过心跳的机制检查服务器间的连接状态 主从">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/07/12/fb96c7TK3knjGdv.png">
+<meta property="og:image" content="https://s2.loli.net/2022/07/12/BujMksDNmw5Hx9z.png">
+<meta property="og:image" content="https://s2.loli.net/2022/07/12/n8CoMD6u7KBAp2O.png">
+<meta property="article:published_time" content="2022-07-12T13:39:58.000Z">
+<meta property="article:modified_time" content="2022-07-12T13:39:23.853Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/07/12/fb96c7TK3knjGdv.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2022/07/12/%E7%BC%93%E5%AD%98/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%BA%8C)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>redis学习笔记(二) | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/07/12/%E7%BC%93%E5%AD%98/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%BA%8C)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          redis学习笔记(二)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-07-12 21:39:58 / 修改时间：21:39:23" itemprop="dateCreated datePublished" datetime="2022-07-12T21:39:58+08:00">2022-07-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="redis学习笔记-二"><a href="#redis学习笔记-二" class="headerlink" title="redis学习笔记(二)"></a>redis学习笔记(二)</h1><h4 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h4><p>​    主从复制是将一台<code>redis</code>服务器设置为主服务器<code>master</code>，复制到其他多台从服务<code>slave</code>上，主服务器负责读写操作，从服务器只能读。<strong>数据的复制只能是主服务器到从服务器。</strong>当主服务器宕机时，可以让从服务器接管主服务器接管，保证系统不至于停机，否则在主服务器重启到恢复数据的这个过程中，服务一直处于停机状态。<strong>主从服务器之间通过心跳的机制检查服务器间的连接状态</strong></p>
+<p><strong>主从服务之间的数据复制通过全量复制和部分复制。</strong></p>
+<ol>
+<li><p><strong>全量复制</strong> </p>
+<p>​    分为两步操作：①主节点接收到从节点的全量复制命令，执行<code>gbsave</code>，在后台生成<code>RDB</code>文件，同时将此刻之后的写操作命令添加到复制缓冲区中。②将<code>RDB</code>文件发送给从节点，从节点先清除本身数据后加载<code>RDB</code>文件，然后在将主节点的复制缓冲区写命令依次执行。从而保证了从节点和主节点的数据一致。</p>
+</li>
+<li><p><strong>部分复制</strong></p>
+<ul>
+<li>复制偏移量：主从节点分别维护一个<code>offset</code>偏移量，主节点每次向从节点发送多少数据，修改<code>offset</code>偏移量值；同理，从节点每次从主节点接收多少数据，也会修改<code>offset</code>偏移量值。</li>
+<li>复制积压缓冲区：主节点内部维护一个长度固定的<code>FIFO</code>队列作为复制积压缓冲区，默认大小是<code>1M</code>，在进行命令同步时，不仅会将写命令同步到从节点，同时会将写命令写入复制积压缓冲区，由于长度固定，写入比较早的命令会被挤出缓冲区，所以当主从的<code>offset</code>差距大于缓冲区长度时，无法进行部分复制，只能执行全量复制。</li>
+<li>服务器运行<code>ID</code>(<code>runId</code>)：每个节点都有运行<code>ID</code>，运行<code>ID</code>在节点启动时自动生成，主节点会将自己的<code>runId</code>发送给从节点，从节点保存起来，出现从节点断线重连：①若若从节点中保存的主<code>runId</code>=主<code>runId</code>则之前同步过该主节点数据，会首先尝试部分复制。②若从节点中保存的主<code>runId</code>!=现主<code>runId</code>，则只能全量复制。</li>
+</ul>
+</li>
+</ol>
+<h4 id="哨兵模式"><a href="#哨兵模式" class="headerlink" title="哨兵模式"></a>哨兵模式</h4><p>​    在主从复制模式下，若出现主服务器宕机，则需要运维人员手动修改从服务器为主服务器，不能良好的支持高可用。哨兵模式从出现就是为了解决这个问题，所以哨兵模式其实就是高可用的主从复制模式。可以由至少一个哨兵(哨兵可以集群)，监听任意多个主从服务器，当主服务器出现异常，导致宕机的时候，由哨兵投票将某个从服务器选举为主服务器，这样就可以保证主从服务之间的高可用。</p>
+<blockquote>
+<p>启动哨兵：redis-sentinel /path/to/sentinel.conf</p>
+</blockquote>
+<ul>
+<li><code>Subjectively Down(SDOWN)</code>：主观下线，单个哨兵做出下线的判断。</li>
+<li><code>Objectively Down(ODOWN)</code>：客观下线，多个哨兵实例对同一客户端做出下线判断。</li>
+</ul>
+<p><strong>客观下线只适用于主服务器，其他从服务器或者哨兵只会主观下线。哨兵在判定它们为下线前不需要进行协商，所以从服务器或者哨兵永远不会达到客观下线的条件。</strong>理论上，主观下线的作用就是当主服务器出现客观下线时，哨兵进行选举的从服务器不会从主观下线的从服务器中选举。</p>
+<p><strong><code>redis</code>集群</strong></p>
+<p>​    集群是为了解决单机<code>redis</code>容量有限的问题，将数据按一定的规则分配到多台机器中，也叫数据分片，集群不需要哨兵。</p>
+<p>使用<code>redis</code>分片会遇到一个问题是如果将所有数据都均匀的分布到每一台服务器上，如果仅仅只通过<code>key</code>的哈希值取服务器数量的模有可能出现两个问题：</p>
+<ul>
+<li><p>大量的哈希碰撞导致大量数据存储在了某一台或者某几台服务器上。</p>
+</li>
+<li><p>当出现服务器增加一台或者减少一台时，需要迁移大量的数据。</p>
+</li>
+</ul>
+<p><strong>解决方案</strong></p>
+<p>采用一致性哈希算法进行处理。</p>
+<p>如下图设置一个从0~2^32-1头尾相连的环。将目前集群中的服务器的<code>ip</code>进行哈希运算后对<code>2^23</code>进行取模后，得到结果一定落在这个环上的某个位置。</p>
+<p><img src="https://s2.loli.net/2022/07/12/fb96c7TK3knjGdv.png" alt="一致性哈希图1.png"></p>
+<p>假设现在集群中有三台服务器，分别进行<code>hash(ip)%2^23</code>运算之后，落在环上的位置，同时对一些需要存储在服务器中的数据进行<code>hash(key)%2^23</code>运算之后的值也会落在这个环上。根据顺时针，将对应的键归于某台服务器上，比如下图中<code>key1</code>落在<code>S1</code>服务器上，<code>key4</code>落在<code>S2</code>服务器上，<code>key2</code>和<code>key3</code>落在<code>S3</code>服务器上。</p>
+<p><img src="https://s2.loli.net/2022/07/12/BujMksDNmw5Hx9z.png" alt="一致性哈希2.png"></p>
+<p>假设这时需要添加一台服务器<code>S4</code>，那么只需要将<code>S4</code>在这个环上左侧部分的数据迁移到<code>S4</code>服务器上，其他服务器不需要进行迁移操作，删除服务器类似，所以不论是添加或者删除服务器，仅需要集群中的两台服务器进行迁移处理。</p>
+<p><img src="https://s2.loli.net/2022/07/12/n8CoMD6u7KBAp2O.png" alt="一致性哈希3.png"></p>
+<p>到这实际上已经解决了使用缓存集群进行分片在扩展和收缩时牵一发而动全身的数据迁移情况，但是在上面的例子中，服务的分布过于理想化，有可能出现一种场景是集群中就两台服务器，且两台服务器在这个环上距离非常靠近。业界称为<strong>数据倾斜</strong>：在存储集群中意思为大部分数据存储在少来服务器上，在计算集群中意思为大部分数据由少量服务器进行计算。</p>
+<p>这里可以通过为服务器创建虚拟的节点，来扩大服务器在环上的分布，比如由每台服务器仅经过一次<code>hash(ip)%2^23</code>运算修改为<code>ip#1</code>、<code>ip#2</code>进行编号后在进行运算，使得一台服务器在环上存在多个节点，达到尽可能将数据均匀分布到各个服务器上的目的。</p>
+<h4 id="缓冲穿透、击穿、雪崩"><a href="#缓冲穿透、击穿、雪崩" class="headerlink" title="缓冲穿透、击穿、雪崩"></a>缓冲穿透、击穿、雪崩</h4><p><strong>缓存穿透</strong>：当某一个<code>key</code>对应数据在缓存中不存在同时在持久层也不存在时，如果大量的请求涌入，会造成数据库的压力，这种现象称为缓存穿透。</p>
+<p><strong>解决方案</strong></p>
+<ul>
+<li>布隆过滤器：将所有数据都打入布隆过滤器中，当通过布隆过滤器查询某个值时，若返回<code>false</code>则一定不存在该数据，若返回<code>true</code>则可能存在数据(有一定误判率)，进入<code>redis</code>查询，若没有命中，在进入持久层查询。</li>
+<li>缓存空对象：这种做法比较粗暴，当出现数据查询不到时，将空对象缓存，一般会设置一个较短的缓存时间。</li>
+</ul>
+<p><strong>缓存击穿</strong>：当某一时刻，某一个<code>key</code>对应的缓存时间过期导致失效，如果大量的请求涌入，导致所有的请求都到持久层，会造成数据库压力，这种现象称为缓存击穿。</p>
+<p><strong>解决方案</strong></p>
+<ul>
+<li>使用互斥锁：使用<code>mutex</code>，当缓存失效时，获取锁，在进入持久层，查询到数据后再添加到缓存中，也就是说若缓存中查询不到值，需要获取锁之后，才能进入持久层。</li>
+</ul>
+<p><strong>缓存雪崩</strong>：在某一个时刻，多个<code>key</code>对应的缓存时间过期，导致这些<code>key</code>全部失效，如果大量的请求涌入，导致所有的请求都到达持久层，会造成数据库压力，这种现象称为缓存雪崩。</p>
+<p><strong>解决方案</strong></p>
+<ul>
+<li>缓存失效随机值，尽量避免多个<code>key</code>扎堆在同一时刻失效。</li>
+</ul>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2022/07/12/%E7%BC%93%E5%AD%98/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%BA%8C)/" title="redis学习笔记(二)">http://xiaocainiaoya.github.io/2022/07/12/缓存/redis学习笔记(二)/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 笔记</a>
+              <a href="/tags/redis/" rel="tag"><i class="fa fa-tag"></i> redis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/12/%E7%BC%93%E5%AD%98/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%B8%80)/" rel="prev" title="redis学习笔记(一)">
+      <i class="fa fa-chevron-left"></i> redis学习笔记(一)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/07/14/mysql/mysql%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6/" rel="next" title="mysql日志文件">
+      mysql日志文件 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C"><span class="nav-number">1.</span> <span class="nav-text">redis学习笔记(二)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">主从复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.0.0.2.</span> <span class="nav-text">哨兵模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%86%B2%E7%A9%BF%E9%80%8F%E3%80%81%E5%87%BB%E7%A9%BF%E3%80%81%E9%9B%AA%E5%B4%A9"><span class="nav-number">1.0.0.3.</span> <span class="nav-text">缓冲穿透、击穿、雪崩</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
