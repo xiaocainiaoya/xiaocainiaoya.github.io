@@ -21,22 +21,26 @@
     var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="旨在记录在使用git过程中出现的一些问题和使用上的一些操作记录、或者是git一些概念上的理解，防止重复踩坑。">
+  <meta name="description" content="数据库和缓存双写一致性背景​    使用缓存在存储热点数据是常用的提交系统响应速度的一种解决方案，但是在更新数据时如何确保数据库和缓存中的数据一致性，特别是在高并发的场景下，应如何保证双写数据的一致性。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="git记录">
-<meta property="og:url" content="http://xiaocainiaoya.github.io/2022/01/10/git/git%E8%AE%B0%E5%BD%95/index.html">
+<meta property="og:title" content="数据库和缓存双写一致性">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2022/07/20/%E7%BC%93%E5%AD%98/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%92%8C%E7%BC%93%E5%AD%98%E5%8F%8C%E5%86%99%E4%B8%80%E8%87%B4%E6%80%A7/index.html">
 <meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
-<meta property="og:description" content="旨在记录在使用git过程中出现的一些问题和使用上的一些操作记录、或者是git一些概念上的理解，防止重复踩坑。">
+<meta property="og:description" content="数据库和缓存双写一致性背景​    使用缓存在存储热点数据是常用的提交系统响应速度的一种解决方案，但是在更新数据时如何确保数据库和缓存中的数据一致性，特别是在高并发的场景下，应如何保证双写数据的一致性。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://s2.loli.net/2022/01/10/q6iVtARvPXImlCZ.png">
-<meta property="article:published_time" content="2022-01-10T13:51:58.000Z">
-<meta property="article:modified_time" content="2022-01-10T12:24:35.881Z">
+<meta property="og:image" content="https://s2.loli.net/2022/07/20/m6zT1AH2oZvSwa8.png">
+<meta property="og:image" content="https://s2.loli.net/2022/07/20/rq9LGBjQ4EfCvRh.png">
+<meta property="og:image" content="https://s2.loli.net/2022/07/20/lZQImSBoycYAO5b.png">
+<meta property="og:image" content="https://s2.loli.net/2022/07/20/jD6v2BzV7gylqRE.png">
+<meta property="article:published_time" content="2022-07-20T12:50:58.000Z">
+<meta property="article:modified_time" content="2022-07-20T08:42:46.397Z">
 <meta property="article:author" content="xiaocainiaoya">
-<meta property="article:tag" content="git">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="redis">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://s2.loli.net/2022/01/10/q6iVtARvPXImlCZ.png">
+<meta name="twitter:image" content="https://s2.loli.net/2022/07/20/m6zT1AH2oZvSwa8.png">
 
-<link rel="canonical" href="http://xiaocainiaoya.github.io/2022/01/10/git/git%E8%AE%B0%E5%BD%95/">
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2022/07/20/%E7%BC%93%E5%AD%98/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%92%8C%E7%BC%93%E5%AD%98%E5%8F%8C%E5%86%99%E4%B8%80%E8%87%B4%E6%80%A7/">
 
 
 <script id="page-configurations">
@@ -49,7 +53,7 @@
   };
 </script>
 
-  <title>git记录 | xiaocainiaoya's blog</title>
+  <title>数据库和缓存双写一致性 | xiaocainiaoya's blog</title>
   
 
 
@@ -166,7 +170,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/01/10/git/git%E8%AE%B0%E5%BD%95/">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/07/20/%E7%BC%93%E5%AD%98/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%92%8C%E7%BC%93%E5%AD%98%E5%8F%8C%E5%86%99%E4%B8%80%E8%87%B4%E6%80%A7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -179,7 +183,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          git记录
+          数据库和缓存双写一致性
         </h1>
 
         <div class="post-meta">
@@ -190,7 +194,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-01-10 21:51:58 / 修改时间：20:24:35" itemprop="dateCreated datePublished" datetime="2022-01-10T21:51:58+08:00">2022-01-10</time>
+              <time title="创建时间：2022-07-20 20:50:58 / 修改时间：16:42:46" itemprop="dateCreated datePublished" datetime="2022-07-20T20:50:58+08:00">2022-07-20</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -198,7 +202,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index"><span itemprop="name">git</span></a>
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
                 </span>
             </span>
 
@@ -220,39 +224,49 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <blockquote>
-<p>旨在记录在使用<code>git</code>过程中出现的一些问题和使用上的一些操作记录、或者是<code>git</code>一些概念上的理解，防止重复踩坑。</p>
-</blockquote>
-<span id="more"></span>
-
-<p><strong>1. 强制回滚远程<code>git</code>仓库的某个提交</strong><br>简单描述一下<code>git</code>的操作流程: </p>
+        <h1 id="数据库和缓存双写一致性"><a href="#数据库和缓存双写一致性" class="headerlink" title="数据库和缓存双写一致性"></a>数据库和缓存双写一致性</h1><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>​    使用缓存在存储热点数据是常用的提交系统响应速度的一种解决方案，但是在更新数据时如何确保数据库和缓存中的数据一致性，特别是在高并发的场景下，应如何保证双写数据的一致性。<span id="more"></span></p>
+<p><img src="https://s2.loli.net/2022/07/20/m6zT1AH2oZvSwa8.png" alt="双写一致性.png"></p>
+<p>通常来说，常见的应用场景为：</p>
 <ol>
-<li>工作区编写代码通过<code>add</code>命令添加到暂存区</li>
-<li>暂存区通过<code>commit</code>命令添加到本地版本库</li>
-<li>本地版本库通过<code>push</code>命令将本地代码推送到远程代码库</li>
+<li>用户请求查询某些数据，先进入缓存查看是否存在</li>
+<li>存在则直接返回数据</li>
+<li>不存在则查数据库，查到则将数据添加一份到缓存中，再返回，使得下次查询可以直接从缓存中获取，从而提高系统的响应速度。</li>
 </ol>
-<p><code>git reset --soft HEAD^</code>  将本地仓库回滚为指定版本，且多余的提交回滚到暂存区</p>
-<p><code>git reset --fixed HEAD^</code> 将本地仓库和暂存区回滚为指定版本</p>
-<p><code>git reset --hard HEAD^</code> 将本地仓库、暂存区和工作区回滚为指定版本</p>
-<p>强制回滚一个提交步骤:</p>
-<ol>
-<li>拉取需要修改的分支代码</li>
-<li>通过<code>git reset --hard HEAD^</code>命令回滚一个提交</li>
-<li>通过<code>git push --force</code>强制推送到远程代码库</li>
+<h2 id="双写的四种场景"><a href="#双写的四种场景" class="headerlink" title="双写的四种场景"></a>双写的四种场景</h2><ol>
+<li>先更新缓存，再更新数据库</li>
 </ol>
-<p><strong>2. 在<code>git</code>中<code>~</code>和<code>^</code>的区别</strong><br><code>HEAD^</code>, <code>HEAD^1</code>, <code>HEAD~</code>三个表达式都表示<code>HEAD</code>的父提交</p>
-<p><code>HEAD^n</code>: 指的是<code>HEAD</code>的第<code>n</code>个父提交(有多个父提交的前提下[这里的父提交实际上是合并操作])<br><code>HEAD~n</code>: 指的是<code>HEAD</code>的第<code>n</code>个祖先提交(这里需要区分父提交和祖先提交的区别)，所以<code>HEAD~n=HEAD^^^(n个^)</code><br><img src="https://s2.loli.net/2022/01/10/q6iVtARvPXImlCZ.png" alt="git中^和~的区别.png"></p>
-<p><strong>3. <code>log</code>和<code>reflog</code>的区别</strong></p>
+<p>​    如果采用这种方式，极易产生数据不一致的情况。因为先更新缓存，如果因为某些原因出现数据写入失败，比如主键冲突、非空字段未填值、数据库宕机等等情况导致数据库写入失败，这时就出现了缓存中是新值，数据库中是旧值，造成了数据库和缓存数据不一致。</p>
+<ol start="2">
+<li>先更新数据库，再更新缓存</li>
+</ol>
+<p>​    假设更新数据库的操作和更新缓存的操作在同一个事务中，那么更新数据库之后，再更新缓存，如果出现缓存更新失败，那么事务回滚，保证了数据的一致性。但由于数据库和缓存实际上都是采用远程链接的方式读写数据，所以一般来说只有在低并发的场景下，才会将二者放在同一个事务中，否则若写缓存过慢，直接导致数据库事务时间被拉长，而形成长事务。如果二者不在同一个事务中，若数据库更新数据成功，缓存中更新数据失败，就会导致数据的不一致。</p>
+<p>​    假设在高并发场景下，且更新缓存和更新数据库不在同一个事务中执行。假设有两个写操作，当写操作A更新数据库之后，在将数据写入缓存的过程中出现网络拥堵等情况，这时写操作B，也更新了数据库，拿着更新之后的值，写入到缓存中，同时写操作A的网络不拥堵了，写操作A又更新了缓存，这时数据库中是写操作B的值，缓存中是写操作A的值，从而造成了数据不一致。</p>
+<p><img src="https://s2.loli.net/2022/07/20/rq9LGBjQ4EfCvRh.png" alt="先更新数据库再更新缓存.png"></p>
+<ol start="3">
+<li>先删除缓存，再更新数据库</li>
+</ol>
+<p>​    同样在高并发下，如果请求A在删除缓存之后，写入数据库之前的这段时间内，如果有请求B进行获取数据，这是它从缓存中获取不到，则从数据库中获取，由于这时A还未将数据写入到数据库中，请求B读到的是旧值，而请求B又将读到的旧值写入到缓存中，之后请求A又将新值写入到数据库中，造成了数据库和缓存数据不一致。</p>
+<p><img src="https://s2.loli.net/2022/07/20/lZQImSBoycYAO5b.png" alt="先删缓存再写库.png"></p>
+<p>可以通过<strong>缓存双删</strong>的方式解决这个问题，写操作A在写入数据库之后，再删除一次缓存，这时又有一个新的问题，如果写操作A在一更新数据库之后，就去删缓存，可能存在某些线程中已经获取了旧值，只不过还没写入到缓存中，也就是上图的步骤7和步骤8。所以一般是在更新数据库之后一段时间之后进行缓存删除，比如500ms。</p>
+<ol start="4">
+<li>先更新数据库，再删除缓存</li>
+</ol>
+<p>​    同样假设有两个请求，一个读请求A，一个写请求B。</p>
 <ul>
-<li><code>reflog</code>: 可以查看所有分支的所有操作记录(包括已经删除的提交或者是重置的提交)</li>
-<li><code>log</code>: 不能查看被删除的提交</li>
+<li>当写请求B先到，在更新数据库的过程中或者更新数据库后还未删除缓存时，读请求到达，读取了缓存中的数据，然后写请求B再删除缓存，对于这种场景仅读请求A读取了一次旧值。</li>
+<li>当读请求A先到，读取到了缓存中的数据，直接返回了，这时写请求B在更新数据库，再删除缓存，同样对于这种场景，仅读请求A读取了一次旧值。</li>
 </ul>
-<p>基于以上两个命令的区别<code>reflog</code>在一些场景下可以提供一些妙用。<br>比如:<br><strong>查看某个分支是基于那个分支迁出:</strong> <code>git reflog --date=local | grep &lt;分支名称&gt;</code></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 输出信息</span><br><span class="line">077b02d HEAD@&#123;Fri Jan 7 17:03:26 2022&#125;: checkout: moving from 原分支名称 to 迁出后分支名称</span><br></pre></td></tr></table></figure>
-
-
-<p>博客地址：<a href="https://xiaocainiaoya.github.io/">https://xiaocainiaoya.github.io/</a></p>
-<p>联系方式：<a href="mailto:&#x78;&#105;&#97;&#111;&#x63;&#97;&#105;&#110;&#105;&#97;&#111;&#121;&#x61;&#x40;&#102;&#x6f;&#x78;&#109;&#x61;&#105;&#108;&#x2e;&#x63;&#111;&#109;">&#x78;&#105;&#97;&#111;&#x63;&#97;&#105;&#110;&#105;&#97;&#111;&#121;&#x61;&#x40;&#102;&#x6f;&#x78;&#109;&#x61;&#105;&#108;&#x2e;&#x63;&#111;&#109;</a></p>
+<p>但是还是有一种场景下，会导致数据不一致，也就是缓存过期了。</p>
+<p>也就是当写操作A到达，在更新数据时出现拥堵，这时读操作B来读取缓存，刚好缓存过期，则从数据库中获取到了旧值，同时写操作A更新了数据库，且删除了缓存，然后读操作B再将旧值写入到缓存中，造成数据不一致。</p>
+<p><img src="https://s2.loli.net/2022/07/20/jD6v2BzV7gylqRE.png" alt="写库再删缓存.png"></p>
+<p>但是一般来说认为要造成上述场景需要满足两个条件：</p>
+<ol>
+<li>缓存刚好过期了</li>
+<li>读操作B从数据库读到数据之后，更新缓存的耗时比写操作A更新数据库+删除缓存的耗时长。(一般来说对缓存的操作耗时要远小于对数据的操作耗时)</li>
+</ol>
+<p><strong>综上，一般来说还是需要采用先更新数据库再删除缓存的策略。</strong></p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>​    实际上不论是方案3中的缓存双删还是方案4都存在一个问题，在二者操作不在同一个事务的前提下，如果删除缓存操作失败了，那么就会导致缓存和数据库数据不一致。</p>
+<p>​    这时就需要引入重试机制，缓存删除失败之后进行重试。关于重试就可简单可复杂了，简单就是直接捕获异常进行重试操作，但这可能影响接口时效，也可以将设置专门线程池，将重试操作推给线程池，又或者引入一些任务调度或者是<code>MQ</code>的中间件来处理。在查资料的过程中，有看到有人说也可以通过订阅<code>mysql</code>的<code>binlog</code>，如果发现了更新数据请求，则删除对应的缓存，但是据我所知很多项目在生产环境甚至连<code>binlog</code>功能都没有开启[旺柴]。</p>
 
     </div>
     <div>
@@ -276,7 +290,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://xiaocainiaoya.github.io/2022/01/10/git/git%E8%AE%B0%E5%BD%95/" title="git记录">http://xiaocainiaoya.github.io/2022/01/10/git/git记录/</a>
+    <a href="http://xiaocainiaoya.github.io/2022/07/20/%E7%BC%93%E5%AD%98/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%92%8C%E7%BC%93%E5%AD%98%E5%8F%8C%E5%86%99%E4%B8%80%E8%87%B4%E6%80%A7/" title="数据库和缓存双写一致性">http://xiaocainiaoya.github.io/2022/07/20/缓存/数据库和缓存双写一致性/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -287,7 +301,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/git/" rel="tag"><i class="fa fa-tag"></i> git</a>
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 笔记</a>
+              <a href="/tags/redis/" rel="tag"><i class="fa fa-tag"></i> redis</a>
           </div>
 
         
@@ -296,13 +311,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/12/29/Spring/Lock4j%E7%9A%84%E9%94%81%E4%BB%A3%E7%90%86%E6%B5%85%E6%9E%90/" rel="prev" title="Lock4j的锁代理浅析">
-      <i class="fa fa-chevron-left"></i> Lock4j的锁代理浅析
+    <a href="/2022/07/14/mysql/mysql%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6/" rel="prev" title="mysql日志文件">
+      <i class="fa fa-chevron-left"></i> mysql日志文件
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2022/03/02/java/webservice%E5%88%9D%E8%AF%95/" rel="next" title="webService初试">
-      webService初试 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -361,6 +373,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E5%92%8C%E7%BC%93%E5%AD%98%E5%8F%8C%E5%86%99%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">1.</span> <span class="nav-text">数据库和缓存双写一致性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8C%E5%86%99%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%9C%BA%E6%99%AF"><span class="nav-number">1.2.</span> <span class="nav-text">双写的四种场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">1.3.</span> <span class="nav-text">结论</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
