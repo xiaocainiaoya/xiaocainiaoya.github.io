@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="tk.mybaits动态表名背景​    由于目前项目中多采用模块化的方式进行组件的整合，在新服务的搭建时为了尽可能保证新服务指向的数据库中的表名统一于服务名，比如新服务是订单模块，希望这个模块指向的数据库中的表名都是以ORDER_开头。且一些二次开发的组件中也有使用mysql进行数据的相关处理，故希望可以通过统一处理的方式进行表名动态化。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tk.mybaits动态表名">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2022/07/27/mybatis/tk.mybaits%E5%8A%A8%E6%80%81%E8%A1%A8%E5%90%8D/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="tk.mybaits动态表名背景​    由于目前项目中多采用模块化的方式进行组件的整合，在新服务的搭建时为了尽可能保证新服务指向的数据库中的表名统一于服务名，比如新服务是订单模块，希望这个模块指向的数据库中的表名都是以ORDER_开头。且一些二次开发的组件中也有使用mysql进行数据的相关处理，故希望可以通过统一处理的方式进行表名动态化。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/07/27/XcaJ5jdZ2omVnP1.png">
+<meta property="article:published_time" content="2022-07-27T14:13:58.000Z">
+<meta property="article:modified_time" content="2022-07-27T13:49:50.171Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="问题和方案">
+<meta property="article:tag" content="mybatis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/07/27/XcaJ5jdZ2omVnP1.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2022/07/27/mybatis/tk.mybaits%E5%8A%A8%E6%80%81%E8%A1%A8%E5%90%8D/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>tk.mybaits动态表名 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/07/27/mybatis/tk.mybaits%E5%8A%A8%E6%80%81%E8%A1%A8%E5%90%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          tk.mybaits动态表名
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-07-27 22:13:58 / 修改时间：21:49:50" itemprop="dateCreated datePublished" datetime="2022-07-27T22:13:58+08:00">2022-07-27</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mybatis/" itemprop="url" rel="index"><span itemprop="name">mybatis</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="tk-mybaits动态表名"><a href="#tk-mybaits动态表名" class="headerlink" title="tk.mybaits动态表名"></a>tk.mybaits动态表名</h1><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>​    由于目前项目中多采用模块化的方式进行组件的整合，在新服务的搭建时为了尽可能保证新服务指向的数据库中的表名统一于服务名，比如新服务是订单模块，希望这个模块指向的数据库中的表名都是以<code>ORDER_</code>开头。且一些二次开发的组件中也有使用<code>mysql</code>进行数据的相关处理，故希望可以通过统一处理的方式进行表名动态化。 <span id="more"></span>    </p>
+<h2 id="跟踪"><a href="#跟踪" class="headerlink" title="跟踪"></a>跟踪</h2><p>​    <code>tk.mybatis</code>的大致处理逻辑：</p>
+<p><img src="https://s2.loli.net/2022/07/27/XcaJ5jdZ2omVnP1.png" alt="tk相关处理过程.png"></p>
+<ol>
+<li>扫描器会将所有被<code>@Mapper</code>标记的类通过<code>SpringBean</code>的创建对象流程中，然后创建相应的对象后，添加到<code>SpringBean</code>容器中。</li>
+<li>将这个标记的类对象包装为<code>MapperFactoryBean</code>对象</li>
+<li>待到创建<code>bean</code>流程的最后，也就是经过了初始化、后置处理器列表等扩展点的相关处理之后，通过包装对象<code>MapperFactoryBean#afterPropertiesSet()</code>进行<code>tk.mybatis</code>对象的二次处理。</li>
+<li>通过这个后置方法，解析出这个<code>@Mapper</code>对象所对应的表实体的表名和其他一些在创建<code>SQL</code>所需要的配置信息。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EntityHelper</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 存储在这个map中 实体类 =&gt; 表对象</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;Class&lt;?&gt;, EntityTable&gt; entityTableMap = <span class="keyword">new</span> ConcurrentHashMap&lt;Class&lt;?&gt;, EntityTable&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<ol start="5">
+<li>根据这个标记对象所继承的上层接口，逐个解析出对应的<code>SQL</code>语句。以下方代码为例，这里的上层接口<code>CommonMapper</code>继承于<code>Mapper</code>，而<code>Mapper</code>又继承于很多的上层接口，其中就有<code>selectOne</code>接口，那么在这一步就会根据第四步骤中解析出来的表信息和字段信息等，构建一个基于变量的<code>SQL</code>语句，如果业务层调用该方法时，仅将相关参数填充后就形成一条完整的<code>SQL</code>。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Mapper</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">XxxxMapper</span> <span class="keyword">extends</span> <span class="title">CommonMapper</span>&lt;<span class="title">XxxAttachment</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">CommonMapper</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Mapper</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span></span></span><br><span class="line"><span class="class">        <span class="title">BaseMapper</span>&lt;<span class="title">T</span>&gt;,</span></span><br><span class="line"><span class="class">        <span class="title">ExampleMapper</span>&lt;<span class="title">T</span>&gt;,</span></span><br><span class="line"><span class="class">        <span class="title">RowBoundsMapper</span>&lt;<span class="title">T</span>&gt;,</span></span><br><span class="line"><span class="class">        <span class="title">Marker</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">SelectOneMapper</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据实体中的属性进行查询，只能有一个返回值，有多个结果是抛出异常，查询条件使用等号</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> record</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@SelectProvider(type = BaseSelectProvider.class, method = &quot;dynamicSQL&quot;)</span></span><br><span class="line">    <span class="function">T <span class="title">selectOne</span><span class="params">(T record)</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="处理方案"><a href="#处理方案" class="headerlink" title="处理方案"></a>处理方案</h2><p>​    根据以上的步骤，可以得出一个结论，如果想要动态（这个动态是指创建时动态，并不是指运行时动态）的修改表名，那么需要在第四步之后，第五步之前将<code>entityTableMap</code>中对应的表名修改为想要的表名。</p>
+<p>​    根据<code>Springbean</code>创建对象的逻辑，在初始化后置方法之前，会经过后置处理器列表，所以可以通过模拟一个后置处理器列表，提前对<code>entityTableMap</code>相关信息进行解析并缓存。</p>
+<p><code>MapperFactoryBean</code> 进行处理的主要逻辑：</p>
+<ol>
+<li><p>根据<code>XxxMapper</code>类获取到对应的表实体</p>
+</li>
+<li><p>通过<code>EntityHelper.initEntityNameMap()</code>方法解析出这个表实体的相关信息，并缓存。</p>
+</li>
+<li><p>将<code>XxxMapper.selectExample() </code>等等内置的通用接口解析为动态SQL语句，缓存在某个地方(这个我没有去找在哪里)</p>
+</li>
+</ol>
+<p>综上：只要能在 第3步之前将<code>EntityHelper</code>中的这个缓存中的<code>EntityTable</code>的表名称修改为相应的值，就能实现将表名动态化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TablePrefixBeanPostProcessor</span> <span class="keyword">implements</span> <span class="title">BeanPostProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * tk.mybatis 在 MapperFactoryBean 进行相关的逻辑处理，所以通过BeanPostProcessor，在执行MapperFactoryBean.afterPropertiesSet()方法之前，</span></span><br><span class="line"><span class="comment">    * 进行一次预处理，将表相关信息通过EntityHelper.initEntityNameMap()方法提前添加到对应的entityTableMap&lt;Class, EntityTable&gt;缓存之后，</span></span><br><span class="line"><span class="comment">    * 然后马上将这个实体所对应的EntityTable的表名进行需要的业务处理。</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@author</span> xiaocainiaoya</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@date</span> 2022/7/27 16:04:01</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> bean</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> beanName</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span>: java.lang.Object</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(bean.getClass() != <span class="keyword">null</span> &amp;&amp; bean.getClass().toString().contains(<span class="string">&quot;tk.mybatis.spring.mapper.MapperFactoryBean&quot;</span>))&#123;</span><br><span class="line">            Class&lt;?&gt; mapperClass = ((MapperFactoryBean)bean).getMapperInterface();</span><br><span class="line">            Type[] types = mapperClass.getGenericInterfaces();</span><br><span class="line">            ParameterizedType parameterizedType = (ParameterizedType) types[<span class="number">0</span>];</span><br><span class="line">            Class&lt;?&gt; returnType = (Class&lt;?&gt;)  parameterizedType.getActualTypeArguments()[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 反射获取mapperHelper</span></span><br><span class="line">            MapperHelper mapperHelper = (MapperHelper) ReflectUtil.getFieldValue(bean, <span class="string">&quot;mapperHelper&quot;</span>);</span><br><span class="line">            <span class="comment">// 提前解析这个bean所对应的表实体的相关信息</span></span><br><span class="line">            EntityHelper.initEntityNameMap(returnType, mapperHelper.getConfig());</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 是否需要修改表名</span></span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                EntityTable entityTable = EntityHelper.getEntityTable(returnType);</span><br><span class="line">                entityTable.setName(<span class="string">&quot;prefix&quot;</span> + entityTable.getName());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessAfterInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上方代码中的最后的判断语句可以根据相应的规则，比如说自定义一个注解，并且在注解中指定一个前缀的参数，标记在实体上，这里可以通过获取这个注解进行是否需要添加前缀的逻辑处理。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>​    实际上以上这种场景应该在真是情况中少之又少，一般情况下并不会说想要统一某个服务中的所有表名前缀，但是在解决的问题的过程中，其实对<code>springBean</code>创建实体的流程，以及<code>tk.mybatis</code>对实体解析的相关逻辑都大致的过了一遍，加强了框架中一些细节处理的印象，对于后续如果出现一些<code>bug</code>可以尽快的定位到问题。</p>
+<p>​    实际上我并不是一下子就想到这么做，在想到这么做之前，我也经过了其他的尝试，比方说我最先想到的是通过写<code>mybatis</code>插件的方式，拦截出<code>BoundSql</code>具体的<code>SQL</code>语句，通过修改这个<code>SQL</code>语句达到目的，但是发现不同类型的<code>SQL</code>判断方式略有不同，操作难度大，所以一直往上层追溯，发现<code>BoundSql</code>中的语句是在<code>Bean</code>初始化过程就已经生成，后面才一点一点整理出上述步骤流程，从而找到下手的地方。</p>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2022/07/27/mybatis/tk.mybaits%E5%8A%A8%E6%80%81%E8%A1%A8%E5%90%8D/" title="tk.mybaits动态表名">http://xiaocainiaoya.github.io/2022/07/27/mybatis/tk.mybaits动态表名/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/" rel="tag"><i class="fa fa-tag"></i> 问题和方案</a>
+              <a href="/tags/mybatis/" rel="tag"><i class="fa fa-tag"></i> mybatis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/21/mybatis/tk.mybaits%E5%92%8CmybatisPlus%E5%85%BC%E5%AE%B9%E6%80%A7/" rel="prev" title="tk.mybaits和mybatisPlus兼容性">
+      <i class="fa fa-chevron-left"></i> tk.mybaits和mybatisPlus兼容性
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#tk-mybaits%E5%8A%A8%E6%80%81%E8%A1%A8%E5%90%8D"><span class="nav-number">1.</span> <span class="nav-text">tk.mybaits动态表名</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%9F%E8%B8%AA"><span class="nav-number">1.2.</span> <span class="nav-text">跟踪</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E6%96%B9%E6%A1%88"><span class="nav-number">1.3.</span> <span class="nav-text">处理方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
