@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="mysql45讲学习总结（二）—索引​    一句话简单来说，索引的出现其实就是为了提高数据查询的效率，就像书的目录一样。一本 500 页的书，如果你想快速找到其中的某一个知识点，在不借助目录的情况下，那我估计你可得找一会儿。同样，对于数据库的表而言，索引其实就是它的“目录”。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql45讲学习总结（二）---索引">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2022/09/21/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89---%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="mysql45讲学习总结（二）—索引​    一句话简单来说，索引的出现其实就是为了提高数据查询的效率，就像书的目录一样。一本 500 页的书，如果你想快速找到其中的某一个知识点，在不借助目录的情况下，那我估计你可得找一会儿。同样，对于数据库的表而言，索引其实就是它的“目录”。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/09/22/5VS38hx476lnUrK.png">
+<meta property="og:image" content="https://s2.loli.net/2022/09/22/5VS38hx476lnUrK.png">
+<meta property="og:image" content="https://s2.loli.net/2022/09/22/uneZG4Os8JbfMRS.jpg">
+<meta property="og:image" content="https://s2.loli.net/2022/09/22/Ik84FoZC3MHlWPV.jpg">
+<meta property="og:image" content="https://s2.loli.net/2022/09/22/OzSdyGrlAkwEhUC.jpg">
+<meta property="og:image" content="https://s2.loli.net/2022/09/23/ARtpzfZ5Dg7G1O6.png">
+<meta property="article:published_time" content="2022-09-21T14:13:58.000Z">
+<meta property="article:modified_time" content="2022-09-23T06:33:07.128Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/09/22/5VS38hx476lnUrK.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2022/09/21/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89---%E7%B4%A2%E5%BC%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>mysql45讲学习总结（二）---索引 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/09/21/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89---%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql45讲学习总结（二）---索引
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-21 22:13:58" itemprop="dateCreated datePublished" datetime="2022-09-21T22:13:58+08:00">2022-09-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-09-23 14:33:07" itemprop="dateModified" datetime="2022-09-23T14:33:07+08:00">2022-09-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="mysql45讲学习总结（二）—索引"><a href="#mysql45讲学习总结（二）—索引" class="headerlink" title="mysql45讲学习总结（二）—索引"></a>mysql45讲学习总结（二）—索引</h1><p>​    一句话简单来说，索引的出现其实就是为了提高数据查询的效率，就像书的目录一样。一本 500 页的书，如果你想快速找到其中的某一个知识点，在不借助目录的情况下，那我估计你可得找一会儿。同样，对于数据库的表而言，索引其实就是它的“目录”。</p>
+<span id="more"></span>
+
+<h1 id="索引的常见模型"><a href="#索引的常见模型" class="headerlink" title="索引的常见模型"></a>索引的常见模型</h1><p>​    索引的出现是为了提高查询效率，实际上，索引之所以能够提高查询效率，一定程度上是借助于索引的存储模型，这里简答介绍三种常见数据结构，哈希表、有序数组和搜索树。</p>
+<p>// TODO</p>
+<h1 id="InnoDB索引模型"><a href="#InnoDB索引模型" class="headerlink" title="InnoDB索引模型"></a>InnoDB索引模型</h1><p>​    在<code>InnoDB</code>存储引擎中，表都是根据主键顺序以索引的形式存放，这种存储方式的表称为索引组织表。<code>InnoDB</code>使用的索引模型为<code>B+</code>树形索引模型，所以数据都是存储在<code>B+</code>树中。</p>
+<p>每一个索引在<code>InnoDB</code>里面都对应着一颗<code>B+</code>树。</p>
+<p>假设有一个表，<code>ID</code>为主键，且还有字段<code>k,name</code>，同时<code>k</code>字段上有索引。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">create table T(</span><br><span class="line">id int primary key, </span><br><span class="line">k int not null, </span><br><span class="line">name varchar(16),</span><br><span class="line">index (k))engine&#x3D;InnoDB;</span><br></pre></td></tr></table></figure>
+
+<p>表中有5条记录：(ID,K)&rarr; (100,1)、(200,2)、(300,3)、(500,5) 、 (600,6)</p>
+<p>主键索引树和<code>k</code>字段索引树如下：(图中主键索引显示为[100, 200]在一页，[300, 500, 600]在一页)</p>
+<p><img src="https://s2.loli.net/2022/09/22/5VS38hx476lnUrK.png" alt="ID和k索引树.png"></p>
+<p>由上图可知：</p>
+<p>索引类型分为主键索引(聚簇索引)和非主键(二级索引)索引。</p>
+<ul>
+<li>主键索引的叶子节点存储的是一整行的记录。</li>
+<li>非主键索引的叶子节点存储的是主键ID。</li>
+</ul>
+<p>某个查询语句使用主键索引和非主键索引的差别在于，非主键索引查询到树节点之后得到叶子节点上的主键<code>ID</code>之后，需要再通过主键索引树再查找一轮，得到主键<code>ID</code>对应的行数据，这个过程称为回表。</p>
+<h1 id="索引维护"><a href="#索引维护" class="headerlink" title="索引维护"></a>索引维护</h1><p>​    根据第一小节中的常见的索引模型可知，索引之所以查询速度高，实际上是依赖于索引模型，也就是说在插入数据时，就需要根据索引模型相应的规则进行数据的存储。所以虽然添加索引的查询效率高，但索引的数量并不是越多越好，过多的索引会增加插入数据带来的成本。</p>
+<p>以上方索引树的图为例：</p>
+<ul>
+<li>如果插入的新行<code>ID</code>值为700，则只需要在R5的记录后面插入一条新记录。</li>
+<li>如果插入的新行<code>ID</code>值为400，则需要将500和600往后挪，空出位置。如果R5所在的数据页满了，则需要申请一个新的数据页，然后将部分数据挪过去，这个过程称为页分裂。</li>
+<li>如果相邻两页数据由于删除了数据，导致利用率比较低，那么就会出现合并页，这个过程是页分裂的逆过程。</li>
+</ul>
+<h1 id="索引概念"><a href="#索引概念" class="headerlink" title="索引概念"></a>索引概念</h1><p>还是这个表为例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">create table T (</span><br><span class="line">ID int primary key,</span><br><span class="line">k int NOT NULL DEFAULT 0, </span><br><span class="line">s varchar(16) NOT NULL DEFAULT &#39;&#39;,</span><br><span class="line">index k(k))</span><br><span class="line">engine&#x3D;InnoDB;</span><br><span class="line"># 同时插入6条记录</span><br><span class="line">insert into T values(100,1, &#39;aa&#39;),(200,2,&#39;bb&#39;),(300,3,&#39;cc&#39;),(500,5,&#39;ee&#39;),(600,6,&#39;ff&#39;),(700,7,&#39;gg&#39;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2022/09/22/5VS38hx476lnUrK.png" alt="ID和k索引树.png"></p>
+<p>执行查询语句：</p>
+<blockquote>
+<p>select * from T where k between 3 and 5</p>
+</blockquote>
+<p>执行流程：</p>
+<ol>
+<li>到非主键索引<code>k</code>上搜索<code>k=3</code>的树节点，得到主键<code>ID=100</code>。根据这个<code>ID</code>值，到主键索引树查询到对应行<code>R3</code>。</li>
+<li>到非主键索引<code>k</code>上取<code>k=3</code>的下一个值，得到<code>k=5</code>这个树节点，得到主键<code>ID=500</code>。根据这个<code>ID</code>值，到主键索引树查询到对应行<code>R4</code>。</li>
+<li>到非主键索引<code>k</code>上取<code>k=3</code>的下一个值，得到<code>k=6</code>这个树节点，不满足<code>where</code>条件，循环结束。</li>
+</ol>
+<p>在步骤1和步骤2都有回表的动作，这是因为需要查询的字段在非主键索引<code>k</code>上没有，那么有没有办法避免回表？</p>
+<h2 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h2><p>如果将执行语句修改为：</p>
+<blockquote>
+<p>select ID from T where k between 3 and 5</p>
+</blockquote>
+<p>由于这时需要查询的字段<code>ID</code>，就是非主键索引<code>k</code>的叶子节点上能获取到的数据，所以就不需要进行回表的操作，也就达到了减少一次回表查询的动作，从而提升查询效率。</p>
+<h2 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h2><p>所以为了不进行回表，就需要在数节点上存储的数据做文章，就需要通过联合索引。这里的<code>name_age</code>就是联合索引。</p>
+<p>假设一个市民信息表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE &#96;tuser&#96; (</span><br><span class="line">  &#96;id&#96; int(11) NOT NULL,</span><br><span class="line">  &#96;id_card&#96; varchar(32) DEFAULT NULL,</span><br><span class="line">  &#96;name&#96; varchar(32) DEFAULT NULL,</span><br><span class="line">  &#96;age&#96; int(11) DEFAULT NULL,</span><br><span class="line">  &#96;ismale&#96; tinyint(1) DEFAULT NULL,</span><br><span class="line">  PRIMARY KEY (&#96;id&#96;),</span><br><span class="line">  KEY &#96;id_card&#96; (&#96;id_card&#96;),</span><br><span class="line">  KEY &#96;name_age&#96; (&#96;name&#96;,&#96;age&#96;)</span><br><span class="line">) ENGINE&#x3D;InnoDB</span><br></pre></td></tr></table></figure>
+
+<p>如果这时需要用市民的名称查询他的年龄：</p>
+<blockquote>
+<p>select age from tuser where name = “xxx”</p>
+</blockquote>
+<p>如果使用<code>name_age</code>索引，就不需要进行一次回表就可以查出想要的某个名称对应的年龄，当然了这里会出现多条记录的情况。</p>
+<h2 id="最左前缀原则"><a href="#最左前缀原则" class="headerlink" title="最左前缀原则"></a>最左前缀原则</h2><p>如果将这条查询语句换个查询条件，能否使用这个联合索引呢？</p>
+<blockquote>
+<p>select name from tuser where age = xx</p>
+</blockquote>
+<p><img src="https://s2.loli.net/2022/09/22/uneZG4Os8JbfMRS.jpg" alt="联合索引.jpeg"></p>
+<p>由上图可以看出，联合索引是根据联合索引定义时字段的先后顺序进行排序，也就是这里先根据<code>name</code>排序，再根据<code>age</code>排序。</p>
+<ul>
+<li>当需求为查询所有名字为”张三“的人，可以快速定位到ID4，然后逐个遍历节点与<code>where</code>条件进行比对。</li>
+<li>当需求为查询所有名字第一个字为”张”，查询语句为<code>where name like &#39;张%&#39;</code>，也会命中这个索引，查询到第一个符合条件的节点为ID3，然后逐个遍历节点与<code>where</code>条件进行比对。</li>
+<li>当需求为查询年龄为20的人，就无法使用这个索引。对这个索引来说，是先对<code>name</code>进行排序，在<code>name</code>一致的情况下，对<code>age</code>排序。</li>
+</ul>
+<p>综上：查询条件中不一定要全部定义，只要满足最左前缀，就可以利用这个索引来加速检索。这个最左前缀可以是联合索引的最左<code>N</code>个字段，也可以是字符串索引的最左<code>M</code>个字符。</p>
+<p><strong>在建立联合索引的时候，如何安排索引内的字段顺序。</strong></p>
+<p>这里我们的评估标准是，索引的复用能力。因为可以支持最左前缀，所以当已经有了 (a,b) 这个联合索引后，一般就不需要单独在 a 上建立索引了。因此，<strong>第一原则是，如果通过调整顺序，可以少维护一个索引，那么这个顺序往往就是需要优先考虑采用的。</strong></p>
+<h2 id="索引下推"><a href="#索引下推" class="headerlink" title="索引下推"></a>索引下推</h2><p>如果查询语句的查询条件部分满足最左前缀原则呢？</p>
+<p>以市民表的联合索引<code>(name, age)</code>为例</p>
+<blockquote>
+<p>select * from tuser where name like ‘张 %’ and age=10 and ismale=1;</p>
+</blockquote>
+<p>根据最左前缀的规则，这个语句在搜索树时，只能用到”张”，找到第一个满足条件的记录X，然后根据其他判断条件进行判断，就算只有这样，也是要比全表扫描效率高。</p>
+<p>在<code>MYSQL5.6</code>之前，只能从记录X开始一个个回表，到主键索引上找出记录行，在对比字段值。</p>
+<p>在<code>MYSQL5.6</code>之后，引入索引下推优化，可以在所有遍历过程中，对索引中包含的字段先做判断，直接过滤掉不满足条件的记录，减少回表次数。</p>
+<p>无索引下推执行过程如下图所示：不会获取联合索引中<code>age</code>的值，在匹配”张“之后，逐个往后遍历，并进行回表取出对应行数据进行查询条件的判断。</p>
+<p><img src="https://s2.loli.net/2022/09/22/Ik84FoZC3MHlWPV.jpg" alt="无索引下推.jpeg"></p>
+<p>采用索引下推的执行过程如下图所示：在匹配”张“之后，会获取<code>age</code>的值与查询条件进行匹配，如果不匹配直接获取下一个节点。所以这里的年龄等于30和20的数据，获取到之后不会进行回表操作。</p>
+<p><img src="https://s2.loli.net/2022/09/22/OzSdyGrlAkwEhUC.jpg" alt="有索引下推.jpeg"></p>
+<h1 id="重建索引"><a href="#重建索引" class="headerlink" title="重建索引"></a>重建索引</h1><p>重建非主键索引：</p>
+<blockquote>
+<p>alter table T drop index k;</p>
+<p>alter table T add index(k);</p>
+</blockquote>
+<p>重建主键索引：</p>
+<blockquote>
+<p>alter table T drop primary key;</p>
+<p>alter table T add primary key(id);</p>
+</blockquote>
+<p>重建非主键索引的做法是合理的，可以达到省空间的目的；但是重建主键索引的过程是不合理的，不论是删除主键还是创建主键，都会将整个表重建，所以第一个语句其实可有可无，单纯执行第二个语句就会对表进行重建。再者可以使用<code>alter table T engine=InnoDB</code>对表进行重建。</p>
+<p><strong>表数据删除一半，表文件大小不变？</strong></p>
+<p>​    <code>InnoDB</code>表包含两个部分，表结构定义和数据。在<code>MYSQL8.0</code>之前，表结构是存储在以<code>.frm</code>为后缀的文件里。而<code>MYSQL8.0</code>则已经允许将把表结构定义放在系统数据表，实际上表结构定义占用的空间很小，所以占用空间的主要部分就是表数据。</p>
+<p>表数据既可以存在共享表空间里，也可以是单独的文件。这个行为是由参数<code>innodb_file_per_table</code>控制的：</p>
+<ol>
+<li>这个参数设置为<code>OFF</code>表示的是，表的数据放在系统共享表空间，也就是跟数据字典放在一起；</li>
+<li>这个参数设置为<code>ON</code>表示的是，每个<code>InnoDB</code>表数据存储在一个以<code>.ibd</code>为后缀的文件中。</li>
+</ol>
+<p>从<code>MySQL 5.6.6</code>版本开始，它的默认值就是<code>ON</code>。一个表单独存储为一个文件更容易管理，而且在你不需要这个表的时候，通过<code>drop table</code>命令，系统就会直接删除这个文件。而如果是放在共享表空间中，即使表删掉了，空间也是不会回收的。</p>
+<p>在<code>InnoDB</code>中，数据都是以<code>B+</code>树模型且按页存储，前面也有说到，在进行查询数据时，<code>MYSQL</code>是将数据的某一页或者某几页加载到内存中。假设要删除<code>A</code>页的<code>R4</code>这条记录，这里只会将这个空间标记为复用，但是占用的空间并没有减少，如果之后又在300~600间插入一条数据，那么会复用这个空间，所以有时候删除记录并不会减少表占用空间。</p>
+<p><img src="https://s2.loli.net/2022/09/23/ARtpzfZ5Dg7G1O6.png" alt="索引数据页结构.png"></p>
+<p>​    当然了，如果将300<del>600的数据行都删除，那么这整个<code>A</code>数据页就被标记复用，对应数据页的复用，比行的复用稍微灵活，比如上述中将500对应行删除之后，只能在插入300</del>600之间的数据可以复用这个空间，但是如果整个数据页被标记复用，这个时候如果需要使用新页，这个标记删除的数据页就可以被复用。如果相邻两个数据页的利用率比较低，<code>MYSQL</code>也会将这两个页的数据合并到一个页，将另一个页标记为复用。</p>
+<p>​    所以如果使用<code>delete</code>删除整个表，结果就是这个表的所有数据页被标记为复用，但是占用的磁盘空间并不会减少；但是若使用<code>truncate</code>命令，相当于使用了<code>drop</code>和<code>create</code>命令的结合，单纯从这一方面看，<code>truncate</code>在删除整个表数据时会减少空间。(但是<code>truncate</code>不能加<code>where</code>条件，动作上是先删除表<code>drop</code>再<code>create</code>表，所以它是<code>DDL</code>命令)。</p>
+<p>​    这里将这些标记为复用的空间称为”空洞“。新增、删除、修改(比如将300修改为800，则操作上是将300对应行标记复用，在插入800对应行)数据都会存在生成新的空洞的情况，比如新增一条数据，导致某个页进行了页分裂，但是由于页空间没有填满，造成了较大的空洞，如果空洞比较多，产生的现象就是删除部分数据，并不会导致磁盘空间的减少。所以如果在删除数据之后能将这些空洞去掉，就可以减少占用磁盘空间。</p>
+<h2 id="重建表"><a href="#重建表" class="headerlink" title="重建表"></a>重建表</h2><p>​    假设已经存在了一个较多空洞的表<code>A</code>，可以通过创建一个同样的表<code>B</code>，按照主键递增的顺序将数据从<code>A</code>表中读出，再写入到表<code>B</code>中，由于表<code>B</code>是新建表，所以表<code>A</code>主键索引上的空洞在表<code>B</code>是不存在的。这时用表<code>B</code>替换表<code>A</code>，从结果上来看，起到了收缩表<code>A</code>的目的。</p>
+<p>​    在<code>MYSQL</code>中已经存在这个命令，通过使用<code>alter table A engine=InnoDB</code>来重建表。实际上流程就是上述流程，只不过<code>MYSQL</code>将这些操作内置，你只需要通过这一个命令即可。</p>
+<p>​    当然了，这个过程中最消耗资源的过程，就是将表<code>A</code>数据拷贝到表<code>B</code>的过程。但是在这个过程中，如果出现新数据需要写入到表<code>A</code>中，就有可能造成数据丢失，所以在这个过程中表<code>A</code>不能有更新。</p>
+<p>在<code>MYSQL5.6</code>版本开始引入<code>Online DDL</code>，对这个操作流程进行优化。也就是在拷贝的过程中，通过记录一个<code>row log</code>，拷贝完成之后，将<code>row log</code>的操作应用到表<code>B</code>。由于这个优化之后，在表重建过程中，允许对表<code>A</code>做写操作，所以称为<code>Online DDL</code>。</p>
+<p>​    这个<code>DDL</code>在<code>alter</code>启动的时候就获取了<code>DML</code>写锁，但是在真正拷贝数据时，就退化为读锁，这样是为了实现<code>Online</code>，<code>MDL</code>读锁不会阻塞写操作，至于为什么不直接释放锁，是因为要禁止其他线程同时做<code>DDL</code>。</p>
+<p>上述的这些重建方法都会扫描原表数据和构建临时文件，对于大表来说，这个操作是很消耗<code>IO</code>和<code>CPU</code>资源，所以可以通过一些比较稳定的开源组件操作，比如<code>GitHub</code>开源的<code>gh-ost</code>。</p>
+<p>据说100万行数据以下，可以使用<code>online ddl</code>超过百万可以使用<code>gh-ost</code></p>
+<p>关于重建表的三个命令：</p>
+<ul>
+<li><code>alter table t engine = InnoDB</code>：在5.6版本之后，默认就是<code>Online DDL</code>的方式。</li>
+<li><code>analyze table t</code>：这个命令实际上不是重建表，只是对表的索引信息做重新统计，没有修改数据，这个过程加了<code>MDL</code>读锁。</li>
+<li><code>optimize table t</code>：这个命令等于<code>recreate</code>+<code>analyze</code></li>
+</ul>
+<h1 id="特例"><a href="#特例" class="headerlink" title="特例"></a>特例</h1><h2 id="联合主键"><a href="#联合主键" class="headerlink" title="联合主键"></a>联合主键</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE &#96;geek&#96; (</span><br><span class="line">  &#96;a&#96; int(11) NOT NULL,</span><br><span class="line">  &#96;b&#96; int(11) NOT NULL,</span><br><span class="line">  &#96;c&#96; int(11) NOT NULL,</span><br><span class="line">  &#96;d&#96; int(11) NOT NULL,</span><br><span class="line">  PRIMARY KEY (&#96;a&#96;,&#96;b&#96;),</span><br><span class="line">  KEY &#96;c&#96; (&#96;c&#96;),</span><br><span class="line">  KEY &#96;ca&#96; (&#96;c&#96;,&#96;a&#96;),</span><br><span class="line">  KEY &#96;cb&#96; (&#96;c&#96;,&#96;b&#96;)</span><br><span class="line">) ENGINE&#x3D;InnoDB;</span><br></pre></td></tr></table></figure>
+
+<p>表<code>geek</code>已经存在联合主键<code>(a, b)</code>，是不是只需要创建<code>(c)</code>索引包含了<code>(ca)</code>和<code>(cb)</code>的场景，为什么需要再创建<code>(ca)</code>和<code>(cb)</code>?</p>
+<p>假设存在以下两条语句：</p>
+<blockquote>
+<p>select * from geek where c=N order by a limit 1;</p>
+<p>select * from geek where c=N order by b limit 1;</p>
+</blockquote>
+<p>那么这时所有<code>ca</code>和索引<code>cb</code>有存在的必要吗？</p>
+<p>假设表中记录为：</p>
+<table>
+<thead>
+<tr>
+<th>a</th>
+<th>b</th>
+<th>c</th>
+<th>d</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>d</td>
+</tr>
+<tr>
+<td>1</td>
+<td>3</td>
+<td>2</td>
+<td>d</td>
+</tr>
+<tr>
+<td>1</td>
+<td>4</td>
+<td>3</td>
+<td>d</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1</td>
+<td>3</td>
+<td>d</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>d</td>
+</tr>
+<tr>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>d</td>
+</tr>
+</tbody></table>
+<p>主键<code>a</code>和<code>b</code>的联合主键相当于对数据进行<code>order by a, b</code>。也就是先按<code>a</code>排序，再按<code>b</code>排序，<code>c</code>无序，这里没有使用到<code>d</code>。</p>
+<p>索引<code>ca</code>的组织结果：逻辑上最后一列是<code>ab</code>的值，但是由于联合索引中已经存在了<code>a</code>，索引最后一列中只有<code>b</code>。<strong>与索引<code>(c)</code>一致。</strong></p>
+<table>
+<thead>
+<tr>
+<th>c</th>
+<th>a</th>
+<th>b(主键的b部分)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2</td>
+<td>1</td>
+<td>3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2</td>
+<td>3</td>
+</tr>
+</tbody></table>
+<p>索引<code>cb</code>的组织结果：同理，最后一列也只有<code>b</code>。</p>
+<table>
+<thead>
+<tr>
+<th>c</th>
+<th>a</th>
+<th>a(主键的a部分)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>2</td>
+<td>3</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>4</td>
+<td>1</td>
+</tr>
+<tr>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+</tr>
+</tbody></table>
+<p>综上：<code>ca</code>索引和<code>c</code>的数据组织结果一致，但<code>cb</code>不一致，若上述两条查询语句为高频语句，则<code>cb</code>可以保留。</p>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2022/09/21/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89---%E7%B4%A2%E5%BC%95/" title="mysql45讲学习总结（二）---索引">http://xiaocainiaoya.github.io/2022/09/21/mysql/mysql45讲学习总结（二）---索引/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"><i class="fa fa-tag"></i> mysql</a>
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 笔记</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/09/19/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/IntelliJ%20IDEA%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/" rel="prev" title="IntelliJ IDEA插件开发">
+      <i class="fa fa-chevron-left"></i> IntelliJ IDEA插件开发
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/09/21/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89/" rel="next" title="mysql45讲学习总结（一）">
+      mysql45讲学习总结（一） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89%E2%80%94%E7%B4%A2%E5%BC%95"><span class="nav-number">1.</span> <span class="nav-text">mysql45讲学习总结（二）—索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%9A%84%E5%B8%B8%E8%A7%81%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">索引的常见模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#InnoDB%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">InnoDB索引模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%BB%B4%E6%8A%A4"><span class="nav-number">4.</span> <span class="nav-text">索引维护</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E6%A6%82%E5%BF%B5"><span class="nav-number">5.</span> <span class="nav-text">索引概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A6%86%E7%9B%96%E7%B4%A2%E5%BC%95"><span class="nav-number">5.1.</span> <span class="nav-text">覆盖索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95"><span class="nav-number">5.2.</span> <span class="nav-text">联合索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%B7%A6%E5%89%8D%E7%BC%80%E5%8E%9F%E5%88%99"><span class="nav-number">5.3.</span> <span class="nav-text">最左前缀原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E4%B8%8B%E6%8E%A8"><span class="nav-number">5.4.</span> <span class="nav-text">索引下推</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E5%BB%BA%E7%B4%A2%E5%BC%95"><span class="nav-number">6.</span> <span class="nav-text">重建索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%BB%BA%E8%A1%A8"><span class="nav-number">6.1.</span> <span class="nav-text">重建表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%89%B9%E4%BE%8B"><span class="nav-number">7.</span> <span class="nav-text">特例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%94%E5%90%88%E4%B8%BB%E9%94%AE"><span class="nav-number">7.1.</span> <span class="nav-text">联合主键</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
