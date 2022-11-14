@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="MySQL单表数据数据最大两千万？相比大家也有听说过MySQL单表数据数据最大两千万，如果超过两千万数据库性能就会下降的说法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql问题汇总">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2022/10/11/mysql/mysql%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="MySQL单表数据数据最大两千万？相比大家也有听说过MySQL单表数据数据最大两千万，如果超过两千万数据库性能就会下降的说法。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-10-11T14:13:58.000Z">
+<meta property="article:modified_time" content="2022-10-11T07:42:47.329Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="笔记">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2022/10/11/mysql/mysql%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>mysql问题汇总 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/10/11/mysql/mysql%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql问题汇总
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-10-11 22:13:58 / 修改时间：15:42:47" itemprop="dateCreated datePublished" datetime="2022-10-11T22:13:58+08:00">2022-10-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="MySQL单表数据数据最大两千万？"><a href="#MySQL单表数据数据最大两千万？" class="headerlink" title="MySQL单表数据数据最大两千万？"></a>MySQL单表数据数据最大两千万？</h2><p>相比大家也有听说过<code>MySQL</code>单表数据数据最大两千万，如果超过两千万数据库性能就会下降的说法。<span id="more"></span></p>
+<p>其实这种说法的背后是索引高度的问题，<code>MySQL</code>索引内部使用的是<code>B+</code>树，叶子节点存具体的数据，非叶子节点是为了去叶子节点寻址。<code>MySQL</code>的数据是按页存储，每一页的大小是16k，读取的时候也是按页读取，也就是说就算你的语句里有<code>limit 1</code>，但是实际上也是将整页都加载到内存中。</p>
+<p>这个16k大小的页包含有页头（页号，寻址指针等内容）、页尾（检验码等）、页目录（这一页内的数据目录，用于快速找到页内数据），剩下的空间就是存放具体的数据记录<code>record</code>。结合<code>B+</code>树的特性，非叶子节点内具体的数据记录<code>record</code>实际上存储的某一页的页号以及这一页的最小记录的<code>id</code>值。叶子节点内具体的数据记录<code>record</code>实际上存储的是行信息(再具体到存储的是行记录的多少内容，要看是什么索引)。</p>
+<p>所以想查询某一行数据的主要过程：从索引的根往下找，先根据非叶子节点的<code>id</code>值匹配，匹配到对应的<code>id</code>值之后根据页号，找到对应的叶子节点，从而获取到整行数据。</p>
+<p>当数据庞大时，树的叶子节点如果想要容纳所有数据就需要增加高度，高度越高，能容纳的数据量也就越大。同时也伴随着更多的磁盘io，一般3层索引树，会有3次磁盘io，并且是随机io。<br>这里有一个计算公式：<code>(x ^ (z-1)) * y</code></p>
+<ul>
+<li>非叶子结点内指向其他内存页的指针数量为<code>x</code></li>
+<li>叶子节点内能容纳的<code>record</code>数量为<code>y</code></li>
+<li><code>B+</code>树的层数为<code>z</code></li>
+</ul>
+<p><b>x的值：</b>主键假设是bigint（8Byte），而页号在源码里叫FIL_PAGE_OFFSET（4Byte），那么非叶子节点里的一条数据是12Byte左右，整个数据页16k， 页头页尾那部分数据全加起来大概128Byte，加上页目录毛估占1k吧。那剩下的15k除以12Byte，等于1280，也就是可以指向x=1280页。<br><b>y的值：</b>叶子节点和非叶子节点结构是一致的，这里也假设记录可用空间为15k，假设一行数据需要占用1k空间，那么叶子节点可用容纳15行的数据。</p>
+<p>根据公式：<br>若z=2，则(1280 ^ (2-1)) * 15 ≈ 2w<br>若z=3，则(1280 ^ (3-1)) * 15 ≈ 2.5kw<br>这里的<code>2.5kw</code>也就是通常说的单表数据不要超过2kw的估值，如果高度再加一层，那么所能容纳的数据量就更加庞大。但是你有没有发现，我假设了单行数据的空间是1k，如果表字段不多，单行数据仅0.25k呢，那么这个计算结果就是1亿，也就是在三层高度的情况下，数据量也有可能达到1亿。</p>
+<h2 id="随机IO-顺序IO"><a href="#随机IO-顺序IO" class="headerlink" title="随机IO/顺序IO"></a>随机IO/顺序IO</h2><p>顺序IO是指读写操作的访问地址连续。随机IO是指读写操作的时间连续，但访问的地址不连续。</p>
+<h2 id="深度分页"><a href="#深度分页" class="headerlink" title="深度分页"></a>深度分页</h2><p>深度分页涉及到的问题通常是使用<code>limit offset, size</code>，对于<code>limit 10, 10</code>和<code>limit 10000, 10</code>，性能上前者是快于后者的，这是因为后者也是需要查出10000条数据，然后丢弃掉，再往后获取10条数据，也就是说前者总共获取了20条数据，后者获取了10010条数据。</p>
+<p>这种情况其实是无解的，因为这是<code>MySQL</code>的内部逻辑，我们根本就触及不到，但是在一定条件下，可以通过一定的手段进行优化。假设有语句：</p>
+<blockquote>
+<p>select * from page order by id limit 10000, 10;</p>
+</blockquote>
+<p>这条查询语句还是有优化空间的，由于这里需要查询整行数据，也就导致了丢弃的10000行数据也去查询了整行数据，实际上这是没有必要的。<br>优化如下，虽然它也是会获取那丢弃的10000条数据，但是这10000条数据仅获取了id值，并没有获取整行数据，当行数据比较长时，还是会有一定的性能提升。</p>
+<blockquote>
+<p>select * from page  where id &gt;=(select id from page  order by id limit 10000, 1) order by id limit 10; </p>
+</blockquote>
+<p>再看在非主键索引上的操作：</p>
+<blockquote>
+<p>select * from page order by user_name  limit 10000, 10;</p>
+</blockquote>
+<p>这里由于是非主键索引，所以会对这丢弃的10000条数据都进行一次回表操作，影响性能。可以通过连接来优化，减少回表次数：</p>
+<blockquote>
+<p>select * from page t1, (select id from page order by user_name limit 10000, 10) t2  WHERE t1.id = t2.id;</p>
+</blockquote>
+<p>前面的优化实际上也都会查询丢弃的10000条数据，所以这里再怎么优化都是治标不治本的优化手段。所以只能通过一些特殊手段控制，比如百度、淘宝的搜索页只会固定页码，到一定页码之后就不允许往后页码查。再比如抖音这种这种滚动下只有翻页没有跳页，可以将当前页设置一个最小值，下一页在这个最小值的基础上查询。这也是同步大表时的一个手段。</p>
+<p>如果同步一个大表，你使用的是<code>select * from tableName</code>，同步到异构系统，比如es等，因为数据量比较大，数据库无法一次性获取到所有数据而报错，如果仅仅通过<code>limit offset, size</code>就有可能出现深度分页的情况，所以一般来说可以通过<code>id</code>排序，将<code>id</code>对应的记录分块，当前块的最大<code>id</code>值，作为下一块<code>id</code>的查询条件。</p>
+<blockquote>
+<p>select * from tableName where id &gt; 上一块id的最大值 order by id limit 100</p>
+</blockquote>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2022/10/11/mysql/mysql%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB/" title="mysql问题汇总">http://xiaocainiaoya.github.io/2022/10/11/mysql/mysql问题汇总/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"><i class="fa fa-tag"></i> mysql</a>
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 笔记</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/10/09/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%94%EF%BC%89---%E6%8E%92%E5%BA%8F/" rel="prev" title="mysql45讲学习总结（五）---排序">
+      <i class="fa fa-chevron-left"></i> mysql45讲学习总结（五）---排序
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/10/14/mybatis/mybatis-plus%E7%89%B9%E6%80%A7/" rel="next" title="mybatis-plus特性">
+      mybatis-plus特性 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL%E5%8D%95%E8%A1%A8%E6%95%B0%E6%8D%AE%E6%95%B0%E6%8D%AE%E6%9C%80%E5%A4%A7%E4%B8%A4%E5%8D%83%E4%B8%87%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">MySQL单表数据数据最大两千万？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BAIO-%E9%A1%BA%E5%BA%8FIO"><span class="nav-number">2.</span> <span class="nav-text">随机IO&#x2F;顺序IO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%88%86%E9%A1%B5"><span class="nav-number">3.</span> <span class="nav-text">深度分页</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

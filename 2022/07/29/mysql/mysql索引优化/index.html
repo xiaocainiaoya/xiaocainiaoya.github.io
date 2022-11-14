@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="mysql索引优化​    描述使用explain命令中的每列所代表的含义，以及出现某些慢查询时的一些优化。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql索引优化">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2022/07/29/mysql/mysql%E7%B4%A2%E5%BC%95%E4%BC%98%E5%8C%96/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="mysql索引优化​    描述使用explain命令中的每列所代表的含义，以及出现某些慢查询时的一些优化。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/10/17/mPcMZU9QsSJ5z7K.png">
+<meta property="og:image" content="https://s2.loli.net/2022/10/17/5LAeJ2RofKDiMVS.png">
+<meta property="og:image" content="https://s2.loli.net/2022/10/17/7yjJrwtMZKVvqGh.png">
+<meta property="og:image" content="https://s2.loli.net/2022/10/17/2aLHIpAiF6oYWuN.png">
+<meta property="article:published_time" content="2022-07-29T14:13:58.000Z">
+<meta property="article:modified_time" content="2022-10-17T09:11:42.838Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/10/17/mPcMZU9QsSJ5z7K.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2022/07/29/mysql/mysql%E7%B4%A2%E5%BC%95%E4%BC%98%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>mysql索引优化 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/07/29/mysql/mysql%E7%B4%A2%E5%BC%95%E4%BC%98%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql索引优化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-07-29 22:13:58" itemprop="dateCreated datePublished" datetime="2022-07-29T22:13:58+08:00">2022-07-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-17 17:11:42" itemprop="dateModified" datetime="2022-10-17T17:11:42+08:00">2022-10-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="mysql索引优化"><a href="#mysql索引优化" class="headerlink" title="mysql索引优化"></a>mysql索引优化</h1><p>​    描述使用<code>explain</code>命令中的每列所代表的含义，以及出现某些慢查询时的一些优化。</p>
+<span id="more"></span>
+
+<p>通过<code>explain</code>命令可以知道<code>MySQL</code>是怎么执行语句，包括有关如何连接表以及连接表的顺序、扫描的行数、是否使用索引、排序使用的是内存排序还是磁盘排序等等。所以一般的语句优化手段都是通过<code>explain</code>来查询语句的处理过程，修改全表扫描的语句，优化查询效率。</p>
+<p><img src="https://s2.loli.net/2022/10/17/mPcMZU9QsSJ5z7K.png" alt="简单expain示例.png"></p>
+<p><b>上图是一个最简单的<code>explain select * from xxx</code>的执行结果，以下依次解释每一项的含义</b></p>
+<h3 id="id"><a href="#id" class="headerlink" title="id"></a>id</h3><p>假设执行语句为<code>explain select * from words where id in (select id from words where word like &#39;aa%&#39;)</code><br>输出结果为:<br><img src="https://s2.loli.net/2022/10/17/5LAeJ2RofKDiMVS.png" alt="expain查询id示例.png"></p>
+<p>这里的<code>id</code>值有两个1和2，实际上对于这条查询语句来说，是先执行了括号内的查询，在将括号内的结果赋予外层查询语句进行第二次查询，所以在<code>expian</code>结果有两条记录，id值越高越先执行，id值相同时从上往下执行。</p>
+<h3 id="select-type"><a href="#select-type" class="headerlink" title="select_type"></a>select_type</h3><p>表示查询的类型：</p>
+<ol>
+<li><code>SIMPLE</code>: 简单语句，比如<code>select * from xxx </code>。</li>
+<li><code>SUBQUERY</code>: 子查询</li>
+<li><code>PRIMARY</code>: 主查询，最外层查询，表示最后一个到它</li>
+<li><code>DERIVED</code>: 衍生表，查询语句中会生成新的表，比如<code>select * from words as t1, (select false) as t2</code></li>
+<li><code>UNION</code>: 连接表</li>
+<li><code>UNION RESULT</code>: 连接结果，一般与<code>UNION</code>配套出现</li>
+</ol>
+<h3 id="table"><a href="#table" class="headerlink" title="table"></a>table</h3><p>表示某一个子查询使用到的表是什么，一般的查询语句直接就是某一个表，但是一些特殊处理，比如<code>select * from words as t1, (select false) as t2</code>这里的<code>table</code>就是空，因为它是临时生成的不是数据库中存在的表结构，再或者是使用<code>union</code>联合的时候，<code>select_type=UNION RESULT</code>的子查询是将两个查询结果联合，所以会标识是那两个id值所对应的查询进行联合<code>&lt;union id1, id2&gt;</code></p>
+<p><img src="https://s2.loli.net/2022/10/17/7yjJrwtMZKVvqGh.png" alt="explain衍生表示例.png"></p>
+<h3 id="type"><a href="#type" class="headerlink" title="type"></a>type</h3><p>type表示连接类型，查看索引执行情况的一个重要指标。以下性能从好到坏依次：<br><code>system  &gt; const &gt; eq_ref &gt; ref  &gt; ref_or_null &gt; index_merge &gt; unique_subquery &gt; index_subquery &gt; range &gt; index &gt; ALL</code></p>
+<ol>
+<li><code>system</code>：这种类型要求数据库表中只有一条数据，是const类型的一个特例，一般情况下是不会出现的。</li>
+<li><code>const</code>：通过一次索引就能找到数据，一般用于主键或唯一索引作为条件，这类扫描效率极高，速度非常快。</li>
+<li><code>eq_ref</code>：常用于主键或唯一索引扫描，一般指使用主键的关联查询</li>
+<li><code>ref</code>：常用于非主键和唯一索引扫描。</li>
+<li><code>ref_or_null</code>：这种连接类型类似于ref，区别在于MySQL会额外搜索包含NULL值的行</li>
+<li><code>index_merge</code>：使用了索引合并优化方法，查询使用了两个以上的索引。</li>
+<li><code>unique_subquery</code>：类似于eq_ref，条件用了in子查询</li>
+<li><code>index_subquery</code>：区别于unique_subquery，用于非唯一索引，可以返回重复值。</li>
+<li><code>range</code>：常用于范围查询，比如：between … and 或 In 等操作，如果是这个类型需要注意，可能会因为数据量的原因导致索引失效</li>
+<li><code>index</code>：全索引扫描</li>
+<li><code>ALL</code>：全表扫描</li>
+</ol>
+<h3 id="possible-keys和key"><a href="#possible-keys和key" class="headerlink" title="possible_keys和key"></a>possible_keys和key</h3><p><code>possible_key</code>这个一般来说用不上，意思就是理论上可能会使用到的索引，但是实际执行时可能会用不上，说了等于没说。<br><code>key</code>表示使用到的索引。</p>
+<h3 id="key-len"><a href="#key-len" class="headerlink" title="key_len"></a>key_len</h3><p>使用的到的索引长度，<code>key_len</code>可以衡量索引的好坏，<code>key_len</code>越小，索引的效果越好，但是要注意如果索引是建立在一个字符串字段上，且字符串字段长度比较长，进行索引时可能会将字符串截断，也就是这一列的前n个字符参与索引。<br><code>MySQL innodb</code>引擎对于索引的长度是有限制的，最大为767字节，不同字符编码方式对应的字节数不一样，比如最常用的<code>utf8mb4</code>字符集是4字节字符集，767/4=191，所以在字符串上创建索引的前191字符才会参与索引。</p>
+<h3 id="ref"><a href="#ref" class="headerlink" title="ref"></a>ref</h3><p>显示索引的哪一列被使用了，如果是<code>where word = &#39;name&#39;</code>，那么显示的就是<code>const</code></p>
+<h3 id="rows"><a href="#rows" class="headerlink" title="rows"></a>rows</h3><p>该列表示MySQL估算要找到我们所需的记录，需要读取的行数。对于<code>InnoDB</code>表，此数字是估计值，并非一定是个准确值，<code>InnoDB</code>的优化器也会通过需要扫描的行数来判断选择哪个索引。可以通过<code>analyze table t</code>命令，来重新统计索引信息。</p>
+<h3 id="Extra"><a href="#Extra" class="headerlink" title="Extra"></a>Extra</h3><p><code>Using filesort</code>：表示按文件排序，一般是在指定的排序和索引排序不一致的情况才会出现。一般见于order by语句<br><code>Using index</code> ：表示是否用了覆盖索引。<br><code>Using temporary</code>： 表示是否使用了临时表,性能特别差，需要重点优化。一般多见于group by语句，或者union语句。<br><code>Using where</code> ： 表示使用了where条件过滤.<br><code>Using index condition</code>：MySQL5.6之后新增的索引下推。在存储引擎层进行数据过滤，而不是在服务层过滤，利用索引现有的数据减少回表的数据。</p>
+<h1 id="常用优化手段"><a href="#常用优化手段" class="headerlink" title="常用优化手段"></a>常用优化手段</h1><h3 id="1-in内容过多"><a href="#1-in内容过多" class="headerlink" title="1. in内容过多"></a>1. in内容过多</h3><p>使用<code>in</code>查询最好内容不要超过200个，因为<code>in</code>查询底层是通过<code>n*m</code>的方式去搜索，也就是每一个条件逐条遍历，默认临界值<code>eq_range_index_dive_limit=200</code>，如果超过这个值，可能会导致代价计算存在问题，从而导致<code>mySQL</code>选择的索引不准确。</p>
+<h3 id="2-磁盘排序"><a href="#2-磁盘排序" class="headerlink" title="2. 磁盘排序"></a>2. 磁盘排序</h3><p>如果查询语句中存在<code>order by</code>但是<code>Extra</code>中没有<code>Using filesort</code>那么恭喜你，你的排序命中了索引，沿用了索引已然有序的特性直接查询出数据。但是实际情况并不是这么刚好，不命中索引的情况下，排序下的<code>Extra</code>的结果为<code>Using filesort</code>。排序分为全字段排序和<code>rowid</code>排序。至于是使用全字段排序和<code>rowid</code>排序主要影响因素是<code>max_length_for_sort_data</code>参数，当单行长度超过这个参数值时使用的就是<code>rowid</code>排序。<code>rowid</code>需要回表，查询性能比全字段查询差。</p>
+<h3 id="3-不等号"><a href="#3-不等号" class="headerlink" title="3.不等号"></a>3.不等号</h3><p>查询使用不等号或者是<code>not in</code>这些时，索引形同虚设，这其实是被优化器处理了，因为优化器认为即便是走索引，还是需要扫描很多行，所以它觉得不划算，所以直接不走索引。还有<code>NOT、!=、&lt;&gt;、!&lt;、!&gt;、NOT EXISTS、NOT IN、NOT LIKE</code>都会导致索引失效。</p>
+<h3 id="4-group-by"><a href="#4-group-by" class="headerlink" title="4.group by"></a>4.group by</h3><blockquote>
+<p>explain select wrod, num from words group by word</p>
+</blockquote>
+<p><img src="https://s2.loli.net/2022/10/17/2aLHIpAiF6oYWuN.png" alt="排序explain.png"><br>可以看到在<code>Extra</code>中有<code>Using filesort</code>和<code>Using temporary</code>，表示使用到了排序和临时表。<br><code>group by</code>的执行流程：</p>
+<ol>
+<li>创建内存临时表，表里设置字段<code>(word, num)</code></li>
+<li>全表扫描<code>words</code>，依次取出<code>word</code>的值，判断临时表中是否有这个值，如果没有就插入<code>（word, 1）</code>，如果有就对这一行的<code>num</code>加一。</li>
+<li>遍历完成后，再对<code>word</code>排序后返回结果。</li>
+</ol>
+<p><b>优化方式：</b>可以对<code>group by</code>后面的字段添加索引，提高步骤1的执行效率；使用<code>order by null</code>，既然默认是要排序，那么手动设置为不要排序，提高步骤3的执行效率。</p>
+<h3 id="5-delete-in"><a href="#5-delete-in" class="headerlink" title="5. delete + in"></a>5. delete + in</h3><p><code>delete form xx where xx in (xx)</code>这个删除语句不会命中索引，但是<code>select * form xx where xx in (xx) </code>这个是会命中索引的，原因是对于这个查询语句实际上将<code>SQL</code>优化为可以命中索引的方式。</p>
+<h3 id="6-asc和desc"><a href="#6-asc和desc" class="headerlink" title="6. asc和desc"></a>6. asc和desc</h3><p>如果出现<code>asc</code>和<code>desc</code>混用，也会导致索引失效。</p>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2022/07/29/mysql/mysql%E7%B4%A2%E5%BC%95%E4%BC%98%E5%8C%96/" title="mysql索引优化">http://xiaocainiaoya.github.io/2022/07/29/mysql/mysql索引优化/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"><i class="fa fa-tag"></i> mysql</a>
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 笔记</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/27/mybatis/tk.mybaits%E5%8A%A8%E6%80%81%E8%A1%A8%E5%90%8D/" rel="prev" title="tk.mybaits动态表名">
+      <i class="fa fa-chevron-left"></i> tk.mybaits动态表名
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/08/05/spock/Spock%E5%AE%9E%E8%B7%B5%EF%BC%88%E4%B8%80%EF%BC%89/" rel="next" title="Spock实践（一）">
+      Spock实践（一） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mysql%E7%B4%A2%E5%BC%95%E4%BC%98%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">mysql索引优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#id"><span class="nav-number">1.0.1.</span> <span class="nav-text">id</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#select-type"><span class="nav-number">1.0.2.</span> <span class="nav-text">select_type</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#table"><span class="nav-number">1.0.3.</span> <span class="nav-text">table</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#type"><span class="nav-number">1.0.4.</span> <span class="nav-text">type</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#possible-keys%E5%92%8Ckey"><span class="nav-number">1.0.5.</span> <span class="nav-text">possible_keys和key</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#key-len"><span class="nav-number">1.0.6.</span> <span class="nav-text">key_len</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ref"><span class="nav-number">1.0.7.</span> <span class="nav-text">ref</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rows"><span class="nav-number">1.0.8.</span> <span class="nav-text">rows</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Extra"><span class="nav-number">1.0.9.</span> <span class="nav-text">Extra</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E4%BC%98%E5%8C%96%E6%89%8B%E6%AE%B5"><span class="nav-number">2.</span> <span class="nav-text">常用优化手段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-in%E5%86%85%E5%AE%B9%E8%BF%87%E5%A4%9A"><span class="nav-number">2.0.1.</span> <span class="nav-text">1. in内容过多</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%A3%81%E7%9B%98%E6%8E%92%E5%BA%8F"><span class="nav-number">2.0.2.</span> <span class="nav-text">2. 磁盘排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%B8%8D%E7%AD%89%E5%8F%B7"><span class="nav-number">2.0.3.</span> <span class="nav-text">3.不等号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-group-by"><span class="nav-number">2.0.4.</span> <span class="nav-text">4.group by</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-delete-in"><span class="nav-number">2.0.5.</span> <span class="nav-text">5. delete + in</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-asc%E5%92%8Cdesc"><span class="nav-number">2.0.6.</span> <span class="nav-text">6. asc和desc</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

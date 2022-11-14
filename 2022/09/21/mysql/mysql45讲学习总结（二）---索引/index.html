@@ -28,6 +28,8 @@
 <meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
 <meta property="og:description" content="mysql45讲学习总结（二）—索引​    一句话简单来说，索引的出现其实就是为了提高数据查询的效率，就像书的目录一样。一本 500 页的书，如果你想快速找到其中的某一个知识点，在不借助目录的情况下，那我估计你可得找一会儿。同样，对于数据库的表而言，索引其实就是它的“目录”。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/07/29/Cdn3PoHR5vbi8Iy.png">
+<meta property="og:image" content="https://s2.loli.net/2022/07/29/nI3Ay1ZM4bpQRs8.png">
 <meta property="og:image" content="https://s2.loli.net/2022/09/22/5VS38hx476lnUrK.png">
 <meta property="og:image" content="https://s2.loli.net/2022/09/22/5VS38hx476lnUrK.png">
 <meta property="og:image" content="https://s2.loli.net/2022/09/22/uneZG4Os8JbfMRS.jpg">
@@ -35,12 +37,12 @@
 <meta property="og:image" content="https://s2.loli.net/2022/09/22/OzSdyGrlAkwEhUC.jpg">
 <meta property="og:image" content="https://s2.loli.net/2022/09/23/ARtpzfZ5Dg7G1O6.png">
 <meta property="article:published_time" content="2022-09-21T14:13:58.000Z">
-<meta property="article:modified_time" content="2022-09-23T06:33:07.128Z">
+<meta property="article:modified_time" content="2022-10-17T03:47:17.028Z">
 <meta property="article:author" content="xiaocainiaoya">
 <meta property="article:tag" content="mysql">
 <meta property="article:tag" content="笔记">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://s2.loli.net/2022/09/22/5VS38hx476lnUrK.png">
+<meta name="twitter:image" content="https://s2.loli.net/2022/07/29/Cdn3PoHR5vbi8Iy.png">
 
 <link rel="canonical" href="http://xiaocainiaoya.github.io/2022/09/21/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89---%E7%B4%A2%E5%BC%95/">
 
@@ -202,7 +204,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-09-23 14:33:07" itemprop="dateModified" datetime="2022-09-23T14:33:07+08:00">2022-09-23</time>
+                <time title="修改时间：2022-10-17 11:47:17" itemprop="dateModified" datetime="2022-10-17T11:47:17+08:00">2022-10-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -235,8 +237,17 @@
         <h1 id="mysql45讲学习总结（二）—索引"><a href="#mysql45讲学习总结（二）—索引" class="headerlink" title="mysql45讲学习总结（二）—索引"></a>mysql45讲学习总结（二）—索引</h1><p>​    一句话简单来说，索引的出现其实就是为了提高数据查询的效率，就像书的目录一样。一本 500 页的书，如果你想快速找到其中的某一个知识点，在不借助目录的情况下，那我估计你可得找一会儿。同样，对于数据库的表而言，索引其实就是它的“目录”。</p>
 <span id="more"></span>
 
-<h1 id="索引的常见模型"><a href="#索引的常见模型" class="headerlink" title="索引的常见模型"></a>索引的常见模型</h1><p>​    索引的出现是为了提高查询效率，实际上，索引之所以能够提高查询效率，一定程度上是借助于索引的存储模型，这里简答介绍三种常见数据结构，哈希表、有序数组和搜索树。</p>
-<p>// TODO</p>
+<h1 id="索引的常见模型"><a href="#索引的常见模型" class="headerlink" title="索引的常见模型"></a>索引的常见模型</h1><p>​    索引实际上就像是字典的目录，当需要查询某个字时，通过目录可以快速定位到某一页，从而快速查找到所需要的数据，不必进行全局遍历，达到提高查询效率的目的，实现上一般都是通过设计某种的数据结构，简单介绍几个常用的数据结构。</p>
+<ol>
+<li>哈希表：一种以键值对存储数据的数据结构，类似于<code>Java</code>中的<code>HashMap</code>的实现（当然了<code>jdk8</code>之后是采用数组加红黑树的方式），数据结构为一个数组加链表（有的地方称拉链法），当添加某个值时计算出这个值的<code>HASH</code>值，然后插入到数组对应的链表尾部，这种数据结构对于添加和删除的效率是比较高的，只需要移动一个节点的引用。</li>
+<li>有序数组（规则数组）：通过某种规则将数据存入到数组中，在查询时同样可以根据这种规则直接通过下标获取到数据，如果是有序数组，对于范围查询的效率也是比较高的。这种数据结构瓶颈在于扩容以及空间的使用率上，比如现在是有序数组，数组长度为10，假设现在仅有两个值1和50，那么50的这个值存放在哪个位置？如果将数组长度扩大50，空间利用率就极低。</li>
+<li>二叉树：二叉树是课本中经典的数据结构了，同样在添加、删除节点时，需要进行平衡。</li>
+</ol>
+<h3 id="InnoDB的索引模型"><a href="#InnoDB的索引模型" class="headerlink" title="InnoDB的索引模型"></a>InnoDB的索引模型</h3><p>​    <code>InnoDB</code>引擎中采用<code>B+</code>数索引模型，每一个索引都对应着一颗<code>B+</code>树。分为主键索引和非主键索引。</p>
+<p>​    主键索引又称为聚簇索引，主键索引的叶子节点是整行数据。</p>
+<p><img src="https://s2.loli.net/2022/07/29/Cdn3PoHR5vbi8Iy.png" alt="主键索引示意图.png"></p>
+<p>​        非主键索引又称为二级索引，非主键索引的叶子节点的内容是主键的值。由下图可知，非主键索引的查询逻辑是通过非主键索引获取到要查询数据的主键，再通过主键索引获取到对应行数据，这个过程称为回表。</p>
+<p><img src="https://s2.loli.net/2022/07/29/nI3Ay1ZM4bpQRs8.png" alt="非主键索引示意图.png"></p>
 <h1 id="InnoDB索引模型"><a href="#InnoDB索引模型" class="headerlink" title="InnoDB索引模型"></a>InnoDB索引模型</h1><p>​    在<code>InnoDB</code>存储引擎中，表都是根据主键顺序以索引的形式存放，这种存储方式的表称为索引组织表。<code>InnoDB</code>使用的索引模型为<code>B+</code>树形索引模型，所以数据都是存储在<code>B+</code>树中。</p>
 <p>每一个索引在<code>InnoDB</code>里面都对应着一颗<code>B+</code>树。</p>
 <p>假设有一个表，<code>ID</code>为主键，且还有字段<code>k,name</code>，同时<code>k</code>字段上有索引。</p>
@@ -300,8 +311,8 @@
 <li>当需求为查询年龄为20的人，就无法使用这个索引。对这个索引来说，是先对<code>name</code>进行排序，在<code>name</code>一致的情况下，对<code>age</code>排序。</li>
 </ul>
 <p>综上：查询条件中不一定要全部定义，只要满足最左前缀，就可以利用这个索引来加速检索。这个最左前缀可以是联合索引的最左<code>N</code>个字段，也可以是字符串索引的最左<code>M</code>个字符。</p>
-<p><strong>在建立联合索引的时候，如何安排索引内的字段顺序。</strong></p>
-<p>这里我们的评估标准是，索引的复用能力。因为可以支持最左前缀，所以当已经有了 (a,b) 这个联合索引后，一般就不需要单独在 a 上建立索引了。因此，<strong>第一原则是，如果通过调整顺序，可以少维护一个索引，那么这个顺序往往就是需要优先考虑采用的。</strong></p>
+<p><b>在建立联合索引的时候，如何安排索引内的字段顺序。</b></p>
+<p>这里我们的评估标准是，索引的复用能力。因为可以支持最左前缀，所以当已经有了 (a,b) 这个联合索引后，一般就不需要单独在 a 上建立索引了。因此，<b>第一原则是，如果通过调整顺序，可以少维护一个索引，那么这个顺序往往就是需要优先考虑采用的。</b></p>
 <h2 id="索引下推"><a href="#索引下推" class="headerlink" title="索引下推"></a>索引下推</h2><p>如果查询语句的查询条件部分满足最左前缀原则呢？</p>
 <p>以市民表的联合索引<code>(name, age)</code>为例</p>
 <blockquote>
@@ -325,7 +336,7 @@
 <p>alter table T add primary key(id);</p>
 </blockquote>
 <p>重建非主键索引的做法是合理的，可以达到省空间的目的；但是重建主键索引的过程是不合理的，不论是删除主键还是创建主键，都会将整个表重建，所以第一个语句其实可有可无，单纯执行第二个语句就会对表进行重建。再者可以使用<code>alter table T engine=InnoDB</code>对表进行重建。</p>
-<p><strong>表数据删除一半，表文件大小不变？</strong></p>
+<p><b>表数据删除一半，表文件大小不变？</b></p>
 <p>​    <code>InnoDB</code>表包含两个部分，表结构定义和数据。在<code>MYSQL8.0</code>之前，表结构是存储在以<code>.frm</code>为后缀的文件里。而<code>MYSQL8.0</code>则已经允许将把表结构定义放在系统数据表，实际上表结构定义占用的空间很小，所以占用空间的主要部分就是表数据。</p>
 <p>表数据既可以存在共享表空间里，也可以是单独的文件。这个行为是由参数<code>innodb_file_per_table</code>控制的：</p>
 <ol>
@@ -335,7 +346,7 @@
 <p>从<code>MySQL 5.6.6</code>版本开始，它的默认值就是<code>ON</code>。一个表单独存储为一个文件更容易管理，而且在你不需要这个表的时候，通过<code>drop table</code>命令，系统就会直接删除这个文件。而如果是放在共享表空间中，即使表删掉了，空间也是不会回收的。</p>
 <p>在<code>InnoDB</code>中，数据都是以<code>B+</code>树模型且按页存储，前面也有说到，在进行查询数据时，<code>MYSQL</code>是将数据的某一页或者某几页加载到内存中。假设要删除<code>A</code>页的<code>R4</code>这条记录，这里只会将这个空间标记为复用，但是占用的空间并没有减少，如果之后又在300~600间插入一条数据，那么会复用这个空间，所以有时候删除记录并不会减少表占用空间。</p>
 <p><img src="https://s2.loli.net/2022/09/23/ARtpzfZ5Dg7G1O6.png" alt="索引数据页结构.png"></p>
-<p>​    当然了，如果将300<del>600的数据行都删除，那么这整个<code>A</code>数据页就被标记复用，对应数据页的复用，比行的复用稍微灵活，比如上述中将500对应行删除之后，只能在插入300</del>600之间的数据可以复用这个空间，但是如果整个数据页被标记复用，这个时候如果需要使用新页，这个标记删除的数据页就可以被复用。如果相邻两个数据页的利用率比较低，<code>MYSQL</code>也会将这两个页的数据合并到一个页，将另一个页标记为复用。</p>
+<p>​    当然了，如果将300-600的数据行都删除，那么这整个<code>A</code>数据页就被标记复用，对应数据页的复用，比行的复用稍微灵活，比如上述中将500对应行删除之后，只能在插入300-600之间的数据可以复用这个空间，但是如果整个数据页被标记复用，这个时候如果需要使用新页，这个标记删除的数据页就可以被复用。如果相邻两个数据页的利用率比较低，<code>MYSQL</code>也会将这两个页的数据合并到一个页，将另一个页标记为复用。</p>
 <p>​    所以如果使用<code>delete</code>删除整个表，结果就是这个表的所有数据页被标记为复用，但是占用的磁盘空间并不会减少；但是若使用<code>truncate</code>命令，相当于使用了<code>drop</code>和<code>create</code>命令的结合，单纯从这一方面看，<code>truncate</code>在删除整个表数据时会减少空间。(但是<code>truncate</code>不能加<code>where</code>条件，动作上是先删除表<code>drop</code>再<code>create</code>表，所以它是<code>DDL</code>命令)。</p>
 <p>​    这里将这些标记为复用的空间称为”空洞“。新增、删除、修改(比如将300修改为800，则操作上是将300对应行标记复用，在插入800对应行)数据都会存在生成新的空洞的情况，比如新增一条数据，导致某个页进行了页分裂，但是由于页空间没有填满，造成了较大的空洞，如果空洞比较多，产生的现象就是删除部分数据，并不会导致磁盘空间的减少。所以如果在删除数据之后能将这些空洞去掉，就可以减少占用磁盘空间。</p>
 <h2 id="重建表"><a href="#重建表" class="headerlink" title="重建表"></a>重建表</h2><p>​    假设已经存在了一个较多空洞的表<code>A</code>，可以通过创建一个同样的表<code>B</code>，按照主键递增的顺序将数据从<code>A</code>表中读出，再写入到表<code>B</code>中，由于表<code>B</code>是新建表，所以表<code>A</code>主键索引上的空洞在表<code>B</code>是不存在的。这时用表<code>B</code>替换表<code>A</code>，从结果上来看，起到了收缩表<code>A</code>的目的。</p>
@@ -351,7 +362,106 @@
 <li><code>analyze table t</code>：这个命令实际上不是重建表，只是对表的索引信息做重新统计，没有修改数据，这个过程加了<code>MDL</code>读锁。</li>
 <li><code>optimize table t</code>：这个命令等于<code>recreate</code>+<code>analyze</code></li>
 </ul>
-<h1 id="特例"><a href="#特例" class="headerlink" title="特例"></a>特例</h1><h2 id="联合主键"><a href="#联合主键" class="headerlink" title="联合主键"></a>联合主键</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE &#96;geek&#96; (</span><br><span class="line">  &#96;a&#96; int(11) NOT NULL,</span><br><span class="line">  &#96;b&#96; int(11) NOT NULL,</span><br><span class="line">  &#96;c&#96; int(11) NOT NULL,</span><br><span class="line">  &#96;d&#96; int(11) NOT NULL,</span><br><span class="line">  PRIMARY KEY (&#96;a&#96;,&#96;b&#96;),</span><br><span class="line">  KEY &#96;c&#96; (&#96;c&#96;),</span><br><span class="line">  KEY &#96;ca&#96; (&#96;c&#96;,&#96;a&#96;),</span><br><span class="line">  KEY &#96;cb&#96; (&#96;c&#96;,&#96;b&#96;)</span><br><span class="line">) ENGINE&#x3D;InnoDB;</span><br></pre></td></tr></table></figure>
+<h1 id="索引选择"><a href="#索引选择" class="headerlink" title="索引选择"></a>索引选择</h1><p>使用唯一索引还是普通索引？这是分为查询过程和更新过程来分析两种索引之间的性能差别</p>
+<h2 id="查询过程"><a href="#查询过程" class="headerlink" title="查询过程"></a>查询过程</h2><blockquote>
+<p>select id from T where k=5</p>
+</blockquote>
+<p>这个查询语句在索引树上查找的过程：先从<code>B+</code>树根开始按层搜索叶子节点。</p>
+<ul>
+<li>普通索引：查找到满足条件的第一个记录(5, 500)后，需要查找下一个记录，知道碰到第一个不满足的<code>k=5</code>条件的记录。</li>
+<li>唯一索引：查找到满足条件的第一个记录(5, 500)后，由于唯一索引的特性，直接停止检索。</li>
+</ul>
+<p>所以对于查询语句来说，两种索引的性能差别几乎没有差别，由于<code>MYSQL</code>是按页读写数据，所以当找到<code>k=5</code>的记录时，它所在的数据页都在内存里，那么对于普通索引来说仅比唯一索引多做了一个判断而已，所以几乎忽略不计。</p>
+<h2 id="更新过程"><a href="#更新过程" class="headerlink" title="更新过程"></a>更新过程</h2><blockquote>
+<p>change buffer：当需要更新一个数据页时，如果这个数据页在内存中，则直接更新这个数据页；如果这个数据页不在内存中，在不影响数据一致性的情况下，InnoDB会将这些更新动作缓存在 change buffer 中，这样就不需要从磁盘中读出这个数据页，当下次查询出这个数据页时，将数据页读入到内存中，然后先执行 change buffer 中与这个页相关的动作之后，再返回。(虽然这块缓存的名称叫 change buffer 实际上它是可以持久化数据，也就是说 change buffer 的数据也会被写入磁盘中。)</p>
+<p>将 change buffer 的动作应用到操作页，得到最新的数据结果的过程称为 merge。除了访问数据页之外，后台会用定时线程会触发 merge、数据库正常关闭也会触发 merge。</p>
+</blockquote>
+<p>实际上唯一索引并不会用到 change buffer。这是因为唯一索引在更新时，需进行唯一性约束。而这个判断就使得必须将数据页读入内存才能判断，所以如果都已经将数据读入到内存中，那么直接更新内存中的值即可。</p>
+<p>如果要插入一个新记录（4, 400）：</p>
+<p>第一种情况，这个记录要更新的数据行在内存中。</p>
+<ul>
+<li>唯一索引：找到3到5之间的位置，判断到没有冲突，插入新记录。</li>
+<li>普通索引：找到3到5之间的位置，插入新记录。</li>
+</ul>
+<p>普通索引和唯一索引对更新语句性能影响的差别，只是一个判断，只会耗费微小的 CPU 时间。</p>
+<p>第二种情况，这个记录要更新的数据行不在内存中。</p>
+<ul>
+<li>唯一索引：需要将数据页读到内存中，判断没有冲突，插入新记录</li>
+<li>普通索引：将动作插入到 change buffer。</li>
+</ul>
+<p>将数据从磁盘读入到内存中涉及随机IO的访问，是数据库里成本最高的操作之一。change buffer 减少了随机磁盘访问，所以对更新性能是很明显。</p>
+<h1 id="索引策略"><a href="#索引策略" class="headerlink" title="索引策略"></a>索引策略</h1><p>​    在<code>MySQL</code>中一张表是可以创建多个索引，但是具体的<code>SQL</code>语句使用哪个索引来进行查询，是由<code>MySQL</code>来确定，有没有可能<code>MySQL</code>选到的索引不是最优解。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 创建表</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `t` (</span><br><span class="line">  `id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `a` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `b` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  <span class="keyword">PRIMARY</span> KEY (`id`),</span><br><span class="line">  KEY `a` (`a`),</span><br><span class="line">  KEY `b` (`b`)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB;</span><br><span class="line"></span><br><span class="line"># 创建<span class="number">10</span>w条数据: 从(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>)，(<span class="number">2</span>,<span class="number">2</span>,<span class="number">2</span>)，(<span class="number">3</span>,<span class="number">3</span>,<span class="number">3</span>)直到(<span class="number">100000</span>,<span class="number">100000</span>,<span class="number">100000</span>)</span><br><span class="line">delimiter ;;</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">procedure</span> idata()</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">  <span class="keyword">declare</span> i <span class="type">int</span>;</span><br><span class="line">  <span class="keyword">set</span> i<span class="operator">=</span><span class="number">1</span>;</span><br><span class="line">  while(i<span class="operator">&lt;=</span><span class="number">100000</span>)do</span><br><span class="line">    <span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(i, i, i);</span><br><span class="line">    <span class="keyword">set</span> i<span class="operator">=</span>i<span class="operator">+</span><span class="number">1</span>;</span><br><span class="line">  <span class="keyword">end</span> while;</span><br><span class="line"><span class="keyword">end</span>;;</span><br><span class="line">delimiter ;</span><br><span class="line"><span class="keyword">call</span> idata();</span><br></pre></td></tr></table></figure>
+
+<p>现在来看一条<code>SQL</code>查询语句：</p>
+<blockquote>
+<p>select * from t where a between 10000 and 20000;</p>
+</blockquote>
+<p>这样查询语句会使用索引<code>a</code>来提高查询效率，用<code>explain</code>命令结果：</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>select_type</th>
+<th>table</th>
+<th>type</th>
+<th>possible_keys</th>
+<th>key</th>
+<th>key_len</th>
+<th>ref</th>
+<th>rows</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>SIMPLE</td>
+<td>t</td>
+<td>range</td>
+<td>a</td>
+<td>a</td>
+<td>5</td>
+<td></td>
+<td>10000</td>
+<td>Using where</td>
+</tr>
+</tbody></table>
+<p>果然<code>key=a</code>表示使用了所以<code>a</code>，扫描了10000行数据。</p>
+<p>再来：</p>
+<table>
+<thead>
+<tr>
+<th>sessionA</th>
+<th>sessionB</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Start transaction with consistent snapshot;</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>delete from t;<br>call idata();</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>explain select * from t where a between 10000 and 20000;</td>
+</tr>
+<tr>
+<td>commit;</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>这里表示<code>sessionA</code>开启一个事务后，<code>sessionB</code>把数据删了之后，再次调用写10w行数据的存储过程，再通过<code>explain</code>命令查询这条<code>SQL</code>语句的执行。</p>
+<p>这时<code>sessionB</code>的查询语句就不会再选择索引<code>a</code>，但是如果这里使用<code>select * from t force index(a) where a between 10000 and 20000;</code>就会使用索引。</p>
+<p>这个例子对应的就是我们平常不断的删除数据和新增数据的场景，在这种情况下<code>MySQL</code>可能会选错索引。</p>
+<p>在<code>sessionB</code>中删除了所有数据，然后通过<code>call idata()</code>插入10w行数据，看上去这里重新插入了10w行数据，但是<code>sessionA</code>在<code>sessionB</code>删除之前就开启了事务且还没有提交，所以之前的10w行数据还不能删除，这就导致之前的每一行数据都有两个版本，旧版本是数据，新版本被标记<code>delete</code>。所以再重新插入10w行数据之后，索引<code>a</code>上就有两份10w行数据。</p>
+<p>至于为什么会选错索引，实际上优化器在选择索引的时候，有很多判断维度：扫描行、是否使用临时表、是否排序等。这里主要是因为旧的10w行数据的存在，优化器认为需要扫描的行数比较多，索引没有命中索引。其实优化器在对扫描行的判断，是通过采样分析，也是一个预估的值。可以通过<code>analyze table t</code>来重新进行统计。</p>
+<h1 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h1><h2 id="联合主键"><a href="#联合主键" class="headerlink" title="联合主键"></a>联合主键</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE &#96;geek&#96; (</span><br><span class="line">  &#96;a&#96; int(11) NOT NULL,</span><br><span class="line">  &#96;b&#96; int(11) NOT NULL,</span><br><span class="line">  &#96;c&#96; int(11) NOT NULL,</span><br><span class="line">  &#96;d&#96; int(11) NOT NULL,</span><br><span class="line">  PRIMARY KEY (&#96;a&#96;,&#96;b&#96;),</span><br><span class="line">  KEY &#96;c&#96; (&#96;c&#96;),</span><br><span class="line">  KEY &#96;ca&#96; (&#96;c&#96;,&#96;a&#96;),</span><br><span class="line">  KEY &#96;cb&#96; (&#96;c&#96;,&#96;b&#96;)</span><br><span class="line">) ENGINE&#x3D;InnoDB;</span><br></pre></td></tr></table></figure>
 
 <p>表<code>geek</code>已经存在联合主键<code>(a, b)</code>，是不是只需要创建<code>(c)</code>索引包含了<code>(ca)</code>和<code>(cb)</code>的场景，为什么需要再创建<code>(ca)</code>和<code>(cb)</code>?</p>
 <p>假设存在以下两条语句：</p>
@@ -408,7 +518,7 @@
 </tr>
 </tbody></table>
 <p>主键<code>a</code>和<code>b</code>的联合主键相当于对数据进行<code>order by a, b</code>。也就是先按<code>a</code>排序，再按<code>b</code>排序，<code>c</code>无序，这里没有使用到<code>d</code>。</p>
-<p>索引<code>ca</code>的组织结果：逻辑上最后一列是<code>ab</code>的值，但是由于联合索引中已经存在了<code>a</code>，索引最后一列中只有<code>b</code>。<strong>与索引<code>(c)</code>一致。</strong></p>
+<p>索引<code>ca</code>的组织结果：逻辑上最后一列是<code>ab</code>的值，但是由于联合索引中已经存在了<code>a</code>，索引最后一列中只有<code>b</code>。<b>与索引<code>(c)</code>一致。</b></p>
 <table>
 <thead>
 <tr>
@@ -489,6 +599,62 @@
 </tr>
 </tbody></table>
 <p>综上：<code>ca</code>索引和<code>c</code>的数据组织结果一致，但<code>cb</code>不一致，若上述两条查询语句为高频语句，则<code>cb</code>可以保留。</p>
+<h2 id="字符串添加索引"><a href="#字符串添加索引" class="headerlink" title="字符串添加索引"></a>字符串添加索引</h2><p>​    字符串字段存在一个问题，如果是热点字段使用比较频繁，在不加字段的情况下，就会出现一直全表扫描，那么如果为字符串字段添加索引？</p>
+<p>如果你仅仅只想到直接为该字符串字段添加一个索引，那么只能说你只看到了问题的表面，因为为字符串字段添加索引需要考虑到这个字符串字段的长度问题，如果这个字符串长度比较长，那么这个索引需要占用的空间就会比较大。</p>
+<h3 id="前缀索引"><a href="#前缀索引" class="headerlink" title="前缀索引"></a>前缀索引</h3><p>前缀索引是只取字段的部分长度作为索引：</p>
+<blockquote>
+<p>alter table SUser add index index2(email(6));</p>
+</blockquote>
+<p>设置<code>SUser</code>表的<code>email</code>字段的前6位作为索引。<br>假设表中有数据：</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>email</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>xiaocainiaoya@foxmail</td>
+</tr>
+<tr>
+<td>2</td>
+<td>cainiao@foxmail</td>
+</tr>
+<tr>
+<td>3</td>
+<td>niao@foxmail</td>
+</tr>
+</tbody></table>
+<p>那么如果根据<code>email</code>前六位来做为前缀索引就只需要匹配一次，回表一次后，将字段值与查询值再次匹配若匹配成功，则获取数据。<br>所以这种方式需要这个字段存储的值具备一定的规则，然后根据规则设置索引的长度，长度越长，区分度就越高，查询效率就越高，伴随着占用空间就越大。</p>
+<p><b>注：前缀索引会破坏覆盖索引，如果仅查询索引上的字段，但是由于需要回表进行一次匹配（系统不知道这个字段值到底有没有被截断）。所以覆盖索引相关的优化可能就失效了。</b></p>
+<h3 id="倒叙存储"><a href="#倒叙存储" class="headerlink" title="倒叙存储"></a>倒叙存储</h3><p>一些字段的规则比如身份证，身份证的前面6位表示地域位置，在查询时需要遍历的列就比较多，可以将身份证倒叙存储，也就是通过<code>reverse(idCard)</code>进行存储，再通过<code>index(idCard(6))</code>设置索引，减少遍历的行数。</p>
+<h3 id="哈希字段"><a href="#哈希字段" class="headerlink" title="哈希字段"></a>哈希字段</h3><p>再设置一个哈希字段，比如创建身份证字段之后，再创建一个身份证的哈希字段，插入的时候计算身份证的哈希值填入，那么就可以为这个哈希字段添加索引，从而减少索引字段的长度，但是由于不同值经过哈希算法后可能会得到同一个值，所以存在一定的误差，在查询时还是要将身份证的原值加上。</p>
+<blockquote>
+<p>select field_list from t where id_card_crc=crc32(‘input_id_card_string’) and id_card=’input_id_card_string’</p>
+</blockquote>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><ol>
+<li><p>直接创建完整索引，这样可能比较占用空间；</p>
+</li>
+<li><p>创建前缀索引，节省空间，但会增加查询扫描次数，并且不能使用覆盖索引；</p>
+</li>
+<li><p>倒序存储，再创建前缀索引，用于绕过字符串本身前缀的区分度不够的问题；</p>
+</li>
+<li><p>创建 hash 字段索引，查询性能稳定，有额外的存储和计算消耗，跟第三种方式一样，都不支持范围扫描。</p>
+</li>
+</ol>
+<h2 id="条件字段函数操作"><a href="#条件字段函数操作" class="headerlink" title="条件字段函数操作"></a>条件字段函数操作</h2><p>如果在查询条件上添加聚合函数会导致索引失效，这是因为对索引字段进行聚合函数会破坏索引的有序性，导致优化器放弃走索引树的搜索功能，但是并不是说放弃了这个索引，因为如果遍历这个索引比遍历主键索引来的快，还是会使用这个索引，但是结果是使用了这个索引扫描的行也是全表的行数。</p>
+<p>但是尽管有些聚合操作不破坏索引有序性，但是<code>MySQL</code>也不予支持，比如<code>where age + 1 = 1001</code>，不会改变索引的有序性，但是这时候也是扫描全表，要修改为<code>where age = 1001 - 1</code></p>
+<h2 id="隐式类型转换"><a href="#隐式类型转换" class="headerlink" title="隐式类型转换"></a>隐式类型转换</h2><p>如果表中有一个<code>varchar</code>字段，但是查询语句是<code>where age = 10</code>，那么就涉及到类型的转换，<code>MySQL</code>采用的是字符串转换成数字的转换。也就是说<code>where age = 10</code>，需要将全表的数据都进行字符串转数字的转换，所以导致了索引失效。<br>如果换过来，表中有一个<code>int</code>字段，但是查询语句是<code>where age = &#39;10&#39;</code>,这个时候实际上是将这个<code>&#39;10&#39;</code>转为数字，在去表中匹配，这时就会命中索引。</p>
+<h2 id="隐式字符编码转换"><a href="#隐式字符编码转换" class="headerlink" title="隐式字符编码转换"></a>隐式字符编码转换</h2><p>假设有两个表有关联操作，但是关联字段的编码不一样，一个是<code>utf8mb4</code>，一个是<code>utf8</code>，因为<code>utf8mb4</code>是<code>utf8</code>的超集，在做自动类型转换的时候，为了避免数据在转换过程中由于截断导致数据错误，是按“数据长度增加的方向”进行转换。</p>
+<p>也就是说，实际上这个语句等同于下面这个写法: </p>
+<blockquote>
+<p>select * from trade_detail  where traideid USING utf8mb4 = $L2.tradeid.value;<br>select * from trade_detail  where CONVERT(traideid USING utf8mb4)=$L2.tradeid.value;</p>
+</blockquote>
+<p>在这种情况下实际上就是需要判断谁是驱动表，谁是被驱动表，</p>
+<blockquote>
+<p>select * from trade_detail  where traideid = CONVERT($L2.tradeid.value USING utf8mb4);</p>
+</blockquote>
 
     </div>
     <div>
@@ -533,12 +699,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/09/19/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/IntelliJ%20IDEA%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/" rel="prev" title="IntelliJ IDEA插件开发">
-      <i class="fa fa-chevron-left"></i> IntelliJ IDEA插件开发
+    <a href="/2022/09/21/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89---%E5%88%9D%E8%AF%95/" rel="prev" title="mysql45讲学习总结（一）---初试">
+      <i class="fa fa-chevron-left"></i> mysql45讲学习总结（一）---初试
     </a></div>
       <div class="post-nav-item">
-    <a href="/2022/09/21/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89/" rel="next" title="mysql45讲学习总结（一）">
-      mysql45讲学习总结（一） <i class="fa fa-chevron-right"></i>
+    <a href="/2022/09/26/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89---%E4%BA%8B%E5%8A%A1/" rel="next" title="mysql45讲学习总结（三）---事务">
+      mysql45讲学习总结（三）---事务 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -598,7 +764,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89%E2%80%94%E7%B4%A2%E5%BC%95"><span class="nav-number">1.</span> <span class="nav-text">mysql45讲学习总结（二）—索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%9A%84%E5%B8%B8%E8%A7%81%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">索引的常见模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#InnoDB%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">InnoDB索引模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%BB%B4%E6%8A%A4"><span class="nav-number">4.</span> <span class="nav-text">索引维护</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E6%A6%82%E5%BF%B5"><span class="nav-number">5.</span> <span class="nav-text">索引概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A6%86%E7%9B%96%E7%B4%A2%E5%BC%95"><span class="nav-number">5.1.</span> <span class="nav-text">覆盖索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95"><span class="nav-number">5.2.</span> <span class="nav-text">联合索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%B7%A6%E5%89%8D%E7%BC%80%E5%8E%9F%E5%88%99"><span class="nav-number">5.3.</span> <span class="nav-text">最左前缀原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E4%B8%8B%E6%8E%A8"><span class="nav-number">5.4.</span> <span class="nav-text">索引下推</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E5%BB%BA%E7%B4%A2%E5%BC%95"><span class="nav-number">6.</span> <span class="nav-text">重建索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%BB%BA%E8%A1%A8"><span class="nav-number">6.1.</span> <span class="nav-text">重建表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%89%B9%E4%BE%8B"><span class="nav-number">7.</span> <span class="nav-text">特例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%94%E5%90%88%E4%B8%BB%E9%94%AE"><span class="nav-number">7.1.</span> <span class="nav-text">联合主键</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89%E2%80%94%E7%B4%A2%E5%BC%95"><span class="nav-number">1.</span> <span class="nav-text">mysql45讲学习总结（二）—索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%9A%84%E5%B8%B8%E8%A7%81%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">索引的常见模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#InnoDB%E7%9A%84%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.0.1.</span> <span class="nav-text">InnoDB的索引模型</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#InnoDB%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">InnoDB索引模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%BB%B4%E6%8A%A4"><span class="nav-number">4.</span> <span class="nav-text">索引维护</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E6%A6%82%E5%BF%B5"><span class="nav-number">5.</span> <span class="nav-text">索引概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A6%86%E7%9B%96%E7%B4%A2%E5%BC%95"><span class="nav-number">5.1.</span> <span class="nav-text">覆盖索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95"><span class="nav-number">5.2.</span> <span class="nav-text">联合索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%B7%A6%E5%89%8D%E7%BC%80%E5%8E%9F%E5%88%99"><span class="nav-number">5.3.</span> <span class="nav-text">最左前缀原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E4%B8%8B%E6%8E%A8"><span class="nav-number">5.4.</span> <span class="nav-text">索引下推</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E5%BB%BA%E7%B4%A2%E5%BC%95"><span class="nav-number">6.</span> <span class="nav-text">重建索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%BB%BA%E8%A1%A8"><span class="nav-number">6.1.</span> <span class="nav-text">重建表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9"><span class="nav-number">7.</span> <span class="nav-text">索引选择</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E8%BF%87%E7%A8%8B"><span class="nav-number">7.1.</span> <span class="nav-text">查询过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E8%BF%87%E7%A8%8B"><span class="nav-number">7.2.</span> <span class="nav-text">更新过程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%AD%96%E7%95%A5"><span class="nav-number">8.</span> <span class="nav-text">索引策略</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B"><span class="nav-number">9.</span> <span class="nav-text">案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%94%E5%90%88%E4%B8%BB%E9%94%AE"><span class="nav-number">9.1.</span> <span class="nav-text">联合主键</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%B7%BB%E5%8A%A0%E7%B4%A2%E5%BC%95"><span class="nav-number">9.2.</span> <span class="nav-text">字符串添加索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E7%BC%80%E7%B4%A2%E5%BC%95"><span class="nav-number">9.2.1.</span> <span class="nav-text">前缀索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%80%92%E5%8F%99%E5%AD%98%E5%82%A8"><span class="nav-number">9.2.2.</span> <span class="nav-text">倒叙存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E5%AD%97%E6%AE%B5"><span class="nav-number">9.2.3.</span> <span class="nav-text">哈希字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">9.2.4.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%AD%97%E6%AE%B5%E5%87%BD%E6%95%B0%E6%93%8D%E4%BD%9C"><span class="nav-number">9.3.</span> <span class="nav-text">条件字段函数操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%90%E5%BC%8F%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="nav-number">9.4.</span> <span class="nav-text">隐式类型转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%90%E5%BC%8F%E5%AD%97%E7%AC%A6%E7%BC%96%E7%A0%81%E8%BD%AC%E6%8D%A2"><span class="nav-number">9.5.</span> <span class="nav-text">隐式字符编码转换</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -612,14 +778,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-count">61</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">

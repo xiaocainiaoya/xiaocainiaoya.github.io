@@ -21,24 +21,17 @@
     var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="MySQL索引​    在实际应用中，为了加快接口的查询效率，常用的手段就是通过对查询的表添加索引，那么为何索引会提高数据的查询效率？如果添加索引会提高查询效率，那么为每个字段都添加索引是不是查询效率会更好？">
-<meta property="og:type" content="article">
-<meta property="og:title" content="mysql索引">
-<meta property="og:url" content="http://xiaocainiaoya.github.io/2022/07/29/mysql/mysql%E7%B4%A2%E5%BC%95/index.html">
+  <meta name="description" content="穷则独善其身，达则兼济天下">
+<meta property="og:type" content="website">
+<meta property="og:title" content="xiaocainiaoya&#39;s blog">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/archives/2022/11/index.html">
 <meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
-<meta property="og:description" content="MySQL索引​    在实际应用中，为了加快接口的查询效率，常用的手段就是通过对查询的表添加索引，那么为何索引会提高数据的查询效率？如果添加索引会提高查询效率，那么为每个字段都添加索引是不是查询效率会更好？">
+<meta property="og:description" content="穷则独善其身，达则兼济天下">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://s2.loli.net/2022/07/29/Cdn3PoHR5vbi8Iy.png">
-<meta property="og:image" content="https://s2.loli.net/2022/07/29/nI3Ay1ZM4bpQRs8.png">
-<meta property="article:published_time" content="2022-07-29T14:13:58.000Z">
-<meta property="article:modified_time" content="2022-07-29T09:37:49.419Z">
 <meta property="article:author" content="xiaocainiaoya">
-<meta property="article:tag" content="mysql">
-<meta property="article:tag" content="笔记">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://s2.loli.net/2022/07/29/Cdn3PoHR5vbi8Iy.png">
 
-<link rel="canonical" href="http://xiaocainiaoya.github.io/2022/07/29/mysql/mysql%E7%B4%A2%E5%BC%95/">
+<link rel="canonical" href="http://xiaocainiaoya.github.io/archives/2022/11/">
 
 
 <script id="page-configurations">
@@ -46,12 +39,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : true,
+    isPost : false,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>mysql索引 | xiaocainiaoya's blog</title>
+  <title>归档 | xiaocainiaoya's blog</title>
   
 
 
@@ -161,138 +154,51 @@
         <div class="content-wrap">
           
 
-          <div class="content post posts-expand">
+          <div class="content archive">
             
 
-    
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/07/29/mysql/mysql%E7%B4%A2%E5%BC%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          mysql索引
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-07-29 22:13:58 / 修改时间：17:37:49" itemprop="dateCreated datePublished" datetime="2022-07-29T22:13:58+08:00">2022-07-29</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+  
+  <div class="post-block">
+    <div class="posts-collapse">
+      <div class="collection-title">
+        
+        <span class="collection-header">不错! 目前共计 61 篇日志。 继续努力。</span>
+      </div>
 
       
-        <h1 id="MySQL索引"><a href="#MySQL索引" class="headerlink" title="MySQL索引"></a>MySQL索引</h1><p>​    在实际应用中，为了加快接口的查询效率，常用的手段就是通过对查询的表添加索引，那么为何索引会提高数据的查询效率？如果添加索引会提高查询效率，那么为每个字段都添加索引是不是查询效率会更好？</p>
-<span id="more"></span>
-
-<h3 id="索引模型"><a href="#索引模型" class="headerlink" title="索引模型"></a>索引模型</h3><p>​    索引实际上就像是字典的目录，当需要查询某个字时，通过目录可以快速定位到某一页，从而快速查找到所需要的数据，不必进行全局遍历，达到提高查询效率的目的，实现上一般都是通过设计某种的数据结构，简单介绍几个常用的数据结构。</p>
-<ol>
-<li>哈希表：一种以键值对存储数据的数据结构，类似于<code>Java</code>中的<code>HashMap</code>的实现（当然了<code>jdk8</code>之后是采用数组加红黑树的方式），数据结构为一个数组加链表（有的地方称拉链法），当添加某个值时计算出这个值的<code>HASH</code>值，然后插入到数组对应的链表尾部，这种数据结构对于添加和删除的效率是比较高的，只需要移动一个节点的引用。</li>
-<li>有序数组（规则数组）：通过某种规则将数据存入到数组中，在查询时同样可以根据这种规则直接通过下标获取到数据，如果是有序数组，对于范围查询的效率也是比较高的。这种数据结构瓶颈在于扩容以及空间的使用率上，比如现在是有序数组，数组长度为10，假设现在仅有两个值1和50，那么50的这个值存放在哪个位置？如果将数组长度扩大50，空间利用率就极低。</li>
-<li>二叉树：二叉树是课本中经典的数据结构了，同样在添加、删除节点时，需要进行平衡。</li>
-</ol>
-<h3 id="InnoDB的索引模型"><a href="#InnoDB的索引模型" class="headerlink" title="InnoDB的索引模型"></a>InnoDB的索引模型</h3><p>​    <code>InnoDB</code>引擎中采用<code>B+</code>数索引模型，每一个索引都对应着一颗<code>B+</code>树。分为主键索引和非主键索引。</p>
-<p>​    主键索引又称为聚簇索引，主键索引的叶子节点是整行数据。</p>
-<p><img src="https://s2.loli.net/2022/07/29/Cdn3PoHR5vbi8Iy.png" alt="主键索引示意图.png"></p>
-<p>​        非主键索引又称为二级索引，非主键索引的叶子节点的内容是主键的值。由下图可知，非主键索引的查询逻辑是通过非主键索引获取到要查询数据的主键，再通过主键索引获取到对应行数据，这个过程称为回表。</p>
-<p><img src="https://s2.loli.net/2022/07/29/nI3Ay1ZM4bpQRs8.png" alt="非主键索引示意图.png"></p>
-
+    <div class="collection-year">
+      <span class="collection-header">2022</span>
     </div>
-    <div>
-      
-        <div>
-    
-        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
-    
-</div>
-      
-    </div>
-    
-    
-    
-        
 
-<div>
-<ul class="post-copyright">
-  <li class="post-copyright-author">
-    <strong>本文作者： </strong>xiaocainiaoya
-  </li>
-  <li class="post-copyright-link">
-    <strong>本文链接：</strong>
-    <a href="http://xiaocainiaoya.github.io/2022/07/29/mysql/mysql%E7%B4%A2%E5%BC%95/" title="mysql索引">http://xiaocainiaoya.github.io/2022/07/29/mysql/mysql索引/</a>
-  </li>
-  <li class="post-copyright-license">
-    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
-  </li>
-</ul>
-</div>
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
 
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2022-11-13T22:13:58+08:00"
+              content="2022-11-13">
+          11-13
+        </time>
+      </div>
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/mysql/" rel="tag"><i class="fa fa-tag"></i> mysql</a>
-              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 笔记</a>
-          </div>
+      <div class="post-title">
+          <a class="post-title-link" href="/2022/11/13/mybatis/mybatis%E6%8E%A7%E5%88%B6%E9%83%A8%E5%88%86%E5%AD%97%E6%AE%B5%E4%B8%8D%E6%89%93%E5%8D%B0/" itemprop="url">
+            <span itemprop="name">mybatis控制部分字段不打印</span>
+          </a>
+      </div>
 
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2022/07/27/mybatis/tk.mybaits%E5%8A%A8%E6%80%81%E8%A1%A8%E5%90%8D/" rel="prev" title="tk.mybaits动态表名">
-      <i class="fa fa-chevron-left"></i> tk.mybaits动态表名
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2022/08/05/spock/Spock%E5%AE%9E%E8%B7%B5%EF%BC%88%E4%B8%80%EF%BC%89/" rel="next" title="Spock实践（一）">
-      Spock实践（一） <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
+    </header>
   </article>
+
+
+    </div>
+  </div>
   
   
+  
+
   
 
 
@@ -345,7 +251,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL%E7%B4%A2%E5%BC%95"><span class="nav-number">1.</span> <span class="nav-text">MySQL索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.0.1.</span> <span class="nav-text">索引模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InnoDB%E7%9A%84%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.0.2.</span> <span class="nav-text">InnoDB的索引模型</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -359,14 +264,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-count">61</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
