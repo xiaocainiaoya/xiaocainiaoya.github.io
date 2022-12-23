@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="mybatis处理器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mybatis处理器">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2022/11/22/mybatis/mybatis%E7%9A%84%E8%AF%AD%E5%8F%A5%E5%A4%84%E7%90%86%E5%99%A8/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="mybatis处理器">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/11/28/OsSeqNWphfcyRGt.png">
+<meta property="og:image" content="https://s2.loli.net/2022/11/28/rmSGMb6WdnNoyu4.png">
+<meta property="og:image" content="https://s2.loli.net/2022/12/05/VkmnT5IjZgsGvP9.png">
+<meta property="article:published_time" content="2022-11-22T14:13:58.000Z">
+<meta property="article:modified_time" content="2022-12-05T11:50:44.696Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="mybatis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/11/28/OsSeqNWphfcyRGt.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2022/11/22/mybatis/mybatis%E7%9A%84%E8%AF%AD%E5%8F%A5%E5%A4%84%E7%90%86%E5%99%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>mybatis处理器 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/11/22/mybatis/mybatis%E7%9A%84%E8%AF%AD%E5%8F%A5%E5%A4%84%E7%90%86%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mybatis处理器
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-11-22 22:13:58" itemprop="dateCreated datePublished" datetime="2022-11-22T22:13:58+08:00">2022-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-05 19:50:44" itemprop="dateModified" datetime="2022-12-05T19:50:44+08:00">2022-12-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mybatis/" itemprop="url" rel="index"><span itemprop="name">mybatis</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="mybatis处理器"><a href="#mybatis处理器" class="headerlink" title="mybatis处理器"></a>mybatis处理器</h1><span id="more"></span>
+
+
+
+<h2 id="一、statementHandler"><a href="#一、statementHandler" class="headerlink" title="一、statementHandler"></a>一、statementHandler</h2><p>​    <code>JDBC</code>处理器，基于<code>JDBC</code>构建<code>Statement</code>并设置参数，然后去执行具体的<code>SQL</code>语句，每调用会话当中一次<code>SQL</code>，都会有与之相对应且唯一的<code>Statement</code>实例。</p>
+<p><img src="https://s2.loli.net/2022/11/28/OsSeqNWphfcyRGt.png" alt="statementHandler.png"></p>
+<p><code>StatementHandler</code>为顶层接口，为<code>Statement</code>处理器相关实现设置标准。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">StatementHandler</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">  <span class="comment">// 预处理</span></span><br><span class="line">  <span class="function">Statement <span class="title">prepare</span><span class="params">(Connection connection, Integer transactionTimeout)</span><span class="keyword">throws</span> SQLException</span>;</span><br><span class="line">	</span><br><span class="line">  <span class="comment">// 设置参数</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">parameterize</span><span class="params">(Statement statement)</span> <span class="keyword">throws</span> SQLException</span>;</span><br><span class="line">	</span><br><span class="line">  <span class="comment">// 批处理</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">batch</span><span class="params">(Statement statement)</span> <span class="keyword">throws</span> SQLException</span>;</span><br><span class="line">	</span><br><span class="line">  <span class="comment">// 写操作</span></span><br><span class="line">  <span class="function"><span class="keyword">int</span> <span class="title">update</span><span class="params">(Statement statement)</span> <span class="keyword">throws</span> SQLException</span>;</span><br><span class="line">	</span><br><span class="line">  <span class="comment">// 读操作</span></span><br><span class="line">  &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(Statement statement, ResultHandler resultHandler)</span><span class="keyword">throws</span> SQLException</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 读游标</span></span><br><span class="line">  &lt;E&gt; <span class="function">Cursor&lt;E&gt; <span class="title">queryCursor</span><span class="params">(Statement statement)</span><span class="keyword">throws</span> SQLException</span>;</span><br><span class="line">	</span><br><span class="line">  <span class="comment">// 辅助接口：获取动态语句</span></span><br><span class="line">  <span class="function">BoundSql <span class="title">getBoundSql</span><span class="params">()</span></span>;</span><br><span class="line">	</span><br><span class="line">  <span class="comment">// 辅助接口：获取参数解析器</span></span><br><span class="line">  <span class="function">ParameterHandler <span class="title">getParameterHandler</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>BaseStatementHandler</code>抽取了具体子类的公共部分，比如有设置超时时间、设置获取行数等等。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BaseStatementHandler#prepare</span></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Statement <span class="title">prepare</span><span class="params">(Connection connection, Integer transactionTimeout)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    ErrorContext.instance().sql(boundSql.getSql());</span><br><span class="line">    Statement statement = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">// BaseStatementHandler的抽象方法，由具体的子类来实现</span></span><br><span class="line">      statement = instantiateStatement(connection);</span><br><span class="line">      <span class="comment">// 根据子类返回的statement对象，来进行超时时间、获取行数的设置</span></span><br><span class="line">      setStatementTimeout(statement, transactionTimeout);</span><br><span class="line">      setFetchSize(statement);</span><br><span class="line">      <span class="keyword">return</span> statement;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">      closeStatement(statement);</span><br><span class="line">      <span class="keyword">throw</span> e;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">      closeStatement(statement);</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> ExecutorException(<span class="string">&quot;Error preparing statement.  Cause: &quot;</span> + e, e);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 抽象方法，由具体的子类实现</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> Statement <span class="title">instantiateStatement</span><span class="params">(Connection connection)</span> <span class="keyword">throws</span> SQLException</span>;</span><br></pre></td></tr></table></figure>
+
+<p>本篇中没有特殊说明都是以<code>PreparedStatementHandler</code>为例。具体的子类需要实现这个方法，使用<code>Conection</code>对象生成对应的<code>statement</code>对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PreparedStatementHandler#instantiateStatement</span></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> Statement <span class="title">instantiateStatement</span><span class="params">(Connection connection)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    String sql = boundSql.getSql();</span><br><span class="line">    <span class="keyword">if</span> (mappedStatement.getKeyGenerator() <span class="keyword">instanceof</span> Jdbc3KeyGenerator) &#123;</span><br><span class="line">      String[] keyColumnNames = mappedStatement.getKeyColumns();</span><br><span class="line">      <span class="keyword">if</span> (keyColumnNames == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> connection.prepareStatement(sql, keyColumnNames);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mappedStatement.getResultSetType() == ResultSetType.DEFAULT) &#123;</span><br><span class="line">      <span class="comment">// 基于jdbc的connection#prepareStatement方法来创建PreparedStatement</span></span><br><span class="line">      <span class="keyword">return</span> connection.prepareStatement(sql);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> connection.prepareStatement(sql, mappedStatement.getResultSetType().getValue(), ResultSet.CONCUR_READ_ONLY);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>StatementHandler执行流程：</strong></p>
+<p><img src="https://s2.loli.net/2022/11/28/rmSGMb6WdnNoyu4.png" alt="statementHandler执行过程.png"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SimpleExecutor#doQuery</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">doQuery</span><span class="params">(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  Statement stmt = <span class="keyword">null</span>;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    Configuration configuration = ms.getConfiguration();</span><br><span class="line">    <span class="comment">// 1.通过Configuration对象创建StatementHandler对象</span></span><br><span class="line">    StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line">    <span class="comment">// 2.预处理</span></span><br><span class="line">    stmt = prepareStatement(handler, ms.getStatementLog());</span><br><span class="line">    <span class="comment">// 3.最后执行，对于PreparedStatement来说就是调用它的execute()方法。</span></span><br><span class="line">    <span class="keyword">return</span> handler.query(stmt, resultHandler);</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    closeStatement(stmt);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>1.通过<code>Configuration</code>对象创建<code>StatementHandler</code>对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> StatementHandler <span class="title">newStatementHandler</span><span class="params">(Executor executor, MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 通过RoutingStatementHandler导航类来根据需要不同类型的statement进行创建</span></span><br><span class="line">    StatementHandler statementHandler = <span class="keyword">new</span> RoutingStatementHandler(executor, mappedStatement, parameterObject, rowBounds, resultHandler, boundSql);</span><br><span class="line">    statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);</span><br><span class="line">    <span class="keyword">return</span> statementHandler;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// RoutingStatementHandler#new()</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">RoutingStatementHandler</span><span class="params">(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span> (ms.getStatementType()) &#123;</span><br><span class="line">      <span class="keyword">case</span> STATEMENT:</span><br><span class="line">        delegate = <span class="keyword">new</span> SimpleStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> PREPARED:</span><br><span class="line">        delegate = <span class="keyword">new</span> PreparedStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> CALLABLE:</span><br><span class="line">        delegate = <span class="keyword">new</span> CallableStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ExecutorException(<span class="string">&quot;Unknown statement type: &quot;</span> + ms.getStatementType());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>2.预处理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Statement <span class="title">prepareStatement</span><span class="params">(StatementHandler handler, Log statementLog)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    Statement stmt;</span><br><span class="line">    Connection connection = getConnection(statementLog);</span><br><span class="line">    <span class="comment">// 调用StatementHandler的预处理接口来创建一个Statement对象</span></span><br><span class="line">    stmt = handler.prepare(connection, transaction.getTimeout());</span><br><span class="line">    <span class="comment">// 这里会调用参数解析器DefaultPrepareterHander来对statement对象的参数值(会经过类型转换等操作)</span></span><br><span class="line">    handler.parameterize(stmt);</span><br><span class="line">    <span class="keyword">return</span> stmt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3.最后执行，对于<code>PreparedStatement</code>来说就是调用它的<code>execute()</code>方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(Statement statement, ResultHandler resultHandler)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  PreparedStatement ps = (PreparedStatement) statement;</span><br><span class="line">  <span class="comment">// PreparedStatement的execute()方法。</span></span><br><span class="line">  ps.execute();</span><br><span class="line">  <span class="comment">// 执行完语句之后，使用结果集处理器对结果进行javabean的映射</span></span><br><span class="line">  <span class="keyword">return</span> resultSetHandler.handleResultSets(ps);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​    <code>BaseStatementHandler</code>将具体的<code>StatementHandler</code>中编写了具体子类的共性部分，实际上是由它来进行具体的<code>JDBC</code>抽象，创建它需要执行器、参数解析器、结果集处理器、动态语句等的参与。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> Configuration configuration;</span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> ObjectFactory objectFactory;</span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> TypeHandlerRegistry typeHandlerRegistry;</span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> ResultSetHandler resultSetHandler;</span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> ParameterHandler parameterHandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> Executor executor;</span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> MappedStatement mappedStatement;</span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> RowBounds rowBounds;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> BoundSql boundSql;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、ParamenterHandler"><a href="#二、ParamenterHandler" class="headerlink" title="二、ParamenterHandler"></a>二、ParamenterHandler</h2><p>参数名称解析器<code>ParamNameResolver</code>。</p>
+<p><b>单个参数：</b>默认不做任何处理，除非设置了<code>@Param</code></p>
+<p><b>多个参数：</b></p>
+<ol>
+<li>根据参数声明的顺序将参数转换为<code>param1</code>、<code>param2</code>…</li>
+<li>通过<code>@Param</code>指定变量名称</li>
+<li>基于反射转换成变量名，如果不支持则根据声明的顺序转换成<code>arg0</code>、<code>arg1</code>…</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 单个参数情况下：</span></span><br><span class="line"><span class="comment"> *    args的值直接为这个参数的值 &#123;0, &quot;arg0&quot;&#125;</span></span><br><span class="line"><span class="comment"> * 多参数情况下：</span></span><br><span class="line"><span class="comment"> *    如果在mapper中对字段标记了<span class="doctag">@Param</span>注解并设置了对应的字段名称，则names的值为 &#123;&#123;0, &quot;field1&quot;&#125;, &#123;1, &quot;field2&quot;&#125;&#125;</span></span><br><span class="line"><span class="comment"> *    如果没有标记<span class="doctag">@Param</span>注解，则names的值为&#123;&#123;0, &quot;arg0&quot;&#125;, &#123;1, &quot;arg1&quot;&#125;&#125;</span></span><br><span class="line"><span class="comment"> *    所以这里仅仅是将字段名称和具体的参数值进行对应成param，实际的解析参数名的参数，在上层调用端。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">getNamedParams</span><span class="params">(Object[] args)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// names 是一个SortMap</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> paramCount = names.size();</span><br><span class="line">    <span class="keyword">if</span> (args == <span class="keyword">null</span> || paramCount == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    <span class="comment">// 如果没有@Param注解，并且参数个数为1，直接返回原值</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!hasParamAnnotation &amp;&amp; paramCount == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> args[names.firstKey()];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> Map&lt;String, Object&gt; param = <span class="keyword">new</span> ParamMap&lt;&gt;();</span><br><span class="line">        <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (Map.Entry&lt;Integer, String&gt; entry : names.entrySet()) &#123;</span><br><span class="line">        <span class="comment">// 直接将args参数中的值添加到param中</span></span><br><span class="line">        param.put(entry.getValue(), args[entry.getKey()]);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 默认还会为参数根据声明的顺序设置param1， param2 ...</span></span><br><span class="line">        <span class="keyword">final</span> String genericParamName = GENERIC_NAME_PREFIX + String.valueOf(i + <span class="number">1</span>);</span><br><span class="line">        <span class="comment">// 不存在同名的情况下，可能有人字段名直接命名成paramX。</span></span><br><span class="line">        <span class="keyword">if</span> (!names.containsValue(genericParamName)) &#123;</span><br><span class="line">            param.put(genericParamName, args[entry.getKey()]);</span><br><span class="line">        &#125;</span><br><span class="line">        i++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 所以如果不出现同名的情况，假设mapper接口设置了两个参数，那么这里返回有两份参数，</span></span><br><span class="line">        <span class="comment">// 一份要么是根据@Param解析规则，或者反射参数(启动参数) -parameters ,或者默认的arg0, arg1</span></span><br><span class="line">        <span class="comment">// 一份是param1， param2...</span></span><br><span class="line">        <span class="comment">// 要注意arg是从0下标开始，param是从1下标开始</span></span><br><span class="line">        <span class="keyword">return</span> param;</span><br><span class="line">    &#125;   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以根据返回<code>param</code>不同的类型，使用的方式也有所不同。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 如果是单个参数，那么这里的#&#123;userId&#125;,写什么都行，#&#123;param1&#125;, #&#123;arg0&#125;都可，实际上</span></span><br><span class="line"><span class="comment">// 根据就不校验名称，直接复制了</span></span><br><span class="line"><span class="meta">@Select(&#123;&quot;select * from users where id=#&#123;userId&#125;&quot;&#125;)</span></span><br><span class="line"><span class="function">User <span class="title">selectByid</span><span class="params">(Integer id)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这里的#&#123;name&#125;也可以写成#&#123;param1&#125;， 但是注意不能写#&#123;arg0&#125;， 因为#&#123;arg0&#125;已经变成@param</span></span><br><span class="line"><span class="comment">// 注解中的名称</span></span><br><span class="line"><span class="meta">@Select(&#123;&quot;select * from users where name=#&#123;name&#125; or age=#&#123;user.age&#125;&quot;&#125;)</span></span><br><span class="line"><span class="function">User <span class="title">selectByNameOrAge</span><span class="params">(<span class="meta">@Param(&quot;name&quot;)</span> String name, <span class="meta">@Param(&quot;user&quot;)</span> User user)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>结合前文提到的<code>StatementHandler</code>执行流程时序图中，在<b>预处理</b>阶段，会<font color="red">为PrearedStatement设置参数</font>，来具体看一下源码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 以SimpleExecutor为例, 在调用doUpdate或者是doQuery方法创建StatementHandler之后，都会进行设置参数。</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">doQuery</span><span class="params">(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  Statement stmt = <span class="keyword">null</span>;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    Configuration configuration = ms.getConfiguration();</span><br><span class="line">    StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line">    <span class="comment">// 设置参数</span></span><br><span class="line">    stmt = prepareStatement(handler, ms.getStatementLog());</span><br><span class="line">    <span class="keyword">return</span> handler.query(stmt, resultHandler);</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    closeStatement(stmt);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Statement <span class="title">prepareStatement</span><span class="params">(StatementHandler handler, Log statementLog)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    Statement stmt;</span><br><span class="line">    Connection connection = getConnection(statementLog);</span><br><span class="line">    <span class="comment">// 创建statement</span></span><br><span class="line">    stmt = handler.prepare(connection, transaction.getTimeout());</span><br><span class="line">    <span class="comment">// 为statement设置参数</span></span><br><span class="line">    handler.parameterize(stmt);</span><br><span class="line">    <span class="keyword">return</span> stmt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PreparedStatementHandler#parameterize</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">parameterize</span><span class="params">(Statement statement)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  <span class="comment">// 进入参数解析器，为statement设置参数</span></span><br><span class="line">  parameterHandler.setParameters((PreparedStatement) statement);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这里就进入到了<code>ParameterHandler</code>的<code>setParameters</code>中，为创建的<code>preparedStatement</code>设置具体的参数。先来看一下<code>ParameterHandler</code>的接口，<code>ParameterHandler</code>是<code>mybatis</code>中的参数处理器，负责为<code>PreparedStatement</code>的<code>SQL</code>语句参数动态赋值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ParameterHandler</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 读取参数</span></span><br><span class="line">  <span class="function">Object <span class="title">getParameterObject</span><span class="params">()</span></span>;</span><br><span class="line">	<span class="comment">// 用于对PreparedStatement的参数赋值</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">setParameters</span><span class="params">(PreparedStatement ps)</span> <span class="keyword">throws</span> SQLException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它只有一个实现类<code>DefaultParameterHandler</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这个parameterObject就是前面说到通过ParameterNameSolver解析之后的对象</span></span><br><span class="line"><span class="comment">// 如果是单个参数，就是具体的值</span></span><br><span class="line"><span class="comment">// 如果是多个参数就是一个map对象</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">getParameterObject</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> parameterObject;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setParameters</span><span class="params">(PreparedStatement ps)</span> </span>&#123;</span><br><span class="line">  ErrorContext.instance().activity(<span class="string">&quot;setting parameters&quot;</span>).object(mappedStatement.getParameterMap().getId());</span><br><span class="line">  <span class="comment">// parameterMappings是对具体执行语句的映射，将将要执行的语句映射成ParamterMapping对象，</span></span><br><span class="line">  <span class="comment">// 将具体需要填充的参数#&#123;&#125;解析出来，形成参数列表</span></span><br><span class="line">  List&lt;ParameterMapping&gt; parameterMappings = boundSql.getParameterMappings();</span><br><span class="line">  <span class="keyword">if</span> (parameterMappings != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">// 参数化sql就需要进行参数设置，遍历这个参数列表，将参数设置到PreparedStatement中</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; parameterMappings.size(); i++) &#123;</span><br><span class="line">      ParameterMapping parameterMapping = parameterMappings.get(i);</span><br><span class="line">      <span class="comment">// ParameterMode.OUT 存储过程的参数模式</span></span><br><span class="line">      <span class="keyword">if</span> (parameterMapping.getMode() != ParameterMode.OUT) &#123;</span><br><span class="line">        <span class="comment">// 声明value，最后就是将这个值设置到PreparedStatement中</span></span><br><span class="line">        Object value; </span><br><span class="line">        <span class="comment">// 获取执行语句声明的#&#123;&#125;中的参数变量名称</span></span><br><span class="line">        String propertyName = parameterMapping.getProperty();</span><br><span class="line">        <span class="keyword">if</span> (boundSql.hasAdditionalParameter(propertyName)) &#123; </span><br><span class="line">          value = boundSql.getAdditionalParameter(propertyName);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (parameterObject == <span class="keyword">null</span>) &#123;</span><br><span class="line">          value = <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) &#123;</span><br><span class="line">          value = parameterObject;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">// 多个参数会走到这里，将map对象，转换成MetaObject对象，就可以直接通过字段名称来获取具体的值  </span></span><br><span class="line">          MetaObject metaObject = configuration.newMetaObject(parameterObject);</span><br><span class="line">          value = metaObject.getValue(propertyName);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 从parameterMapping获取TypeHandler类型转换器对象</span></span><br><span class="line">        TypeHandler typeHandler = parameterMapping.getTypeHandler();</span><br><span class="line">        <span class="comment">// 从TypeHandler类型转换器中获取对应的数据库类型</span></span><br><span class="line">        JdbcType jdbcType = parameterMapping.getJdbcType();</span><br><span class="line">        <span class="keyword">if</span> (value == <span class="keyword">null</span> &amp;&amp; jdbcType == <span class="keyword">null</span>) &#123;</span><br><span class="line">          jdbcType = configuration.getJdbcTypeForNull();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="comment">// TypeHandler.setParameter实际上最后会调用到PreParedStatement.set*()方法，为要执行的语句绑定参数值</span></span><br><span class="line">          <span class="comment">// 比如说TypeHandler是BigDecimalTypeHandler 则调用的就是ps.setBigDecimal(i, parameter);</span></span><br><span class="line">          <span class="comment">// TypeHandler是BigDecimalTypeHandler 则调用的就是ps.setByte(i, parameter);</span></span><br><span class="line">          typeHandler.setParameter(ps, i + <span class="number">1</span>, value, jdbcType);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (TypeException | SQLException e) &#123;</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> TypeException(<span class="string">&quot;Could not set parameters for mapping: &quot;</span> + parameterMapping + <span class="string">&quot;. Cause: &quot;</span> + e, e);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里通过<code>debugger</code>了解一下<code>ParameterMapping</code>中的内容： 主要是将<code>mybatis</code>在<code>SQL</code>或者是在实体上设置的一些配置进行映射，包含有字段名称、<code>javaType</code>数据类型、<code>jdbcType</code>数据库类型，<code>typeHandler</code>类型处理器等。</p>
+<p><img src="https://s2.loli.net/2022/12/05/VkmnT5IjZgsGvP9.png" alt="parameterMapping.png"></p>
+<h2 id="三、ResultHandler"><a href="#三、ResultHandler" class="headerlink" title="三、ResultHandler"></a>三、ResultHandler</h2>
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2022/11/22/mybatis/mybatis%E7%9A%84%E8%AF%AD%E5%8F%A5%E5%A4%84%E7%90%86%E5%99%A8/" title="mybatis处理器">http://xiaocainiaoya.github.io/2022/11/22/mybatis/mybatis的语句处理器/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mybatis/" rel="tag"><i class="fa fa-tag"></i> mybatis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/11/13/mybatis/mybatis%E6%8E%A7%E5%88%B6%E9%83%A8%E5%88%86%E5%AD%97%E6%AE%B5%E4%B8%8D%E6%89%93%E5%8D%B0/" rel="prev" title="mybatis控制部分字段不打印">
+      <i class="fa fa-chevron-left"></i> mybatis控制部分字段不打印
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/11/22/mybatis/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" rel="next" title="mybatis执行器">
+      mybatis执行器 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mybatis%E5%A4%84%E7%90%86%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">mybatis处理器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81statementHandler"><span class="nav-number">1.1.</span> <span class="nav-text">一、statementHandler</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81ParamenterHandler"><span class="nav-number">1.2.</span> <span class="nav-text">二、ParamenterHandler</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81ResultHandler"><span class="nav-number">1.3.</span> <span class="nav-text">三、ResultHandler</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">64</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

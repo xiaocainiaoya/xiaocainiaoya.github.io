@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="mybatis的MetaObject反射工具类​    MetaObject是mybatis中用于处理反射相关的工具类，通过MetaObject就可以进行获取和设置对象值。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mybatis的MetaObject反射工具类">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2022/12/05/mybatis/mybatis%E7%9A%84MetaObject%E5%8F%8D%E5%B0%84%E5%B7%A5%E5%85%B7%E7%B1%BB/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="mybatis的MetaObject反射工具类​    MetaObject是mybatis中用于处理反射相关的工具类，通过MetaObject就可以进行获取和设置对象值。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/12/05/MQDxLNbn4OgvKRw.png">
+<meta property="article:published_time" content="2022-12-05T12:51:58.000Z">
+<meta property="article:modified_time" content="2022-12-05T14:30:58.284Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="mybatis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/12/05/MQDxLNbn4OgvKRw.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2022/12/05/mybatis/mybatis%E7%9A%84MetaObject%E5%8F%8D%E5%B0%84%E5%B7%A5%E5%85%B7%E7%B1%BB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>mybatis的MetaObject反射工具类 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/12/05/mybatis/mybatis%E7%9A%84MetaObject%E5%8F%8D%E5%B0%84%E5%B7%A5%E5%85%B7%E7%B1%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mybatis的MetaObject反射工具类
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-12-05 20:51:58 / 修改时间：22:30:58" itemprop="dateCreated datePublished" datetime="2022-12-05T20:51:58+08:00">2022-12-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mybatis/" itemprop="url" rel="index"><span itemprop="name">mybatis</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="mybatis的MetaObject反射工具类"><a href="#mybatis的MetaObject反射工具类" class="headerlink" title="mybatis的MetaObject反射工具类"></a>mybatis的MetaObject反射工具类</h1><p>​    <code>MetaObject</code>是<code>mybatis</code>中用于处理反射相关的工具类，通过<code>MetaObject</code>就可以进行获取和设置对象值。</p>
+<span id="more"></span>
+
+<h2 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h2><p><b>简单类型：</b></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMetaObject</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个Blog对象</span></span><br><span class="line">    Object blog = <span class="keyword">new</span> Blog();</span><br><span class="line">    Configuration configuration = <span class="keyword">new</span> Configuration();</span><br><span class="line">  	<span class="comment">// 使用默认配置创建一个MetaObject对象</span></span><br><span class="line">    MetaObject metaObject = configuration.newMetaObject(blog);</span><br><span class="line">  	<span class="comment">// 直接为Blog的id属性赋值</span></span><br><span class="line">    metaObject.setValue(<span class="string">&quot;id&quot;</span>, <span class="number">1</span>);</span><br><span class="line">    System.out.println(metaObject.getValue(<span class="string">&quot;id&quot;</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><b>复杂类型：</b></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMetaObject</span><span class="params">()</span></span>&#123;</span><br><span class="line">    Object blog = <span class="keyword">new</span> Blog();</span><br><span class="line">    Configuration configuration = <span class="keyword">new</span> Configuration();</span><br><span class="line">    MetaObject metaObject = configuration.newMetaObject(blog);</span><br><span class="line">    <span class="comment">// 为Bolg中的对象赋值，如果对象为空，会通过该对象的构造函数创建一个空对象</span></span><br><span class="line">    metaObject.setValue(<span class="string">&quot;author.name&quot;</span>, <span class="string">&quot;tommy&quot;</span>);</span><br><span class="line">    System.out.println(metaObject.getValue(<span class="string">&quot;author.name&quot;</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>集合类型：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMetaObject</span><span class="params">()</span></span>&#123;</span><br><span class="line">    Object blog = <span class="keyword">new</span> Blog();</span><br><span class="line">    Configuration configuration = <span class="keyword">new</span> Configuration();</span><br><span class="line">    MetaObject metaObject = configuration.newMetaObject(blog);</span><br><span class="line">    List&lt;Comment&gt; commentList = <span class="keyword">new</span> ArrayList&lt;&gt;(<span class="number">5</span>);</span><br><span class="line">    <span class="comment">// 尽管设置了数组长度为5，以下调用还是报错，原因是set(index, value)方法中有判断</span></span><br><span class="line">    <span class="comment">// 若 index &gt;= size 则报越界，而size只有add(value)方法会进行叠加</span></span><br><span class="line">    <span class="comment">//commentList.set(0,new Comment());</span></span><br><span class="line">    commentList.add(<span class="keyword">new</span> Comment());</span><br><span class="line">    <span class="comment">// 1.如果是Object对象，为空时会通过构造函数进行创建，但是集合不能自动创建</span></span><br><span class="line">    <span class="comment">// 2.setValue的底层是调用集合的List.set(index, value)方法，不是List.add方法，所以要注意数组越界</span></span><br><span class="line">    metaObject.setValue(<span class="string">&quot;comments&quot;</span>, commentList);</span><br><span class="line">    metaObject.setValue(<span class="string">&quot;comments[0]&quot;</span>, <span class="keyword">new</span> Comment());</span><br><span class="line">    System.out.println(metaObject.getValue(<span class="string">&quot;comments[0].user.name&quot;</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p>主要由<code>MetaObject</code>、<code>ObjectWrapper</code>、<code>MetaClass</code>、<code>Reflector</code>构成。</p>
+<p><img src="https://s2.loli.net/2022/12/05/MQDxLNbn4OgvKRw.png" alt="MetaObject.png"></p>
+<h3 id="1-MetaObject"><a href="#1-MetaObject" class="headerlink" title="1.MetaObject"></a>1.MetaObject</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MetaObject</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 原始对象</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Object originalObject;</span><br><span class="line">    <span class="comment">// 包装对象，根据不同对象的不同类型进行包装</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ObjectWrapper objectWrapper;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ObjectFactory objectFactory;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ObjectWrapperFactory objectWrapperFactory;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ReflectorFactory reflectorFactory;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="title">MetaObject</span><span class="params">(Object object, ObjectFactory objectFactory, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.originalObject = object;</span><br><span class="line">    <span class="keyword">this</span>.objectFactory = objectFactory;</span><br><span class="line">    <span class="keyword">this</span>.objectWrapperFactory = objectWrapperFactory;</span><br><span class="line">    <span class="keyword">this</span>.reflectorFactory = reflectorFactory;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 根据不同对象的不同对象进行包装</span></span><br><span class="line">    <span class="keyword">if</span> (object <span class="keyword">instanceof</span> ObjectWrapper) &#123;</span><br><span class="line">        <span class="keyword">this</span>.objectWrapper = (ObjectWrapper) object;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (objectWrapperFactory.hasWrapperFor(object)) &#123;</span><br><span class="line">        <span class="keyword">this</span>.objectWrapper = objectWrapperFactory.getWrapperFor(<span class="keyword">this</span>, object);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (object <span class="keyword">instanceof</span> Map) &#123;</span><br><span class="line">        <span class="keyword">this</span>.objectWrapper = <span class="keyword">new</span> MapWrapper(<span class="keyword">this</span>, (Map) object);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (object <span class="keyword">instanceof</span> Collection) &#123;</span><br><span class="line">        <span class="keyword">this</span>.objectWrapper = <span class="keyword">new</span> CollectionWrapper(<span class="keyword">this</span>, (Collection) object);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.objectWrapper = <span class="keyword">new</span> BeanWrapper(<span class="keyword">this</span>, object);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>创建完<code>MetaObject</code>之后，从<code>MetaObject</code>调用的<code>setValue</code>、<code>getValue</code>等属性操作方法实际上都委派给了<code>ObjectWrapper</code>进行处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">getValue</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">    PropertyTokenizer prop = <span class="keyword">new</span> PropertyTokenizer(name);</span><br><span class="line">    <span class="comment">// 如果存在下一层表达式，则创建下一层MetaObject</span></span><br><span class="line">    <span class="keyword">if</span> (prop.hasNext()) &#123;</span><br><span class="line">        MetaObject metaValue = metaObjectForProperty(prop.getIndexedName());</span><br><span class="line">        <span class="keyword">if</span> (metaValue == SystemMetaObject.NULL_META_OBJECT) &#123;</span><br><span class="line">        	<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">// 通过创建的下一层的MetaObject对象，再次调用getValue，进入递归</span></span><br><span class="line">        	<span class="keyword">return</span> metaValue.getValue(prop.getChildren());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 不存在下一层表达式，通过wrapper对象进行反射获取值</span></span><br><span class="line">        <span class="keyword">return</span> objectWrapper.get(prop);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-ObjectWrapper"><a href="#2-ObjectWrapper" class="headerlink" title="2.ObjectWrapper"></a>2.ObjectWrapper</h3><p><code>ObjectWrapper</code>是顶层接口，定义了<code>wrapper</code>包装原始对象的处理接口，如果原始对象是<code>Bean</code>对象那么具体的获取属性等操作在<code>BeanWrapper</code>，如果原始对象是<code>Map</code>则通过<code>MapWrapper</code>进行实现具体的属性操作，同理<code>List</code>则通过<code>CollectionWrapper</code>进行实现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ObjectWrapper</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">Object <span class="title">get</span><span class="params">(PropertyTokenizer prop)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">set</span><span class="params">(PropertyTokenizer prop, Object value)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function">String <span class="title">findProperty</span><span class="params">(String name, <span class="keyword">boolean</span> useCamelCaseMapping)</span></span>;</span><br><span class="line">    </span><br><span class="line">    String[] getGetterNames();</span><br><span class="line">    </span><br><span class="line">    String[] getSetterNames();</span><br><span class="line">    </span><br><span class="line">    Class&lt;?&gt; getSetterType(String name);</span><br><span class="line">    </span><br><span class="line">    Class&lt;?&gt; getGetterType(String name);</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">hasSetter</span><span class="params">(String name)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">hasGetter</span><span class="params">(String name)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function">MetaObject <span class="title">instantiatePropertyValue</span><span class="params">(String name, PropertyTokenizer prop, ObjectFactory objectFactory)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isCollection</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">add</span><span class="params">(Object element)</span></span>;</span><br><span class="line">    </span><br><span class="line">    &lt;E&gt; <span class="function"><span class="keyword">void</span> <span class="title">addAll</span><span class="params">(List&lt;E&gt; element)</span></span>;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>BeanWrapper</code>和<code>MapWrapper</code>是继承于抽象类<code>BaseWrapper</code>，由抽象类继承顶层接口<code>ObjectWrapper</code>。<code>CollectionWrapper</code>是直接继承于顶层接口。这是因为如果原始对象是集合，它仅有<code>add</code>和<code>addAll</code>操作，其他接口均抛异常。</p>
+<p><b>在BeanWrapper中解析表达式为词法分析器后进行属性操作</b></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 以set方法为例，通过PropertyTokenizer词法分析器，对比如“comment[0].user.id”进行解析</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(PropertyTokenizer prop, Object value)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (prop.getIndex() != <span class="keyword">null</span>) &#123;</span><br><span class="line">    Object collection = resolveCollection(prop, object);</span><br><span class="line">    setCollectionValue(prop, collection, value);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    setBeanProperty(prop, object, value);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setBeanProperty</span><span class="params">(PropertyTokenizer prop, Object object, Object value)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 获取到对象的set方法</span></span><br><span class="line">        Invoker method = metaClass.getSetInvoker(prop.getName());</span><br><span class="line">        Object[] params = &#123;value&#125;;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 通过反射赋值</span></span><br><span class="line">        	method.invoke(object, params);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">        	<span class="keyword">throw</span> ExceptionUtil.unwrapThrowable(t);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><b>PropertyTokenizer：词法分析器</b>，实现迭代器接口，通过<code>next()</code>方法解析下一层。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这里以 comments[0].user.id为例</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PropertyTokenizer</span> <span class="keyword">implements</span> <span class="title">Iterator</span>&lt;<span class="title">PropertyTokenizer</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 表示当前层的名字: comments</span></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="comment">// 若是集合则为comments[0]，否则indexedName和name值一致</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String indexedName;</span><br><span class="line">    <span class="comment">// 表示下标: 若不是集合或者Map，则为空</span></span><br><span class="line">    <span class="keyword">private</span> String index;</span><br><span class="line">    <span class="comment">// 表示子表达式: user.id</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String children;</span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">hasNext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> children != <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> PropertyTokenizer <span class="title">next</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> PropertyTokenizer(children);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-MetaClass"><a href="#3-MetaClass" class="headerlink" title="3.MetaClass"></a>3.MetaClass</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MetaClass</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ReflectorFactory reflectorFactory;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Reflector reflector;</span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">MetaClass</span><span class="params">(Class&lt;?&gt; type, ReflectorFactory reflectorFactory)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.reflectorFactory = reflectorFactory;</span><br><span class="line">      <span class="comment">// 通过这个反射工厂来创建一个反射器</span></span><br><span class="line">      <span class="keyword">this</span>.reflector = reflectorFactory.findForClass(type);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>ReflectorFactory</code>这个反射工厂的主要作用是对<code>Reflector</code>反射器进行缓存。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DefaultReflectorFactory</span> <span class="keyword">implements</span> <span class="title">ReflectorFactory</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> classCacheEnabled = <span class="keyword">true</span>;</span><br><span class="line">    <span class="comment">// 缓存</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ConcurrentMap&lt;Class&lt;?&gt;, Reflector&gt; reflectorMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Reflector <span class="title">findForClass</span><span class="params">(Class&lt;?&gt; type)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (classCacheEnabled) &#123;</span><br><span class="line">        <span class="comment">// 如果缓存中存在，则直接返回</span></span><br><span class="line">        <span class="keyword">return</span> reflectorMap.computeIfAbsent(type, Reflector::<span class="keyword">new</span>);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Reflector(type);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-Reflector"><a href="#4-Reflector" class="headerlink" title="4.Reflector"></a>4.Reflector</h3><p>根据创建的<code>Class</code>对象，解析出这个类的所有<code>get</code>、<code>set</code>方法，构造函数，所有属性字段等。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Reflector</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;?&gt; type;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String[] readablePropertyNames;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String[] writablePropertyNames;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Invoker&gt; setMethods = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Invoker&gt; getMethods = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Class&lt;?&gt;&gt; setTypes = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Class&lt;?&gt;&gt; getTypes = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> Constructor&lt;?&gt; defaultConstructor;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">private</span> Map&lt;String, String&gt; caseInsensitivePropertyMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Reflector</span><span class="params">(Class&lt;?&gt; clazz)</span> </span>&#123;</span><br><span class="line">      type = clazz;</span><br><span class="line">      addDefaultConstructor(clazz);</span><br><span class="line">      addGetMethods(clazz);</span><br><span class="line">      addSetMethods(clazz);</span><br><span class="line">      addFields(clazz);</span><br><span class="line">      readablePropertyNames = getMethods.keySet().toArray(<span class="keyword">new</span> String[getMethods.keySet().size()]);</span><br><span class="line">      writablePropertyNames = setMethods.keySet().toArray(<span class="keyword">new</span> String[setMethods.keySet().size()]);</span><br><span class="line">      <span class="keyword">for</span> (String propName : readablePropertyNames) &#123;</span><br><span class="line">        caseInsensitivePropertyMap.put(propName.toUpperCase(Locale.ENGLISH), propName);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">for</span> (String propName : writablePropertyNames) &#123;</span><br><span class="line">        caseInsensitivePropertyMap.put(propName.toUpperCase(Locale.ENGLISH), propName);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2022/12/05/mybatis/mybatis%E7%9A%84MetaObject%E5%8F%8D%E5%B0%84%E5%B7%A5%E5%85%B7%E7%B1%BB/" title="mybatis的MetaObject反射工具类">http://xiaocainiaoya.github.io/2022/12/05/mybatis/mybatis的MetaObject反射工具类/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mybatis/" rel="tag"><i class="fa fa-tag"></i> mybatis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/11/22/mybatis/mybatis%E6%89%A7%E8%A1%8C%E5%99%A8/" rel="prev" title="mybatis执行器">
+      <i class="fa fa-chevron-left"></i> mybatis执行器
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mybatis%E7%9A%84MetaObject%E5%8F%8D%E5%B0%84%E5%B7%A5%E5%85%B7%E7%B1%BB"><span class="nav-number">1.</span> <span class="nav-text">mybatis的MetaObject反射工具类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">简单使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-MetaObject"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.MetaObject</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-ObjectWrapper"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.ObjectWrapper</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-MetaClass"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.MetaClass</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Reflector"><span class="nav-number">1.2.4.</span> <span class="nav-text">4.Reflector</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">64</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
