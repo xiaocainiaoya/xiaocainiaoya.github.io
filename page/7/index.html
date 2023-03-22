@@ -160,94 +160,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/java/ThreadLocal/ThreadLocal/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/04/13/java/ThreadLocal/ThreadLocal/" class="post-title-link" itemprop="url">ThreadLocal初探</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2021-04-13T21:51:58+08:00">2021-04-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-14 14:08:35" itemprop="dateModified" datetime="2021-04-14T14:08:35+08:00">2021-04-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/ThreadLocal/" itemprop="url" rel="index"><span itemprop="name">ThreadLocal</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="ThreadLocal初探"><a href="#ThreadLocal初探" class="headerlink" title="ThreadLocal初探"></a>ThreadLocal初探</h3><p>[TOC]</p>
-<h4 id="一、ThreadLocal的实现原理"><a href="#一、ThreadLocal的实现原理" class="headerlink" title="一、ThreadLocal的实现原理"></a>一、ThreadLocal的实现原理</h4><p>​    <code>Thread</code>有一个内部变量<code>ThreadLocal.ThreadLocalMap</code>,这个类是<code>ThreadLocal</code>的静态内部类，它的实现与<code>HashMap</code>类似，当线程第一次调用<code>ThreadLocal</code>的<code>get/set</code>方法时会初始化它。它的键是这个<code>ThreadLocal</code>对象本身，值是需要存储的变量。也就是说<code>ThreadLocal</code>类型的本地变量是存放在具体的线程空间里。当不断的使用<code>get</code>方法获取时，是到线程独有线程空间中获取变量，使得其他线程无法访问到，也就达到了线程安全的目的。在使用完成之后，可以通过<code>remove</code>方法，移除不使用的本地变量。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/04/13/java/ThreadLocal/ThreadLocal/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/java/ThreadLocal/TransmittableThreadLocal/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1084,7 +996,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1097,7 +1009,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-count">23</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
