@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="mysql45讲学习总结（六）—锁（第二弹）​    本篇主要为了记录间隙锁和next-key lock相关概念以及加锁规则，在根据一些例子来理解这些加锁规则。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql45讲学习总结（六）---锁（第二弹）">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2023/03/02/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E5%85%AD%EF%BC%89---%E9%94%81%EF%BC%88%E7%AC%AC%E4%BA%8C%E5%BC%B9%EF%BC%89/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="mysql45讲学习总结（六）—锁（第二弹）​    本篇主要为了记录间隙锁和next-key lock相关概念以及加锁规则，在根据一些例子来理解这些加锁规则。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2023/03/02/IqU9dRAu2c6VCYz.png">
+<meta property="og:image" content="https://s2.loli.net/2023/03/02/FpGekvjcSrM7zCt.png">
+<meta property="og:image" content="https://s2.loli.net/2023/03/02/E5r6kSWTJDxpNQu.png">
+<meta property="article:published_time" content="2023-03-02T14:13:58.000Z">
+<meta property="article:modified_time" content="2023-03-03T07:31:25.573Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2023/03/02/IqU9dRAu2c6VCYz.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2023/03/02/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E5%85%AD%EF%BC%89---%E9%94%81%EF%BC%88%E7%AC%AC%E4%BA%8C%E5%BC%B9%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>mysql45讲学习总结（六）---锁（第二弹） | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/03/02/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E5%85%AD%EF%BC%89---%E9%94%81%EF%BC%88%E7%AC%AC%E4%BA%8C%E5%BC%B9%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql45讲学习总结（六）---锁（第二弹）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-03-02 22:13:58" itemprop="dateCreated datePublished" datetime="2023-03-02T22:13:58+08:00">2023-03-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-03-03 15:31:25" itemprop="dateModified" datetime="2023-03-03T15:31:25+08:00">2023-03-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="mysql45讲学习总结（六）—锁（第二弹）"><a href="#mysql45讲学习总结（六）—锁（第二弹）" class="headerlink" title="mysql45讲学习总结（六）—锁（第二弹）"></a>mysql45讲学习总结（六）—锁（第二弹）</h1><p>​    本篇主要为了记录间隙锁和<code>next-key lock</code>相关概念以及加锁规则，在根据一些例子来理解这些加锁规则。</p>
+<span id="more"></span>
+
+<p>这里简单回顾一下：</p>
+<p>表锁：如果查询条件中不包含索引字段，则是表锁。</p>
+<p>行锁：行锁只能锁住行，跟行锁有冲突的是“另外一个行锁”</p>
+<p>间隙锁：间隙锁是锁住两个值之间的空隙，跟间隙锁有冲突的是“往这个间隙插入一个记录”这个动作，所以某一个间隙可以被多个线程上间隙锁。</p>
+<p><code>Next-Key Lock</code>是行锁和间隙锁的结合体。</p>
+<p><b>无论任何锁的释放，都不是在执行完事务内的某条语句之后，是整个事务提交之后才会释放锁。</b></p>
+<h2 id="从一个例子开始"><a href="#从一个例子开始" class="headerlink" title="从一个例子开始"></a>从一个例子开始</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `USER_INFO` (</span><br><span class="line">  `ID` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `USER_ID` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `USER_NAME` <span class="type">varchar</span>(<span class="number">50</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  <span class="keyword">PRIMARY</span> KEY (`ID`),</span><br><span class="line">  KEY `IDX_USER_ID` (`USER_ID`) <span class="keyword">USING</span> BTREE</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 事务1</span></span><br><span class="line"><span class="keyword">delete</span> <span class="keyword">from</span> USER_INFO <span class="keyword">where</span> USER_ID <span class="operator">=</span> <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 事务2</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> USER_INFO <span class="keyword">VALUES</span>(<span class="number">15</span>, <span class="number">20</span>, &quot;marry&quot;);</span><br></pre></td></tr></table></figure>
+
+<p>可以看到上面示例中有一张<code>USER_INFO</code>表，在<code>ID</code>上有主键索引，在<code>USER_ID</code>上有非唯一索引。这时有两个事务并发，事务1是删除，事务2是插入。</p>
+<p><strong>分析一下上锁过程：</strong></p>
+<p>因为<code>USER_ID</code>是有非唯一索引，那么对<code>USER_ID</code>索引上<code>Next-Key Lock</code>。(假设事务1比事务2快一点点到达)</p>
+<ol>
+<li>上锁的基本单位是<code>Next-Key Lock</code>，上<code>Next-Key Lock</code>为(前一个<code>USER_ID</code>, 10]，前开后闭。</li>
+<li>由于<code>USER_ID</code>是非唯一索引，这时还需要向后扫描到第一个不等值才返回(不等于10)，但是由于目前这张表中的最大<code>USER_ID=10</code>，所以这时会变成<code>mysql</code>预设的最大值(+suprenum)。</li>
+<li>所以最后锁的范围为(前一个formId， +suprenum)</li>
+</ol>
+<p><font color="red">在步骤2中，由于间隙锁需要锁住一个空间，但是在<code>USER_ID=10</code>之后没有其他数据，才会导致锁住了<code>USER_ID=10</code>之后的所有空间，这也不能理解，由于是非唯一索引，所以无法保证不会在<code>USER=10</code>之后再插入一条<code>USER_ID=10</code>的数据。</font></p>
+<p>所以这个时候的事务2进来是就需要等待事务1提交事务之后才能进行数据插入。</p>
+<p>可以自己通过脚本测试一下，验证结论是否正确。开两个<code>SQL</code>窗口，进行两个线程测试。</p>
+<p>线程1：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">BEGIN</span> ;</span><br><span class="line"><span class="keyword">delete</span> <span class="keyword">from</span> USER_INFO <span class="keyword">where</span> USER_ID <span class="operator">=</span> <span class="number">10</span></span><br><span class="line"><span class="comment">-- 延迟 提交事务</span></span><br><span class="line"><span class="keyword">SELECT</span> sleep(<span class="number">10</span>) <span class="keyword">FROM</span> USER_INFO limit <span class="number">1</span>;</span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br></pre></td></tr></table></figure>
+
+<p>线程2：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">BEGIN</span> ;</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> USER_INFO <span class="keyword">VALUES</span>(<span class="number">15</span>, <span class="number">20</span>, &quot;marry&quot;);</span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="加锁规则"><a href="#加锁规则" class="headerlink" title="加锁规则"></a>加锁规则</h2><ol>
+<li>原则1：加锁的基本单位就是<code>Next-Key Lock</code>，<code>Next-Key Lock</code>是前开后闭区间。</li>
+<li>原则2：在加锁过程中访问到的对象(记录)才会被锁。</li>
+<li>优化1：对唯一索引的等值查询，<code>Next-Key Lock</code>退化为行锁。</li>
+<li>优化2：索引上的等值查询，从第一个满足等值条件的索引记录开始向右遍历到第一个不满足等值条件记录，并将第一个不满足等值条件记录上的<code>Next-Key Lock</code>退化为间隙锁</li>
+</ol>
+<p>下文通过这个脚本中的表和数据为例，进行加锁规则的一些解释。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `t` (</span><br><span class="line">  `id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `c` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  `d` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  <span class="keyword">PRIMARY</span> KEY (`id`),</span><br><span class="line">  KEY `c` (`c`)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> t <span class="keyword">values</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>),(<span class="number">5</span>,<span class="number">5</span>,<span class="number">5</span>),</span><br><span class="line">(<span class="number">10</span>,<span class="number">10</span>,<span class="number">10</span>),(<span class="number">15</span>,<span class="number">15</span>,<span class="number">15</span>),(<span class="number">20</span>,<span class="number">20</span>,<span class="number">20</span>),(<span class="number">25</span>,<span class="number">25</span>,<span class="number">25</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这时对于主键索引来说，具有的值为<code>0、5、10、15、20、25</code>，以及7个间隙。</p>
+<p><img src="https://s2.loli.net/2023/03/02/IqU9dRAu2c6VCYz.png" alt="间隙锁2.png"></p>
+<h3 id="1-等值查询间隙锁"><a href="#1-等值查询间隙锁" class="headerlink" title="1.等值查询间隙锁"></a>1.等值查询间隙锁</h3><table>
+<thead>
+<tr>
+<th>sessionA</th>
+<th>sessionB</th>
+<th>sessionC</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>begin;<br>update t set d=d+1 where id=7</td>
+<td></td>
+<td></td>
+<td>T1</td>
+</tr>
+<tr>
+<td></td>
+<td>Insert into t values(8, 8, 8)<br>(<font color='red'>blocked</font>)</td>
+<td></td>
+<td>T2</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>update set d=d+1 where id=10;<br/>(<font color='green'>Query OK</font>)</td>
+<td>T3</td>
+</tr>
+</tbody></table>
+<ol>
+<li>在<code>T1</code>时刻，由于没有<code>id=7</code>这条记录，根据加锁规则，锁住<code>B</code>这个间隙，由于<code>Next-Key Lock</code>是前开后闭，所以锁住空间为<code>(5,10]</code></li>
+<li><font color="red">若表中存在<code>id=7</code>这条记录，则根据优化1，锁住的仅仅为<code>id=7</code>这条记录。但是由于没有这条记录，故进入优化2的加锁规则。</font>根据优化2，等值查询<code>where id=7</code>向右遍历时，遇到的最后一个不满足等值条件的记录时，<code>Next-Key Lock</code>退化为间隙锁，所以<code>T1</code>时刻后最终加锁的范围为<code>(5,10)</code></li>
+</ol>
+<p>所以<code>T2</code>时刻的<code>SessionB</code>操作被阻塞，<code>T3</code>时刻的<code>SessionC</code>操作没有被阻塞。</p>
+<h3 id="2-非唯一索引等值锁"><a href="#2-非唯一索引等值锁" class="headerlink" title="2.非唯一索引等值锁"></a>2.非唯一索引等值锁</h3><table>
+<thead>
+<tr>
+<th>sessionA</th>
+<th>sessionB</th>
+<th>sessionC</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>begin;<br>select id form t where c=5 lock in share mode;</td>
+<td></td>
+<td></td>
+<td>T1</td>
+</tr>
+<tr>
+<td></td>
+<td>update t set d=d+1 where id=5;<br>(<font color='green'>Query OK</font>)</td>
+<td></td>
+<td>T2</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>insert into t values(7, 7,7)<br/>(<font color='red'>blocked</font>)</td>
+<td>T3</td>
+</tr>
+</tbody></table>
+<ol>
+<li>根据原则1，加锁单位是<code>Next-Key Lock</code>,所以会给<code>(0,5]</code>上<code>Next-Key Lock</code>锁。</li>
+<li>由于<code>c</code>是非唯一索引，当访问到<code>c=5</code>这条记录后不会停下来，会继续向后遍历，当遍历到<code>c=10</code>这条记录后停止，所以这时要对<code>(5,10]</code>上<code>Next-Key Lock</code>，但根据优化2，这时<code>Next-Key Lock</code>退化为间隙锁<code>(5,10)</code></li>
+</ol>
+<p>所以最终，在<code>T1</code>时刻，上锁的范围是<code>(0, 5]</code>的<code>Next-Key Lock</code>和<code>(5,10)</code>的间隙锁，故<code>T3</code>时刻，<code>SessionC</code>插入<code>c=7</code>的数据被阻塞。</p>
+<p><font color="red">这里为什么<code>T2</code>时刻的<code>SessionB</code>执行成功？</font>这是因为加锁规则中的原则2，只有访问到的对象才会加锁，因为这条<code>SQL</code>采用的是索引覆盖，所以并不需要访问主键索引，所以也就没有对主键索引上锁，所以<code>sessionB</code>才会执行成功。</p>
+<p><b>注意:<code>lock in share mode</code>只会锁覆盖索引，但是<code>for update</code>不一样，<code>Mysql</code>这时认为接下来要更新数据，会顺便为主键索引上锁。</b>所以如果你要用<code>lock in share mode</code>来给行添加读锁避免数据被更新，就必须绕过覆盖索引的优化，在查询字段中添加索引中不存在的字段，让它必须进行一次回表。</p>
+<h3 id="3-主键范围索引锁"><a href="#3-主键范围索引锁" class="headerlink" title="3.主键范围索引锁"></a>3.主键范围索引锁</h3><p>这两条<code>SQL</code>虽然在查询结果是一致的，但是它们的加锁规则不太一样。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t <span class="keyword">where</span> id<span class="operator">=</span><span class="number">10</span> <span class="keyword">for</span> update;</span><br><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t <span class="keyword">where</span> id<span class="operator">&gt;=</span><span class="number">10</span> <span class="keyword">and</span> id<span class="operator">&lt;</span><span class="number">11</span> <span class="keyword">for</span> update;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>sessionA</th>
+<th>sessionB</th>
+<th>sessionC</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>begin;<br>select * from t where id&gt;=10 and id&lt;11 for update;</td>
+<td></td>
+<td></td>
+<td>T1</td>
+</tr>
+<tr>
+<td></td>
+<td>insert into t values(8, 8,8);<br>(<font color='green'>Query OK</font>)<br>insert into t values(13, 13,13);<br/>(<font color='red'>blocked</font>)</td>
+<td></td>
+<td>T2</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>update t set d=d+1 where id=15;<br/>(<font color='red'>blocked</font>)</td>
+<td>T3</td>
+</tr>
+</tbody></table>
+<ol>
+<li>开始执行时，从<code>id=10</code>开始查询，这里本来应该是<code>(5,10]</code>的<code>Next-Key Lock</code>，由于<code>id</code>是唯一索引，退化为行锁，这时只加了<code>id=10</code>这一行的行锁。</li>
+<li>继续向右遍历，找到<code>id=15</code>这条记录后停止，所以这里加<code>(10, 15]</code>，这里要扫到<code>id=15</code>是正常的，只有扫到了这条记录，才会知道需不需要继续往后找。</li>
+</ol>
+<p><b>注意：</b><code>sessionA</code>的步骤一首次定位<code>id=10</code>是用等值查询来判断的，步骤二继续向右遍历用的是范围查询判断(范围查询并没有在两个优化中，所以这里的<code>(10, 15]</code>不会退化为间隙锁！！！这个要注意，优化只有在等值查询的时候才会发生，我在第一次看的时候当时也突然卡住，没有想明白为什么没有退化为间隙锁！)</p>
+<h3 id="4-非唯一索引范围锁"><a href="#4-非唯一索引范围锁" class="headerlink" title="4.非唯一索引范围锁"></a>4.非唯一索引范围锁</h3><table>
+<thead>
+<tr>
+<th>sessionA</th>
+<th>sessionB</th>
+<th>sessionC</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>begin;<br>select * from t where c&gt;=10 and c&lt;11 for update;</td>
+<td></td>
+<td></td>
+<td>T1</td>
+</tr>
+<tr>
+<td></td>
+<td>insert into t values(8, 8,8);<br>(<font color='red'>blocked</font>)</td>
+<td></td>
+<td>T2</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>update t set d=d+1 where c=15;<br/>(<font color='red'>blocked</font>)</td>
+<td>T3</td>
+</tr>
+</tbody></table>
+<p>这个与案例3的区别在于通过字段<code>c</code>来进行查询，字段<code>c</code>是非唯一索引。</p>
+<ol>
+<li>根据<code>c=10</code>找到了<code>c=10</code>这条记录，所以添加对<code>(5,10]</code>添加<code>Next-Key Lock</code>，由于是非唯一索引，所以不会退化为间隙锁。</li>
+<li>继续向右遍历，找到<code>id=15</code>这条记录后停止，所以这里加<code>(10, 15]</code></li>
+</ol>
+<p>综上：这里对索引<code>c</code>上了<code>(5,10]</code>和<code>(10, 15]</code>两个<code>Next-Key Lock</code>。</p>
+<h3 id="5-唯一索引范围锁bug"><a href="#5-唯一索引范围锁bug" class="headerlink" title="5.唯一索引范围锁bug"></a>5.唯一索引范围锁bug</h3><p>在开头叙述的两个原则，两个优化的加锁原则之外，还有一个加锁<code>bug</code>：唯一索引上的范围查询会访问到不满足条件的第一个值为止。</p>
+<table>
+<thead>
+<tr>
+<th>sessionA</th>
+<th>sessionB</th>
+<th>sessionC</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>begin;<br>select * from t where id&gt;10 and id&lt;=15 for update;</td>
+<td></td>
+<td></td>
+<td>T1</td>
+</tr>
+<tr>
+<td></td>
+<td>update t set d=d+1 where id=20;<br/>(<font color='red'>blocked</font>)</td>
+<td></td>
+<td>T2</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>insert into t values(16, 16,16);<br/>(<font color='red'>blocked</font>)</td>
+<td>T3</td>
+</tr>
+</tbody></table>
+<p><code>sessionA</code>是一个范围查询，根据原则1，这时为<code>(10,15]</code>上<code>Next-Key Lock</code>，并且<code>id</code>是唯一键，所以判断到<code>id=15</code>这一行就应该停止了，但实际上<code>InnoDB</code>会继续向后遍历到第一个不满足条件的行为止，也就是<code>id=20</code>这条记录，所以<code>(15,20]</code>也会上<code>Next-Key Lock</code>。所以这时<code>SessionB</code>和<code>SessionC</code>也会被锁住。</p>
+<p>照理来说，扫描到<code>id=15</code>这行后，就可以不用继续往后查询了，但实际上<code>InnoDB</code>实际上还是这么做了。所以在<code>mysql 45讲</code>的作者认为这是一个<code>bug</code>。</p>
+<h3 id="6-非唯一索引上存在等值的情况"><a href="#6-非唯一索引上存在等值的情况" class="headerlink" title="6.非唯一索引上存在等值的情况"></a>6.非唯一索引上存在等值的情况</h3><p>开头创建的表结构和数据中，没有存在索引<code>c</code>上有等值的数据，所以这里插入一条等值数据。</p>
+<blockquote>
+<p>insert into t values(30,10,30);</p>
+</blockquote>
+<p>执行之后，表中有两条<code>c=10</code>的数据。下图为索引<code>c</code>的间隙状态如下(上方是<code>c</code>，下方是主键)</p>
+<p><img src="https://s2.loli.net/2023/03/02/FpGekvjcSrM7zCt.png" alt="非唯一索引间隙锁.png"></p>
+<p>这时有两个<code>c=10</code>的记录，他们的主键<code>id</code>值不同（分别是<code>10</code>和<code>30</code>），但是这两个记录之间也是有间隙的。</p>
+<table>
+<thead>
+<tr>
+<th>sessionA</th>
+<th>sessionB</th>
+<th>sessionC</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>begin;<br>delete from t where c=10</td>
+<td></td>
+<td></td>
+<td>T1</td>
+</tr>
+<tr>
+<td></td>
+<td>update t set d=d+1 where c=15;<br/>(<font color='green'>Query OK</font>)</td>
+<td></td>
+<td>T2</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>insert into t values(12, 12,12);<br/>(<font color='red'>blocked</font>)</td>
+<td>T3</td>
+</tr>
+</tbody></table>
+<ol>
+<li><code>sessionA</code>在遍历时先访问第一个<code>c=10</code>的记录，这时先对<code>(c=5,id=5)</code>到<code>(c=10,id=10)</code>这个<code>Next-Key Lock</code></li>
+<li>继续向后遍历，直到碰到<code>(c=15,id=15)</code>这一行，遍历停止，根据优化2，这时一个等值查询，向右遍历第一个不满足条件的的行会退化为<code>(c=10,id=10) </code>到<code> (c=15,id=15)</code>的间隙锁。</li>
+</ol>
+<p>也就是说这个<code>delete</code>语句在索引<code>c</code>上的加锁范围就是下图中标记的区域，这里不包含两边的两条记录，是开区间，即<code> (c=5,id=5)</code> 和<code>(c=15,id=15)</code>这两行上都没有锁。<b>同时主键索引上锁(10,10,10) 和 (30,10,30) 两行,是行锁。</b></p>
+<p><img src="https://s2.loli.net/2023/03/02/E5r6kSWTJDxpNQu.png" alt="非唯一索引间隙锁2.png"></p>
+<h3 id="7-limit语句加锁"><a href="#7-limit语句加锁" class="headerlink" title="7.limit语句加锁"></a>7.limit语句加锁</h3><p>这个是对案例6的一个对照案例。</p>
+<table>
+<thead>
+<tr>
+<th>sessionA</th>
+<th>sessionB</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>begin;<br>delete from t where c=10 limit 2;</td>
+<td></td>
+<td>T1</td>
+</tr>
+<tr>
+<td></td>
+<td>insert into t values(12, 12, 12);<br/>(<font color='green'>Query OK</font>)</td>
+<td>T2</td>
+</tr>
+</tbody></table>
+<p>这个例子对比案例6的<code>sessionA</code>，仅在<code>delete</code>语句上加了<code>limit 2</code>，可能你会觉得数据库中<code>c=10</code>的记录只有两条，加不加<code>limit 2</code>删除的效果都是一样的，但是实际上加锁的访问有所不同。</p>
+<p>这是因为，案例7的<code>delete</code>语句明确了<code>limit 2</code>的限制，因此在遍历到<code>(c=10, id=30)</code>这一行之后，就已经满足语句了，遍历就结束了。所以索引<code>c</code>的加锁范围就变成了<code>（c=5,id=5)</code>到<code>（c=10,id=30)</code>这个前开后闭区间。所以这时<code>T2</code>时刻的<code>sessionB</code>插入<code>c=12</code>是可以执行成功的。</p>
+<p>所以这个例子对我们的实践是有指导意义的，<b>在删除数据的时候尽量加<code>limit</code>，</b>这样不仅可以控制删除的条数，也可以减少加锁的范围。</p>
+<h3 id="8-死锁"><a href="#8-死锁" class="headerlink" title="8.死锁"></a>8.死锁</h3><table>
+<thead>
+<tr>
+<th>sessionA</th>
+<th>sessionB</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>begin;<br>select from t where c=10 lock in share mode;</td>
+<td></td>
+<td>T1</td>
+</tr>
+<tr>
+<td></td>
+<td>update t set d=d+1 where c=10;<br/>(<font color='green'>Query OK</font>)</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>insert into t values(8, 8, 8)</td>
+<td></td>
+<td>T3</td>
+</tr>
+<tr>
+<td></td>
+<td>ERROR 1213:Deadlock found when trying to get lock; try restarting transaction</td>
+<td>T4</td>
+</tr>
+</tbody></table>
+<ol>
+<li><code>session A </code>启动事务后执行查询语句加<code> lock in share mode</code>，在索引 <code>c </code>上加了<code> next-key lock(5,10]</code> 和间隙锁<code> (10,15)</code>；</li>
+<li><code>session B </code>的<code> update</code> 语句也要在索引 <code>c </code>上加<code> next-key lock(5,10]</code> ，进入锁等待；</li>
+<li>然后 <code>session A</code> 要再插入<code> (8,8,8)</code> 这一行，被<code>session B</code>的间隙锁锁住。由于出现了死锁，<code>InnoDB</code> 让 <code>session B </code>回滚。</li>
+</ol>
+<p>实际上步骤2中加<code>Next-Key Lock</code>是两步操作，分成间隙锁和行锁，在步骤2中加间隙锁是不会冲突，但是在加行锁的时候进入了等待，而T3时刻，<code>sessionA</code>插入数据需要等待<code>sessionB</code>释放间隙锁，所以出现了相互等待的情况，从而导致死锁。</p>
+<p>虽然在分析<code>Next-Key Lock</code>表示间隙锁和行锁的结合，但是具体执行的时候要分为两段来执行。</p>
+<h3 id="9-非唯一索引排序"><a href="#9-非唯一索引排序" class="headerlink" title="9.非唯一索引排序"></a>9.非唯一索引排序</h3><table>
+<thead>
+<tr>
+<th>sessionA</th>
+<th>sessionB</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>begin;<br>select * from t where c&gt;=15 and c&lt;=20 order by c desc lock in share mode;</td>
+<td></td>
+<td>T1</td>
+</tr>
+<tr>
+<td></td>
+<td>insert into t values(6,6,6);<br/>(<font color='red'>blocked</font>)</td>
+<td>T2</td>
+</tr>
+</tbody></table>
+<ol>
+<li>由于这里有<code>order by c desc</code>所以首先从<code>c=20</code>开始定位，所以首先加上间隙锁<code>(20, 25)</code>和<code>Next-Key Lock</code>锁<code>(15, 20]</code>。</li>
+<li>在索引<code>c</code>向左遍历，需要扫描到<code>c=10</code>这条记录才会停止，所以<code>(5, 10]</code>。所以<code>sessionB</code>会阻塞。</li>
+<li>在扫描的过程中，会对<code>c=10</code>，<code>c=15</code>，<code>c=20</code>这三行有数据，且查询字段是<code>select * </code>，需要进行回表，所以会在主键索引上上三个行锁。</li>
+</ol>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2023/03/02/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E5%85%AD%EF%BC%89---%E9%94%81%EF%BC%88%E7%AC%AC%E4%BA%8C%E5%BC%B9%EF%BC%89/" title="mysql45讲学习总结（六）---锁（第二弹）">http://xiaocainiaoya.github.io/2023/03/02/mysql/mysql45讲学习总结（六）---锁（第二弹）/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 笔记</a>
+              <a href="/tags/mysql/" rel="tag"><i class="fa fa-tag"></i> mysql</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/05/mybatis/mybatis%E7%9A%84MetaObject%E5%8F%8D%E5%B0%84%E5%B7%A5%E5%85%B7%E7%B1%BB/" rel="prev" title="mybatis的MetaObject反射工具类">
+      <i class="fa fa-chevron-left"></i> mybatis的MetaObject反射工具类
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E5%85%AD%EF%BC%89%E2%80%94%E9%94%81%EF%BC%88%E7%AC%AC%E4%BA%8C%E5%BC%B9%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">mysql45讲学习总结（六）—锁（第二弹）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E%E4%B8%80%E4%B8%AA%E4%BE%8B%E5%AD%90%E5%BC%80%E5%A7%8B"><span class="nav-number">1.1.</span> <span class="nav-text">从一个例子开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E9%94%81%E8%A7%84%E5%88%99"><span class="nav-number">1.2.</span> <span class="nav-text">加锁规则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%AD%89%E5%80%BC%E6%9F%A5%E8%AF%A2%E9%97%B4%E9%9A%99%E9%94%81"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.等值查询间隙锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E9%9D%9E%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95%E7%AD%89%E5%80%BC%E9%94%81"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.非唯一索引等值锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%B8%BB%E9%94%AE%E8%8C%83%E5%9B%B4%E7%B4%A2%E5%BC%95%E9%94%81"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.主键范围索引锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E9%9D%9E%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95%E8%8C%83%E5%9B%B4%E9%94%81"><span class="nav-number">1.2.4.</span> <span class="nav-text">4.非唯一索引范围锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95%E8%8C%83%E5%9B%B4%E9%94%81bug"><span class="nav-number">1.2.5.</span> <span class="nav-text">5.唯一索引范围锁bug</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E9%9D%9E%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95%E4%B8%8A%E5%AD%98%E5%9C%A8%E7%AD%89%E5%80%BC%E7%9A%84%E6%83%85%E5%86%B5"><span class="nav-number">1.2.6.</span> <span class="nav-text">6.非唯一索引上存在等值的情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-limit%E8%AF%AD%E5%8F%A5%E5%8A%A0%E9%94%81"><span class="nav-number">1.2.7.</span> <span class="nav-text">7.limit语句加锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E6%AD%BB%E9%94%81"><span class="nav-number">1.2.8.</span> <span class="nav-text">8.死锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E9%9D%9E%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95%E6%8E%92%E5%BA%8F"><span class="nav-number">1.2.9.</span> <span class="nav-text">9.非唯一索引排序</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
