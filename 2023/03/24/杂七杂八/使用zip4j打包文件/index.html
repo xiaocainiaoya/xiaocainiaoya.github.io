@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="​    最近接到需求需要为打包后的zip文件设置压缩密码，而我们之前使用的ZipOutputStream结合hutool的NoiUtil进行打包生成zip文件，但是ZipOutputStream没有设置解压密码的功能，故尝试寻找其他三方库(这里是直接问chatGPT)，它的回答是Zip4j。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用zip4j打包文件">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2023/03/24/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/%E4%BD%BF%E7%94%A8zip4j%E6%89%93%E5%8C%85%E6%96%87%E4%BB%B6/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="​    最近接到需求需要为打包后的zip文件设置压缩密码，而我们之前使用的ZipOutputStream结合hutool的NoiUtil进行打包生成zip文件，但是ZipOutputStream没有设置解压密码的功能，故尝试寻找其他三方库(这里是直接问chatGPT)，它的回答是Zip4j。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2023/03/27/qbauo5fZCevzDUS.png">
+<meta property="article:published_time" content="2023-03-24T13:51:58.000Z">
+<meta property="article:modified_time" content="2023-03-27T09:37:54.099Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="杂七杂八">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2023/03/27/qbauo5fZCevzDUS.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2023/03/24/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/%E4%BD%BF%E7%94%A8zip4j%E6%89%93%E5%8C%85%E6%96%87%E4%BB%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>使用zip4j打包文件 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/03/24/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/%E4%BD%BF%E7%94%A8zip4j%E6%89%93%E5%8C%85%E6%96%87%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用zip4j打包文件
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-03-24 21:51:58" itemprop="dateCreated datePublished" datetime="2023-03-24T21:51:58+08:00">2023-03-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-03-27 17:37:54" itemprop="dateModified" datetime="2023-03-27T17:37:54+08:00">2023-03-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/" itemprop="url" rel="index"><span itemprop="name">杂七杂八</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>​    最近接到需求需要为打包后的<code>zip</code>文件设置压缩密码，而我们之前使用的<code>ZipOutputStream</code>结合<code>hutool</code>的<code>NoiUtil</code>进行打包生成<code>zip</code>文件，但是<code>ZipOutputStream</code>没有设置解压密码的功能，故尝试寻找其他三方库(这里是直接问<code>chatGPT</code>)，它的回答是<code>Zip4j</code>。</p>
+<span id="more"></span>
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p><code>Zip4j</code>是一个用于处理<code>ZIP</code>文件格式的<code>Java</code>库，它提供了一个易于使用的<code>API</code>，可以方便地创建、提取和修改<code>ZIP</code>文件，以及支持密码保护的ZIP文件。</p>
+<p><code>Zip4j</code>的主要特点包括：</p>
+<ol>
+<li>支持标准<code>ZIP</code>文件格式以及<code>ZIP64</code>扩展格式，可以处理包含数百万文件的<code>ZIP</code>文件。</li>
+<li>支持密码保护的<code>ZIP</code>文件，包括标准密码和<code>AES</code>加密密码。</li>
+<li>支持<code>ZIP</code>文件的分卷（spanned）和自解压缩（self-extracting）功能。</li>
+<li>支持<code>ZIP</code>文件的压缩级别、注释和<code>UTF-8</code>编码文件名等属性的设置。</li>
+<li>提供了方便的<code>API</code>，可以方便地添加、提取和修改<code>ZIP</code>文件中的文件和文件夹，以及获取<code>ZIP</code>文件中的文件列表和属性信息。</li>
+</ol>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;net.lingala.zip4j&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;zip4j&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.6.1&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p>我使用的是<code>2.1.6</code>版本，新版本对旧版本中的一些常量和接口有调整。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">firstDemo</span><span class="params">(File file1, File file2)</span> <span class="keyword">throws</span> ZipException </span>&#123;</span><br><span class="line">    List&lt;File&gt; fileToAdds = Arrays.asList(file1, file2);</span><br><span class="line"></span><br><span class="line">    ZipFile zipFile = <span class="keyword">new</span> ZipFile(<span class="string">&quot;/xxx/result.zip&quot;</span>);</span><br><span class="line">    zipFile.addFiles(fileToAdds);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ZipException </span>&#123;</span><br><span class="line">    String filePath1 = <span class="string">&quot;/xxx/demo1.txt&quot;</span>;</span><br><span class="line">    String filePath2 = <span class="string">&quot;/xxx/demo2.txt&quot;</span>;</span><br><span class="line"></span><br><span class="line">    File file1 = <span class="keyword">new</span> File(filePath1);</span><br><span class="line">    File file2 = <span class="keyword">new</span> File(filePath2);</span><br><span class="line"></span><br><span class="line">    ZipDemo zipDemo = <span class="keyword">new</span> ZipDemo();</span><br><span class="line">    zipDemo.firstDemo(file1, file2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将<code>fileToAdds</code>列表打包为目标地址为<code>/xxx/result.zip</code>的压缩文件。这种写法是最简单的打包方式，将需要打包的源文件都打包在目标<code>zip</code>文件的顶层目录下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">result.zip</span><br><span class="line">  ├─────── demo1.txt</span><br><span class="line">  └─────── demo2.txt</span><br></pre></td></tr></table></figure>
+
+<p>但是有时候，甚至大部分时候都是需要将打包源文件进行分级(压缩包内文件夹)的方式进行打包。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">result.zip</span><br><span class="line">  ├───── dir1</span><br><span class="line">  │       └─ demo1.txt</span><br><span class="line">  └───── demo2.txt</span><br></pre></td></tr></table></figure>
+
+<p><b>1.设置目标<code>zip</code>文件内文件夹结构示例代码：</b></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">customInnerFilePath</span><span class="params">(File file1, File file2)</span> <span class="keyword">throws</span> ZipException </span>&#123;</span><br><span class="line">    <span class="comment">// 初始化压缩参数</span></span><br><span class="line">    ZipParameters zipParameters = <span class="keyword">new</span> ZipParameters();</span><br><span class="line">    <span class="comment">// 指定zip文件内部对于根目录的绝对路径</span></span><br><span class="line">    zipParameters.setFileNameInZip(<span class="string">&quot;dir1/demo1.txt&quot;</span>);</span><br><span class="line"></span><br><span class="line">    ZipFile zipFile = <span class="keyword">new</span> ZipFile(<span class="string">&quot;/xxx/result.zip&quot;</span>);</span><br><span class="line">    <span class="comment">// 将设置的压缩参数作用在某个文件上</span></span><br><span class="line">    zipFile.addFile(file1, zipParameters);</span><br><span class="line">    zipFile.addFile(file2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><b>2.设置文件夹加密：</b></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">encryptZip</span><span class="params">(File file1, File file2)</span> <span class="keyword">throws</span> ZipException </span>&#123;</span><br><span class="line">    ZipParameters zipParameters = <span class="keyword">new</span> ZipParameters();</span><br><span class="line">    <span class="comment">// 指定zip文件内部对于根目录的绝对路径</span></span><br><span class="line">    zipParameters.setFileNameInZip(<span class="string">&quot;dir1/demo1.txt&quot;</span>);</span><br><span class="line">    zipParameters.setEncryptFiles(<span class="keyword">true</span>);</span><br><span class="line">    zipParameters.setEncryptionMethod(EncryptionMethod.AES);</span><br><span class="line">    zipParameters.setAesKeyStrength(AesKeyStrength.KEY_STRENGTH_256);</span><br><span class="line"></span><br><span class="line">    ZipFile zipFile = <span class="keyword">new</span> ZipFile(<span class="string">&quot;/xxx/result.zip&quot;</span>, <span class="string">&quot;123456&quot;</span>.toCharArray());</span><br><span class="line">    zipFile.addFile(file1, zipParameters);</span><br><span class="line">    zipFile.addFile(file2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><b>注意：</b>上述代码中仅仅是对<code>file1</code>设置了<code>zipParameters</code>参数，也就是说现在有两个被打包文件，但是压缩参数只设置到了其中的一个文件上，打开压缩后的文件会发现，是需要解压密码才能解压，但是如果你有一些不需要解压可以查看<code>zip</code>包内部情况的工具可以发现，可以<code>file2</code>所对应的文件是无需密码就可以查看，也就是说，如果要对压缩包内所有文件在没有解压密码之前都不能访问，需要每个文件添加时设置<code>zipParameters</code>参数，设置为加密开启。</p>
+<p><img src="https://s2.loli.net/2023/03/27/qbauo5fZCevzDUS.png" alt="zip文件内部分文件加密.png"></p>
+<p>还有一点：踩过一个坑，由于我在打包文件的时候，可能出现某一个压缩包已经打包过了，但是业务上并不知道已经打包过了，所以会出现重复打包的情况，而我在针对重复打包的情况，会先将目标<code>zip</code>设置为一个空文件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 通过java标准库中的方法，这时这个目标文件存在，但是内容被清除，结果是0B</span></span><br><span class="line">Files.newByteChannel(result, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE).close();</span><br></pre></td></tr></table></figure>
+
+<p>但是这种情况下运行会报错：</p>
+<blockquote>
+<p>Zip file size less than minimum expected zip file size. Probably not a zip file or a corrupted zip file</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (zip4jRaf.length() &lt; ENDHDR) &#123;</span><br><span class="line">  <span class="keyword">throw</span> <span class="keyword">new</span> ZipException(<span class="string">&quot;Zip file size less than minimum expected zip file size. &quot;</span> +</span><br><span class="line">                         <span class="string">&quot;Probably not a zip file or a corrupted zip file&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>大概意思是目标文件是一个空文件，校验了目标文件头部的一个什么长度。没有细究这个问题，我的做法是改成直接删除旧文件，然后再生成文件。</p>
+<p><b>3.打包分卷</b></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;File&gt; <span class="title">zip</span><span class="params">(List&lt;String&gt; srcFiles, String destFile, <span class="keyword">long</span> fileSize)</span> <span class="keyword">throws</span> ZipException </span>&#123;</span><br><span class="line">    ZipFile zipFile = <span class="keyword">new</span> ZipFile(destFile);</span><br><span class="line">    List&lt;File&gt; filesToAdd = srcFiles.stream().map(File::<span class="keyword">new</span>).collect(Collectors.toList());</span><br><span class="line"></span><br><span class="line">    ZipParameters parameters = <span class="keyword">new</span> ZipParameters();</span><br><span class="line">    parameters.setCompressionMethod(CompressionMethod.DEFLATE);</span><br><span class="line">    parameters.setCompressionLevel(CompressionLevel.NORMAL);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//未指定则设置为512KB</span></span><br><span class="line">    <span class="keyword">if</span>(fileSize==<span class="number">0</span>)&#123;</span><br><span class="line">        fileSize = <span class="number">65536</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//设置压缩分卷</span></span><br><span class="line">    zipFile.createSplitZipFile(filesToAdd, parameters, <span class="keyword">true</span>, fileSize);</span><br><span class="line">    <span class="keyword">return</span> zipFile.getSplitZipFiles();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过分卷生成的文件结构为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">目标文件目录</span><br><span class="line">  ├─────── result.z01</span><br><span class="line">  └─────── result.z02</span><br></pre></td></tr></table></figure>
+
+<p>这里会生成<code>.z</code>+<code>数字排列</code>的压缩包，要提取或打开这样的分卷<code>ZIP</code>文件，必须将所有的<code>ZIP</code>文件都放在同一个目录下。这种场景就可以用于大文件分卷为多个小文件后，传输小文件到目标地址。</p>
+<p><b>4.提取</b></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> ZipException</span>&#123;</span><br><span class="line">    <span class="comment">// 创建一个ZipFile对象，用于打开要提取的ZIP文件</span></span><br><span class="line">    ZipFile zipFile = <span class="keyword">new</span> ZipFile(<span class="string">&quot;/xxx/result.zip&quot;</span>);</span><br><span class="line">    <span class="comment">// 设置解压缩密码（如果需要）</span></span><br><span class="line">    <span class="keyword">if</span> (zipFile.isEncrypted()) &#123;</span><br><span class="line">        zipFile.setPassword(<span class="string">&quot;password&quot;</span>.toCharArray());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 1.将所有文件都提取到当前目录下</span></span><br><span class="line">    zipFile.extractAll(<span class="string">&quot;./&quot;</span>);</span><br><span class="line">    <span class="comment">// 2.仅提取一个文件</span></span><br><span class="line">    zipFile.extractFile(<span class="string">&quot;demo1.txt&quot;</span>, <span class="string">&quot;./&quot;</span>);</span><br><span class="line">    <span class="comment">// 3.提取的这个文件不是在顶层目录</span></span><br><span class="line">    zipFile.extractFile(<span class="string">&quot;dir3/demo3.txt&quot;</span>, <span class="string">&quot;./&quot;</span>);</span><br><span class="line">    <span class="comment">// 4.提取整个内部目录</span></span><br><span class="line">    zipFile.extractFile(<span class="string">&quot;dir3/&quot;</span>, <span class="string">&quot;./&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总之，<code>Zip4j</code>是一个非常实用的<code>Java</code>库，可以帮助程序员方便地处理<code>ZIP</code>文件格式，节省大量的开发时间和工作量。还包含其他的一些，比如添加某个文件到<code>zip</code>文件中，修改<code>zip</code>中的某个文件等等。</p>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2023/03/24/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/%E4%BD%BF%E7%94%A8zip4j%E6%89%93%E5%8C%85%E6%96%87%E4%BB%B6/" title="使用zip4j打包文件">http://xiaocainiaoya.github.io/2023/03/24/杂七杂八/使用zip4j打包文件/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/" rel="tag"><i class="fa fa-tag"></i> 杂七杂八</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/03/02/mysql/mysql45%E8%AE%B2%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93%EF%BC%88%E5%85%AD%EF%BC%89---%E9%94%81%EF%BC%88%E7%AC%AC%E4%BA%8C%E5%BC%B9%EF%BC%89/" rel="prev" title="mysql45讲学习总结（六）---锁（第二弹）">
+      <i class="fa fa-chevron-left"></i> mysql45讲学习总结（六）---锁（第二弹）
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
