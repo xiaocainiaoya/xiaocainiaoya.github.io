@@ -160,6 +160,174 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/Spring/lombok%E7%9A%84@SneakyThrows%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/04/13/Spring/lombok%E7%9A%84@SneakyThrows%E8%AF%A6%E8%A7%A3/" class="post-title-link" itemprop="url">Lombok的@SneakyThrows详解</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2021-04-13T21:51:58+08:00">2021-04-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-14 14:09:17" itemprop="dateModified" datetime="2021-04-14T14:09:17+08:00">2021-04-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h4 id="Lombok的-SneakyThrows详解"><a href="#Lombok的-SneakyThrows详解" class="headerlink" title="Lombok的@SneakyThrows详解"></a>Lombok的@SneakyThrows详解</h4><p>[TOC]</p>
+<h4 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h4><p>​    在<code>java</code>的异常体系中<code>Exception</code>异常有两个分支，一个是运行时异常<code>RuntimeException</code>，一个是编译时异常，在<code>Exception</code>下的所有非<code>RuntimeException</code>异常，比如<code>IOException</code>、<code>SQLException</code>等；所有的运行时异常不捕获，编译时异常是一定要捕获，否则编译会报错。<code>@SneakyThrows</code>就是利用了这一机制，将当前方法抛出的异常，包装成<code>RuntimeException</code>，骗过编译器，使得调用点可以不用显示处理异常信息。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/04/13/Spring/lombok%E7%9A%84@SneakyThrows%E8%AF%A6%E8%A7%A3/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/java/java%E7%9A%84%E6%B3%9B%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/04/13/java/java%E7%9A%84%E6%B3%9B%E5%9E%8B/" class="post-title-link" itemprop="url">java的泛型</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2021-04-13T21:51:58+08:00">2021-04-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-23 20:04:45" itemprop="dateModified" datetime="2021-04-23T20:04:45+08:00">2021-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="java的泛型"><a href="#java的泛型" class="headerlink" title="java的泛型"></a>java的泛型</h3><p>[TOC]</p>
+<h4 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h4><p>​    泛型实现了参数化类型的概念，使代码可以应用于多种类型，设计的初衷应该是希望类或者方法能够具备最广泛的表达能力。在引入泛型之前，一般都是依赖于<code>Object</code>顶层对象实现类似泛型的功能，但是使用<code>Object</code>有一个缺陷是如果类型转换异常，编译器在编译期无法检测这种异常，只有在字节码的运行时期才会抛出类型转换异常。而<code>JDK 1.5</code>之后引入的泛型，在编译期就会对类型进行检查，使得问题可以及早发现。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/04/13/java/java%E7%9A%84%E6%B3%9B%E5%9E%8B/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/spring%E8%BF%87%E6%BB%A4%E5%99%A8%E5%92%8C%E6%8B%A6%E6%88%AA%E5%99%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -841,354 +1009,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95%E5%AD%97%E6%AE%B5%E8%BF%87%E9%95%BF/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/04/13/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95%E5%AD%97%E6%AE%B5%E8%BF%87%E9%95%BF/" class="post-title-link" itemprop="url">数据库索引字段过长</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2021-04-13T21:51:58+08:00">2021-04-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-14 14:07:44" itemprop="dateModified" datetime="2021-04-14T14:07:44+08:00">2021-04-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/" itemprop="url" rel="index"><span itemprop="name">问题和方案</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h5 id="数据库索引字段过长"><a href="#数据库索引字段过长" class="headerlink" title="数据库索引字段过长"></a>数据库索引字段过长</h5><p>​    <strong>问题</strong>：在业务场景中，某些敏感数据需加密之后保存到数据库，而加密字段刚好又是频繁触发查询的字段。在一次插入数据时引发唯一索引异常。原因是索引长度小于数据库字段长度，在比对数据唯一性时截取了该字段的前面部分长度，导致匹配成功，抛出唯一索引异常。</p>
-<p>​    <strong>方案</strong>：这种情况下不能随意调整索引的长度，这涉及到全局的修改。故通过新增一个字段保存改加密字段<code>MD5</code>值，并将索引挂在这个新增字段上，这样既保证了索引的唯一性，又可以不用修改索引长度。</p>
-
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2020/04/13/nginx/nginx/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/13/nginx/nginx/" class="post-title-link" itemprop="url">nginx</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2020-04-13T21:51:58+08:00">2020-04-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-26 10:58:26" itemprop="dateModified" datetime="2022-12-26T10:58:26+08:00">2022-12-26</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/nginx/" itemprop="url" rel="index"><span itemprop="name">nginx</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="nginx"><a href="#nginx" class="headerlink" title="nginx"></a>nginx</h1><p><code>nginx.conf</code>是<code>nginx</code>的主要配置文件。</p>
-<ol>
-<li>顶层下可以有<code>events</code>、<code>http</code>层。</li>
-<li><code>http</code>层下允许有多个<code>server</code>层，用于对不同的网址做不同的配置。</li>
-<li><code>server</code>层下允许有多个<code>location</code>层，用于对不同的(路由)地址进行不同的转发操作。</li>
-</ol>
-<p>修改完<code>nginx.conf</code>配置文件后，可以使用如下命令对进行语法检查。</p>
-<blockquote>
-<p>nginx -t -c /etc/nginx/nginx.conf</p>
-</blockquote>
-<h2 id="nginx模块"><a href="#nginx模块" class="headerlink" title="nginx模块"></a>nginx模块</h2><table>
-<thead>
-<tr>
-<th>nginx编译选项</th>
-<th>模块作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>ngx_http_core_module</td>
-<td>包含一些核心的http的参数配置，对应nginx的配置区块部分</td>
-</tr>
-<tr>
-<td>ngx_http_access_module</td>
-<td>访问控制模块，用来控制网站用户对nginx的访问</td>
-</tr>
-<tr>
-<td>ngx_http_gzip_module</td>
-<td>压缩模块，对nginx返回的数据压缩，数据性能优化模块</td>
-</tr>
-<tr>
-<td>ngx_http_fastcgi_module</td>
-<td>fastcgi模块，和动态应用相关的模块</td>
-</tr>
-<tr>
-<td>ngx_http_upstream_module</td>
-<td>负载均衡模块，可以实现网址的负载均衡功能以及节点节点健康检查</td>
-</tr>
-<tr>
-<td>ngx_http_rewrite_module</td>
-<td>URL地址重写模块</td>
-</tr>
-<tr>
-<td>ngx_http_proxy_module</td>
-<td>proxy代理模块</td>
-</tr>
-<tr>
-<td>ngx_http_limit_conn_module</td>
-<td>限制用户并发连接数以及请求数模块</td>
-</tr>
-<tr>
-<td>ngx_http_limit_req_module</td>
-<td>限制nginx request processing rate根据定义的key(限制请求，一个连接可以有多个请求)</td>
-</tr>
-<tr>
-<td>ngx_http_log_module</td>
-<td>访问日志模块，指定的格式记录nginx客户访问日志等信息</td>
-</tr>
-<tr>
-<td>ngx_http_auth_basic_module</td>
-<td>web认证模块，这只web用户通过账号密码访问nginx</td>
-</tr>
-<tr>
-<td>ngx_http_ssl_module</td>
-<td>ssl模块，用户加密的http连接，比如https</td>
-</tr>
-</tbody></table>
-<p>在<code>nginx.conf</code>中有三种常见变量：<code>http</code>请求变量、<code>nginx</code>内置变量、自定义变量。</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$uri: 当前请求的uri，不带参数</span><br><span class="line">$request_uri: 请求的uri，带完整参数</span><br><span class="line">$host: http请求报文中host首部，如果没有则以处理此请求的虚拟主机名代替</span><br><span class="line">$hostname: nginx服务运行在主机的主机名</span><br><span class="line">$remote_addr: 客户端ip</span><br><span class="line">$remote_port: 客户端端口</span><br><span class="line">$remote_user: 使用用户认证时客户端用户输入的用户名</span><br><span class="line">$request_filename: 用户请求中的URI经过本地root或alias转换后映射的本地文件路径</span><br><span class="line">$request_method: 请求方法，GET、POST、PUT、DELETE</span><br><span class="line">$server_addr: 服务器地址</span><br><span class="line">$server_name: 服务器名称</span><br><span class="line">$server_port: 服务器端口</span><br><span class="line">$server_protocol: 服务器向客户端发送响应时的协议</span><br><span class="line">$scheme: 在请求中使用scheme</span><br><span class="line">$http_HEADER: 匹配请求报文中指定的HEADER</span><br><span class="line">$http_host: 匹配请求报文中的host首部</span><br><span class="line">$document_root: 当前请求映射到root的配置</span><br></pre></td></tr></table></figure>
-
-<h3 id="日志模块"><a href="#日志模块" class="headerlink" title="日志模块"></a>日志模块</h3><p>通过内置变量，对访问的请求进行日志输出。</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">include</span>       mime.types;</span><br><span class="line">    <span class="attribute">default_type</span>  application/octet-stream;</span><br><span class="line">    <span class="comment"># 日志输出格式</span></span><br><span class="line">    <span class="comment">#log_format  main  &#x27;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;$status $body_bytes_sent &quot;$http_referer&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#x27;;</span></span><br><span class="line">&#125;</span><br><span class="line">$remote_addr: 客户端地址</span><br><span class="line">$remote_user: http客户端请求nginx认证用户名</span><br><span class="line">$time_local: nginx的时间</span><br><span class="line">$request: request请求行，GET等方法，http协议等</span><br><span class="line">$status: response 返回状态码</span><br><span class="line">$body_bytes_sent: 服务端响应给客户端body信息大小</span><br><span class="line">$http_referer: http上一级页面</span><br><span class="line">$http_user_agent: http头部,客户端访问设备</span><br><span class="line">$http_x_forwarded_for: http请求携带的http信息</span><br></pre></td></tr></table></figure>
-
-<h3 id="监控模块"><a href="#监控模块" class="headerlink" title="监控模块"></a>监控模块</h3><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">include</span>       mime.types;</span><br><span class="line">    <span class="attribute">default_type</span>  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">sendfile</span>        <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">keepalive_timeout</span>  <span class="number">65</span>;</span><br><span class="line"></span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span>  localhost;</span><br><span class="line">        <span class="attribute">location</span> / &#123;</span><br><span class="line">            <span class="attribute">root</span>   html;</span><br><span class="line">            <span class="attribute">index</span>  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment"># 监控</span></span><br><span class="line">        <span class="attribute">location</span> /mystatus &#123;</span><br><span class="line">      			<span class="comment"># 启用监控</span></span><br><span class="line">            <span class="attribute">stub_status</span> <span class="literal">on</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>设置<code>stub_sattus on</code>之后，就可以通过<code>localhost:80/mystatus</code>访问监控内容。</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 当前活跃连接数</span></span><br><span class="line"><span class="attribute">Active</span> connections: <span class="number">2</span></span><br><span class="line">server accepts handled requests</span><br><span class="line"><span class="number">16</span> <span class="number">16</span> <span class="number">19</span></span><br><span class="line"><span class="comment"># server表示nginx启动到现在共处理了多少次连接</span></span><br><span class="line"><span class="comment"># accepts nginx启动到现在共成功创建了16次握手，请求的丢失数=握手数-连接数</span></span><br><span class="line"><span class="comment"># handled requests 总共处理了19次请求</span></span><br><span class="line">Reading <span class="comment"># nginx读取到客户端的header信息数</span></span><br><span class="line">Writing <span class="comment"># nginx返回给客户端的header信息数</span></span><br><span class="line">Waiting <span class="comment"># nginx开启keep-alive长连接情况下，既没有读也没有写</span></span><br></pre></td></tr></table></figure>
-
-<p>一般可以通过在<code>shell</code>脚本中通过<code>curl</code>获取到这些监控信息后，再通过<code>python</code>将这些信息上报到监控平台组件(<code>openfalcon</code>)，达到可视化监控<code>nginx</code>连接情况的目的。</p>
-<h3 id="资源服务器"><a href="#资源服务器" class="headerlink" title="资源服务器"></a>资源服务器</h3><p>将<code>nginx</code>作为资源服务器，提供文件下载功能。</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">include</span>       mime.types;</span><br><span class="line">    <span class="attribute">default_type</span>  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">sendfile</span>        <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">keepalive_timeout</span>  <span class="number">65</span>;</span><br><span class="line"></span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span>  localhost;</span><br><span class="line">        <span class="attribute">location</span> / &#123;</span><br><span class="line">            <span class="attribute">root</span>   html;</span><br><span class="line">            <span class="attribute">index</span>  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment"># 下载站点</span></span><br><span class="line">        <span class="attribute">location</span> /down &#123;</span><br><span class="line">      		  <span class="comment"># 指向服务器的资源目录</span></span><br><span class="line">            <span class="attribute">root</span> /soft/package/src;</span><br><span class="line">            <span class="attribute">autoindex</span> <span class="literal">on</span>;</span><br><span class="line">            <span class="comment"># 显示文件时间</span></span><br><span class="line">            <span class="attribute">autoindex_localtime</span> <span class="literal">on</span>;</span><br><span class="line">            <span class="comment"># 默认是on 显示的是byte off:文件大概大小单位是kb、mb、gb</span></span><br><span class="line">            <span class="attribute">autoindex_exact_size</span> <span class="literal">off</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="限流模块"><a href="#限流模块" class="headerlink" title="限流模块"></a>限流模块</h3><ul>
-<li>连接频率限制<code>ngx_limit_conn_module</code>，通过<code>limit_req_zone</code>用来限制单位时间内的请求数目，以及速度限制。</li>
-<li>请求频率限制<code>ngx_limit_req_module</code>，通过<code>limit_req_conn</code>用来限制同一时间连接数，即并发限制。</li>
-</ul>
-<p>对于<code>http</code>协议的连接和请求：<code>Http</code>是建立在<code>TCP</code>，通过<code>TCP</code>三次握手，在连接的基础上进行<code>Http</code>请求，也就是说可能存在一个连接多次请求。</p>
-<table>
-<thead>
-<tr>
-<th>HTTP协议版本</th>
-<th>连接关系</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>HTTP1.0</td>
-<td>TCP不能复用</td>
-</tr>
-<tr>
-<td>HTTP1.1</td>
-<td>顺序性TCP复用</td>
-</tr>
-<tr>
-<td>HTTP2.0</td>
-<td>多路复用TCP</td>
-</tr>
-</tbody></table>
-<h4 id="访问限制"><a href="#访问限制" class="headerlink" title="访问限制"></a>访问限制</h4><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">user</span>  nobody;</span><br><span class="line"><span class="attribute">worker_processes</span>  <span class="number">1</span>;</span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">    <span class="attribute">worker_connections</span>  <span class="number">1024</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="comment"># 第一个参数: $binary_remote_addr,表示通过它来做标识,也就是说多次连接时如何判定是同一个机器发起</span></span><br><span class="line">    <span class="comment"># 第二个参数: 表示生成一个大小为1M, 名字为req_zone的内存区域, 用来存储访问的频次</span></span><br><span class="line">    <span class="comment"># 第三个参数: 表示连接频率, 1r/s表示每秒1次</span></span><br><span class="line">    <span class="comment"># 第四个参数: 表示缓存区大小, 这里表示当有大量请求时, 超过了访问频次rate的限制, 先将请求放入缓存区</span></span><br><span class="line">    <span class="comment"># 第四个参数: nodelay表示当burst占满时的策略, 如果配置了nodelay, 会立即执行burst中的请求, 若没有配置nodelay, 则表示会按照rate的速率进行请求处理。</span></span><br><span class="line">    <span class="attribute">limit_req_zone</span> $binary_remote_addr zone=req_zone:<span class="number">1m</span> rate=1r/s burst=<span class="number">3</span> nodelay;</span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span>  localhost;</span><br><span class="line"></span><br><span class="line">        <span class="attribute">location</span> / &#123;</span><br><span class="line">            <span class="attribute">root</span>   html;</span><br><span class="line">            <span class="attribute">index</span>  index.html index.htm;</span><br><span class="line">            <span class="comment"># location中引用全局定义的请求限制</span></span><br><span class="line">            <span class="attribute">limit_req</span> zone=req_zone;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>简单实例</strong></p>
-<p>1.每个<code>IP</code>在每秒内只能访问2次。(<code>nginx</code>的时间处理单位是毫秒，也就是说会将每秒2次转换为每500毫秒1次)</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">limit_req_zone</span> $binary_remote_addr zone=limitTest:<span class="number">10m</span> rate=2r/s;</span><br><span class="line"><span class="section">server</span> &#123; </span><br><span class="line">    <span class="attribute">location</span> / &#123; </span><br><span class="line">        <span class="attribute">limit_req</span> zone=limitTest;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>2.添加请求缓存区，这时表示每个<code>IP</code>最多允许4个突发请求。假设某个<code>IP</code>在10ms内发送了6个请求，这时第一个请求被立即执行，第2~5个放入缓存区，第6个直接拒绝。这时由于没有配置<code>nodelay</code>，所以缓存区中的4个请求会按照<code>rate</code>的速率慢慢执行。</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">limit_req_zone</span> $binary_remote_addr zone=limitTest:<span class="number">10m</span> rate=2r/s;</span><br><span class="line"><span class="section">server</span> &#123; </span><br><span class="line">    <span class="attribute">location</span> / &#123; </span><br><span class="line">        <span class="attribute">limit_req</span> zone=limitTest burst=<span class="number">4</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>3.添加<code>nodelay</code>参数，通过设置<code>burst</code>可以允许<code>nginx</code>进行一定程度的并发，多余的请求会进入缓存区，慢慢处理，起到了对抗一些突发流量的目的，但是如果队列设置比较大，那么根据<code>rate</code>速率执行的时间比较长，就会导致用户等待时间加大。这里可以通过配置<code>nodelay</code>参数，表示缓存区中的请求立即执行，无需等待<code>rate</code>速率。</p>
-<p>​    借用示例2中的例子，假设某个<code>IP</code>在10ms内发送了6个请求，这时第一个请求被立即执行，第2<del>5个放入缓存区，第6个直接拒绝。这时由于配置了<code>nodelay</code>，第1</del>5基本上可以说是同时执行。所以这种情况下，系统的瞬时<code>QPS</code>会超过<code>rate</code>设置的阈值。</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">limit_req_zone</span> $binary_remote_addr zone=limitTest:<span class="number">10m</span> rate=2r/s;</span><br><span class="line"><span class="section">server</span> &#123; </span><br><span class="line">    <span class="attribute">location</span> / &#123; </span><br><span class="line">        <span class="attribute">limit_req</span> zone=limitTest burst=<span class="number">4</span> nodelay;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><b>对比2和3：</b>从例子的结果来看，示例2和示例3的请求处理的个数是一致的，只不过示例3的花费时间减少了。但是虽然<code>burst</code>和<code>nodelay</code>能够降低突发请求的处理事件，但是长期来看并不会提高吞吐量的上限。长期吞吐率是由<code>rate</code>决定，因为<code>nodelay</code>只能保证<code>burst</code>缓存中的请求被立即执行，但是<code>nginx</code>会限制队列元素的释放速度。</p>
-<h4 id="连接限制"><a href="#连接限制" class="headerlink" title="连接限制"></a>连接限制</h4><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">user</span>  nobody;</span><br><span class="line"><span class="attribute">worker_processes</span>  <span class="number">1</span>;</span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">    <span class="attribute">worker_connections</span>  <span class="number">1024</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="comment"># 全局定义连接限制</span></span><br><span class="line">    <span class="attribute">limit_conn_zone</span> $binary_remote_addr zone=conn_zone:<span class="number">10m</span>;</span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span>  localhost;</span><br><span class="line"></span><br><span class="line">        <span class="attribute">location</span> / &#123;</span><br><span class="line">            <span class="attribute">root</span>   html;</span><br><span class="line">            <span class="attribute">index</span>  index.html index.htm;</span><br><span class="line">            <span class="comment"># 同一时刻只允许一个客户端ip连接</span></span><br><span class="line">            <span class="attribute">limit_conn</span> zone=conn_zone <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="访问控制"><a href="#访问控制" class="headerlink" title="访问控制"></a>访问控制</h4><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 允许访问ip的配置语法</span></span><br><span class="line"><span class="attribute">allow</span> ipaddress | CIDR | unix: | all;</span><br><span class="line"><span class="comment"># 拒绝访问ip的配置语法</span></span><br><span class="line"><span class="attribute">deny</span> ipaddress | CIDR | unix: | all;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 拒绝某个ip的访问 其他的全部允许</span></span><br><span class="line"><span class="attribute">location</span> / &#123;</span><br><span class="line">          <span class="attribute">root</span>   html;</span><br><span class="line">          <span class="attribute">index</span>  index.html index.htm;</span><br><span class="line">          <span class="attribute">deny</span> <span class="number">192.168.1.1</span>;</span><br><span class="line">          <span class="attribute">allow</span> all;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 允许某个网段       </span></span><br><span class="line"><span class="attribute">location</span> / &#123;</span><br><span class="line">      <span class="attribute">root</span>   html;</span><br><span class="line">      <span class="attribute">index</span>  index.html index.htm;</span><br><span class="line">      <span class="attribute">allow</span> <span class="number">192.168.1.0</span>/<span class="number">24</span>;</span><br><span class="line">      <span class="attribute">deny</span> all;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="用户认证"><a href="#用户认证" class="headerlink" title="用户认证"></a>用户认证</h4><p><code>nginx</code>也提供了简单的基于<code>http</code>基本身份认证</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span> / &#123;</span><br><span class="line">      <span class="attribute">root</span>   html;</span><br><span class="line">      <span class="attribute">index</span>  index.html index.htm;</span><br><span class="line">      <span class="attribute">auth_basic</span> <span class="string">&quot;please!&quot;</span>;</span><br><span class="line">      <span class="attribute">auth_basic_user_file</span> /etc/nginx/auth_conf;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="常用参数解析"><a href="#常用参数解析" class="headerlink" title="常用参数解析"></a>常用参数解析</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">proxy_pass</span> 代理地址(域名)   <span class="comment"># 当前服务器能访问地址</span></span><br><span class="line">proxy_buffering <span class="literal">on</span> | <span class="literal">off</span>  <span class="comment"># 缓冲区</span></span><br><span class="line"><span class="comment"># 缓冲区大小配置</span></span><br><span class="line">proxy_buffer_size</span><br><span class="line">proxy_buffers</span><br><span class="line">proxy_busy_buffer_size</span><br><span class="line"></span><br><span class="line"><span class="comment"># 跳转重定向</span></span><br><span class="line">proxy_redirect default | <span class="literal">off</span> | <span class="literal">redirect</span> replacement</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置头信息</span></span><br><span class="line">proxy_set_header Host $proxy_host</span><br><span class="line">proxy_set_header Connection close</span><br><span class="line"><span class="comment"># 添加请求头</span></span><br><span class="line">add_header <span class="string">&#x27;Access-Control-Allow-Origin&#x27;</span> <span class="string">&#x27;*&#x27;</span> always;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置代理到后端的TCP超时时间</span></span><br><span class="line"><span class="attribute">proxy_connection_timeout</span> time</span><br><span class="line"><span class="comment"># 建立连接时间</span></span><br><span class="line">proxy_read_timeout time</span><br><span class="line"><span class="comment"># 服务端请求完 发送给客户端的时间</span></span><br><span class="line">proxy_send_timeout</span><br></pre></td></tr></table></figure>
-
-<p>部分参数配置参考</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">proxy_redirect</span> default;</span><br><span class="line"><span class="attribute">proxy_set_header</span> Host $http_host;</span><br><span class="line"><span class="attribute">proxy_set_header</span> X-Real-IP $remote_addr;</span><br><span class="line"><span class="attribute">proxy_set_header</span> X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line"></span><br><span class="line"><span class="attribute">proxy_connect_timeout</span> <span class="number">30</span>;</span><br><span class="line"><span class="attribute">proxy_send_timeout</span> <span class="number">60</span>;</span><br><span class="line"><span class="attribute">proxy_read_timeout</span> <span class="number">60</span>;</span><br><span class="line"></span><br><span class="line"><span class="attribute">proxy_buffer_size</span> <span class="number">32k</span>;</span><br><span class="line"><span class="attribute">proxy_buffering</span> <span class="literal">on</span>;</span><br><span class="line"><span class="attribute">proxy_buffers</span> <span class="number">4</span> <span class="number">128k</span>;</span><br><span class="line"><span class="attribute">proxy_busy_buffers_size</span> <span class="number">256k</span>;</span><br><span class="line"><span class="attribute">proxy_max_temp_file_size</span> <span class="number">256k</span>;</span><br></pre></td></tr></table></figure>
-
-<h4 id="location匹配规则"><a href="#location匹配规则" class="headerlink" title="location匹配规则"></a>location匹配规则</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">location [ = | ^~ | ~ | ~* ] /uri/ &#123; ... &#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>=</code>：表示精确匹配</li>
-<li><code>^~</code>：表示uri以一个常规字符串开头</li>
-<li><code>~</code>：表示区分大小写的匹配规则</li>
-<li><code>~*</code>：表示不区分大小写</li>
-<li><code>!~</code>和<code>!~*</code>：表示区分大小写不匹配或者不区分大小写不匹配规则</li>
-<li><code>/</code>：通用匹配，任何请求都可以匹配到</li>
-</ul>
-<p>匹配优先级顺序：首先匹配<code>=</code>,其次匹配<code>^~</code>,接着按顺序匹配正则表达式，最后最后匹配<code>/</code>,当有匹配成功则停止匹配。</p>
-<p>假设<code>nginx.conf</code>中配置的顺序如下：</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span> = / &#123;</span><br><span class="line">    <span class="comment"># A</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="attribute">location</span> = /login &#123;</span><br><span class="line">    <span class="comment"># B</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="attribute">location</span><span class="regexp"> ^~</span> /static/ &#123;</span><br><span class="line">    <span class="comment"># C</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="attribute">location</span> <span class="regexp">~ \.(gif|jpg|png|js|css)$</span> &#123;</span><br><span class="line">    <span class="comment"># D</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="attribute">location</span> <span class="regexp">~* \.png$</span> &#123;</span><br><span class="line">    <span class="comment"># E</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="attribute">location</span> !<span class="regexp">~ \.xhtml$</span> &#123;</span><br><span class="line">    <span class="comment"># F</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="attribute">location</span> !<span class="regexp">~* \.xhtml$</span> &#123;</span><br><span class="line">    <span class="comment"># G</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="attribute">location</span> / &#123;</span><br><span class="line">    <span class="comment"># H</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li><code>http://localhost/</code>→ 匹配A</li>
-<li><code>http://localhost/login/</code> → 匹配B</li>
-<li><code>http://localhost/register</code> → 匹配H</li>
-<li><code>http://localhost/static/a.html</code> → 匹配C</li>
-<li><code>http://localhost/a.png</code> → 匹配规则D</li>
-<li><code>http://localhost/a.PNG</code> → 匹配规则E</li>
-<li><code>http://localhost/a.xhtml</code> → 匹配规则H</li>
-<li><code>http://localhost/category/id/1111</code> → 匹配规则H</li>
-</ol>
-<p>也可以通过内置变量获取一些特定值进行路由控制。</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">lcaiton</span> /&#123;</span><br><span class="line">    if($http_user_agent ~* &quot;android&quot;)&#123;</span><br><span class="line">        <span class="comment"># 访问安卓站点</span></span><br><span class="line">    &#125;</span><br><span class="line">    if($http_user_agent ~* &quot;iphone&quot;)&#123;</span><br><span class="line">        <span class="comment"># 访问苹果站点</span></span><br><span class="line">    &#125;</span><br><span class="line">    if($http_user_agent ~* &quot;Safari&quot;)&#123;</span><br><span class="line">        <span class="comment"># safari站点</span></span><br><span class="line">    &#125;</span><br><span class="line">    if($http_user_agent ~* &quot;firefox&quot;)&#123;</span><br><span class="line">        <span class="comment"># 访问火狐站点</span></span><br><span class="line">    &#125;</span><br><span class="line">    if($http_user_agent ~* &quot;chrome&quot;)&#123;</span><br><span class="line">        <span class="comment"># 访问谷歌站点</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><b>root、alias和proxy_pass的区别：</b></p>
-<ul>
-<li><code>root</code>直接将<code>location</code>后匹配规则拼接到<code>root</code>后面进行访问。</li>
-<li><code>alias</code>别名，将<code>location</code>后匹配规则与<code>alias</code>替换。</li>
-<li><code>proxy_pass</code>转发到其他服务器上</li>
-</ul>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span> /proxy_file&#123;</span><br><span class="line">        <span class="attribute">root</span> /soft/code;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 访问http://127.0.0.1/proxy_file 实际访问-&gt;http://127.0.0.1/soft/code/proxy_file</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">location</span> /proxy_file&#123;</span><br><span class="line">        <span class="attribute">ailas</span> /soft/code;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 访问http://127.0.0.1/proxy_file 实际访问-&gt;http://127.0.0.1/soft/code </span></span><br><span class="line"></span><br><span class="line"><span class="attribute">location</span> /proxy_file&#123;</span><br><span class="line">        <span class="attribute">proxy_pass</span> http:<span class="number">192.168.1.1:8080</span>/proxy_file;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 访问http://127.0.0.1/proxy_file/xxx 实际访问-&gt;http:192.168.1.1:8080/proxy_file</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="负载均衡器"><a href="#负载均衡器" class="headerlink" title="负载均衡器"></a>负载均衡器</h2><p>​    在<code>nginx</code>中使用<code>upstream</code>模块设置负载均衡器。通过<code>upstream</code>设置两台服务器地址，在<code>server</code>中配置反向代理。默认情况下<code>upstream</code>采用轮询的方式。</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># testName这个名字可以随便起，但是要尽量符合服务器的用途和域名</span></span><br><span class="line"><span class="attribute">upstream</span> testName &#123; </span><br><span class="line">    <span class="attribute">server</span> <span class="number">192.168.1.1:8090</span>; </span><br><span class="line">    <span class="attribute">server</span> <span class="number">192.168.1.2:8090</span>; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span> localhost;</span><br><span class="line">    <span class="attribute">location</span> / &#123;</span><br><span class="line">      <span class="attribute">proxy_pass</span> http://testName;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>​    <code>nginx</code>也能进行四层转发，使用的是<code>stream</code>，区别于<code>upstream</code>。可以实现端口到端口的转发。</p>
-<h2 id="静态资源配置"><a href="#静态资源配置" class="headerlink" title="静态资源配置"></a>静态资源配置</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 图片格式采用压缩方式</span></span><br><span class="line"><span class="attribute">location</span> <span class="regexp">~ .*\.(jgp|gif|png)$</span> &#123;</span><br><span class="line">    <span class="attribute">gzip</span> <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">gzip_http_version</span> <span class="number">1</span>.<span class="number">1</span>;</span><br><span class="line">    <span class="comment"># 压缩参数值范围1~9, 很多资料都建议4~5</span></span><br><span class="line">    <span class="attribute">gzip_comp_level</span> <span class="number">2</span>;</span><br><span class="line">    <span class="comment"># 对那些请求方式生效</span></span><br><span class="line">    <span class="attribute">gzip_types</span> text/plain application/json application/x-javascript image/gif</span><br><span class="line">    root /soft/code/images;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># cache js css</span></span><br><span class="line"><span class="attribute">location</span> <span class="regexp">~ .*\.(jgp|gif|png)$</span> &#123;</span><br><span class="line">    <span class="comment"># 缓存30天</span></span><br><span class="line">    <span class="attribute">expires</span> <span class="number">30d</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 缓存文件夹</span></span><br><span class="line"><span class="attribute">location</span> <span class="regexp">~ ^/(images/js/css/static)/</span> &#123;</span><br><span class="line">    <span class="comment"># 缓存30天</span></span><br><span class="line">    <span class="attribute">expires</span> <span class="number">30d</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 解决跨域</span></span><br><span class="line"><span class="attribute">location</span> <span class="regexp">~ .*\.(html|htm)$</span> &#123;</span><br><span class="line">    <span class="attribute">add_header</span> Access_Control_Allow_Orgin 地址</span><br><span class="line">    add_header Access_Control_Allow_Methods GET,POST,DELETE,OPTIONS</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 防盗链</span></span><br><span class="line"><span class="comment"># valid_referers 会根据请求头部的内容分配一个值为0或1给变量$invalid_referer,如果</span></span><br><span class="line"><span class="comment"># 请求头部中的referer不符合valid_referers,则变量$invalid_referer会被设置为1</span></span><br><span class="line"><span class="comment"># none 表示头部没有referer</span></span><br><span class="line"><span class="comment"># bolcked 表示被防火墙或者代理去除了</span></span><br><span class="line"><span class="comment"># servername 匹配规则</span></span><br><span class="line">location <span class="regexp">~ .*\.(jgp|gif|png)$</span> &#123;</span><br><span class="line">    <span class="attribute">valid_referers</span> <span class="literal">none</span> <span class="literal">blocked</span> 域名/ip</span><br><span class="line">    if($invalid_referer)&#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">403</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="attribute">root</span> /soft/code/images;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 视频</span></span><br><span class="line"><span class="attribute">location</span> <span class="regexp">~ .*\.(mp4|avi|flv)$</span> &#123;</span><br><span class="line">    <span class="attribute">root</span> /soft/code/mp4;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="压测"><a href="#压测" class="headerlink" title="压测"></a>压测</h2><p>通常简单压测可以使用<code>ab</code>工具进行压测。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">yum install httpd-tools -y</span><br><span class="line"></span><br><span class="line"><span class="comment"># -n 总的请求次数</span></span><br><span class="line"><span class="comment"># -c 并发请求数</span></span><br><span class="line"><span class="comment"># -k 是否开启长链接</span></span><br><span class="line">ab -n 200 -c 2 http://localhost/</span><br></pre></td></tr></table></figure>
-
-<p>如果服务器被别人使用<code>ab</code>压测工具也可以使用<code>nginx</code>进行简单预防。在没有模拟<code>agent</code>的情况下，可以使用这种方式阻止请求访问。</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span> /&#123;</span><br><span class="line">    if($http_user_agent ~&quot;Wget|ApacheBench&quot;)&#123;</span><br><span class="line">        <span class="attribute">set</span> $block_user_agent <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    if($block_user_agent = 1)&#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">403</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>以下配置文件为<code>nginx</code>初始配置文件<code>nginx.conf</code></p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用的用户和组</span></span><br><span class="line"><span class="attribute">user</span>  nobody;</span><br><span class="line"><span class="comment"># 指定工作衍生进程数(一般为CPU总核心数或者总核数的两倍)</span></span><br><span class="line"><span class="attribute">worker_processes</span>  <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定错误日志存放路径 日志级别为[info | debug | warn | notice | error | crit]</span></span><br><span class="line"><span class="comment">#error_log  logs/error.log;</span></span><br><span class="line"><span class="comment">#error_log  logs/error.log  notice;</span></span><br><span class="line"><span class="comment">#error_log  logs/error.log  info;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># nginx主进程pid存放路径</span></span><br><span class="line"><span class="comment">#pid        logs/nginx.pid;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">    <span class="comment"># 允许连接数(每个worker进程支持的连接数)</span></span><br><span class="line">    <span class="attribute">worker_connections</span>  <span class="number">1024</span>;</span><br><span class="line">    <span class="comment"># 内核模型 select poll epoll</span></span><br><span class="line">    <span class="attribute">use</span> <span class="literal">epoll</span> </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">http &#123;</span><br><span class="line">    <span class="attribute">include</span>       mime.types;</span><br><span class="line">    <span class="attribute">default_type</span>  application/octet-stream;</span><br><span class="line">    <span class="comment"># 日志输出格式</span></span><br><span class="line">    <span class="comment">#log_format  main  &#x27;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;$status $body_bytes_sent &quot;$http_referer&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#x27;;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#access_log  logs/access.log  main;</span></span><br><span class="line"></span><br><span class="line">    <span class="attribute">sendfile</span>        <span class="literal">on</span>;</span><br><span class="line">    <span class="comment">#tcp_nopush     on;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#keepalive_timeout  0;</span></span><br><span class="line">    <span class="attribute">keepalive_timeout</span>  <span class="number">65</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">#gzip  on;</span></span><br><span class="line"></span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span>  localhost;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#charset koi8-r;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">#access_log  logs/host.access.log  main;</span></span><br><span class="line"></span><br><span class="line">        <span class="attribute">location</span> / &#123;</span><br><span class="line">            <span class="attribute">root</span>   html;</span><br><span class="line">            <span class="attribute">index</span>  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#error_page  404              /404.html;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># redirect server error pages to the static page /50x.html</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="attribute">error_page</span>   <span class="number">500</span> <span class="number">502</span> <span class="number">503</span> <span class="number">504</span>  /50x.html;</span><br><span class="line">        <span class="attribute">location</span> = /50x.html &#123;</span><br><span class="line">            <span class="attribute">root</span>   html;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"># proxy the PHP scripts to Apache listening on 127.0.0.1:80</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ \.php$ &#123;</span></span><br><span class="line">        <span class="comment">#    proxy_pass   http://127.0.0.1;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ \.php$ &#123;</span></span><br><span class="line">        <span class="comment">#    root           html;</span></span><br><span class="line">        <span class="comment">#    fastcgi_pass   127.0.0.1:9000;</span></span><br><span class="line">        <span class="comment">#    fastcgi_index  index.php;</span></span><br><span class="line">        <span class="comment">#    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;</span></span><br><span class="line">        <span class="comment">#    include        fastcgi_params;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># deny access to .htaccess files, if Apache&#x27;s document root</span></span><br><span class="line">        <span class="comment"># concurs with nginx&#x27;s one</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ /\.ht &#123;</span></span><br><span class="line">        <span class="comment">#    deny  all;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># another virtual host using mix of IP-, name-, and port-based configuration</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment">#server &#123;</span></span><br><span class="line">    <span class="comment">#    listen       8000;</span></span><br><span class="line">    <span class="comment">#    listen       somename:8080;</span></span><br><span class="line">    <span class="comment">#    server_name  somename  alias  another.alias;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    location / &#123;</span></span><br><span class="line">    <span class="comment">#        root   html;</span></span><br><span class="line">    <span class="comment">#        index  index.html index.htm;</span></span><br><span class="line">    <span class="comment">#    &#125;</span></span><br><span class="line">    <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># HTTPS server</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment">#server &#123;</span></span><br><span class="line">    <span class="comment">#    listen       443 ssl;</span></span><br><span class="line">    <span class="comment">#    server_name  localhost;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_certificate      cert.pem;</span></span><br><span class="line">    <span class="comment">#    ssl_certificate_key  cert.key;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_session_cache    shared:SSL:1m;</span></span><br><span class="line">    <span class="comment">#    ssl_session_timeout  5m;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_ciphers  HIGH:!aNULL:!MD5;</span></span><br><span class="line">    <span class="comment">#    ssl_prefer_server_ciphers  on;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    location / &#123;</span></span><br><span class="line">    <span class="comment">#        root   html;</span></span><br><span class="line">    <span class="comment">#        index  index.html index.htm;</span></span><br><span class="line">    <span class="comment">#    &#125;</span></span><br><span class="line">    <span class="comment">#&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span>
+    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1254,7 +1078,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-count">72</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
