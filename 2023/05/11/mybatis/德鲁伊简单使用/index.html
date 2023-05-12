@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="德鲁伊简单使用​    在翻阅项目底层代码时发现，在底层的framework模块中有引入druid监控端，但是好像在开发环境、测试环境甚至生产环境中并没有看到有具体的使用，所以想启用一下druid的监控模块。并没有什么实质性内容的介绍，仅仅是踩的一些坑的记录。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="德鲁伊简单使用">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2023/05/11/mybatis/%E5%BE%B7%E9%B2%81%E4%BC%8A%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="德鲁伊简单使用​    在翻阅项目底层代码时发现，在底层的framework模块中有引入druid监控端，但是好像在开发环境、测试环境甚至生产环境中并没有看到有具体的使用，所以想启用一下druid的监控模块。并没有什么实质性内容的介绍，仅仅是踩的一些坑的记录。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2023/05/12/YQLoPJjbdrHqm3W.png">
+<meta property="article:published_time" content="2023-05-11T14:13:58.000Z">
+<meta property="article:modified_time" content="2023-05-12T09:14:30.780Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="mybatis">
+<meta property="article:tag" content="druid">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2023/05/12/YQLoPJjbdrHqm3W.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2023/05/11/mybatis/%E5%BE%B7%E9%B2%81%E4%BC%8A%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>德鲁伊简单使用 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/05/11/mybatis/%E5%BE%B7%E9%B2%81%E4%BC%8A%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          德鲁伊简单使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-05-11 22:13:58" itemprop="dateCreated datePublished" datetime="2023-05-11T22:13:58+08:00">2023-05-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-12 17:14:30" itemprop="dateModified" datetime="2023-05-12T17:14:30+08:00">2023-05-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mybatis/" itemprop="url" rel="index"><span itemprop="name">mybatis</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="德鲁伊简单使用"><a href="#德鲁伊简单使用" class="headerlink" title="德鲁伊简单使用"></a>德鲁伊简单使用</h1><p>​    在翻阅项目底层代码时发现，在底层的<code>framework</code>模块中有引入<code>druid</code>监控端，但是好像在开发环境、测试环境甚至生产环境中并没有看到有具体的使用，所以想启用一下<code>druid</code>的监控模块。并没有什么实质性内容的介绍，仅仅是踩的一些坑的记录。</p>
+<span id="more"></span>
+
+<p><b>注：我使用的版本是<code>1.1.22</code>，如果不是这版本请绕道，避免引起不适，不同版本中修改了部分配置的前缀！！</b></p>
+<h2 id="启用德鲁伊管理页"><a href="#启用德鲁伊管理页" class="headerlink" title="启用德鲁伊管理页"></a>启用德鲁伊管理页</h2><p>1.根据配置项加载这个管理页<code>bean</code>。前缀为<code>my.druid.monitor.enable</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建德鲁伊数据源</span></span><br><span class="line"><span class="meta">@Bean(&quot;dataSource&quot;)</span></span><br><span class="line"><span class="meta">@ConditionalOnMissingBean(DataSource.class)</span></span><br><span class="line"><span class="meta">@ConfigurationProperties(prefix = &quot;spring.datasource&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> DataSource <span class="title">dataSource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> DruidDataSourceBuilder.create().build();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="meta">@ConditionalOnProperty(prefix = &quot;my.druid.monitor&quot;, name = &quot;enable&quot;, havingValue = &quot;true&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ServletRegistrationBean&lt;StatViewServlet&gt; <span class="title">druidServlet</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="meta">@Value(&quot;$&#123;spring.datasource.druid.stat-view-servlet.login-password:admin&#125;&quot;)</span> String password,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="meta">@Value(&quot;$&#123;spring.datasource.druid.stat-view-servlet.login-username:admin&#125;&quot;)</span> String userName,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="meta">@Value(&quot;$&#123;spring.datasource.druid.stat-view-servlet.reset-enable:true&#125;&quot;)</span> String reset,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="meta">@Value(&quot;$&#123;spring.datasource.druid.stat-view-servlet.url-pattern:/druid/*&#125;&quot;)</span> String urlPattern,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="meta">@Value(&quot;$&#123;spring.datasource.druid.stat-view-servlet.allow:&#125;&quot;)</span> String allow,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="meta">@Value(&quot;$&#123;spring.datasource.druid.stat-view-servlet.deny:&#125;&quot;)</span> String deny</span></span></span><br><span class="line"><span class="function"><span class="params">)</span> </span>&#123;</span><br><span class="line">    ServletRegistrationBean&lt;StatViewServlet&gt; reg = <span class="keyword">new</span> ServletRegistrationBean();</span><br><span class="line">    reg.setServlet(<span class="keyword">new</span> StatViewServlet());</span><br><span class="line">    reg.addUrlMappings(urlPattern);</span><br><span class="line">    reg.addInitParameter(<span class="string">&quot;resetEnable&quot;</span>, reset);</span><br><span class="line">    reg.addInitParameter(<span class="string">&quot;loginUsername&quot;</span>, userName);</span><br><span class="line">    reg.addInitParameter(<span class="string">&quot;loginPassword&quot;</span>, password);</span><br><span class="line">    reg.addInitParameter(<span class="string">&quot;allow&quot;</span>,deny );</span><br><span class="line">    reg.addInitParameter(<span class="string">&quot;deny&quot;</span>,allow);</span><br><span class="line">    <span class="keyword">return</span> reg;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>yaml</code>或者<code>properties</code>配置文件中添加相关配置</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="comment"># 忽略默认自动注入druid,避免走默认druid配置</span></span><br><span class="line">  <span class="attr">autoconfigure:</span></span><br><span class="line">    <span class="attr">exclude:</span> <span class="string">com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure</span></span><br><span class="line">  <span class="comment">#数据库连接池配置</span></span><br><span class="line">  <span class="attr">datasource:</span></span><br><span class="line">    <span class="attr">druid:</span></span><br><span class="line">      <span class="attr">stat-view-servlet:</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">        <span class="attr">login-password:</span> <span class="string">admin</span></span><br><span class="line">        <span class="attr">login-username:</span> <span class="string">admin</span></span><br><span class="line">        <span class="attr">reset-enable:</span> <span class="literal">true</span></span><br><span class="line">        <span class="attr">url-pattern:</span> <span class="string">/druid/*</span></span><br><span class="line">        <span class="attr">allow:</span></span><br><span class="line">        <span class="attr">deny:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 全局druid参数，单独数据源配置为空取全局配置</span></span><br><span class="line">    <span class="attr">dynamic:</span></span><br><span class="line">      <span class="comment"># 声明默认的主数据源</span></span><br><span class="line">      <span class="attr">primary:</span> <span class="string">master</span></span><br><span class="line">      <span class="attr">druid:</span></span><br><span class="line">        <span class="comment"># 连接池的配置信息</span></span><br><span class="line">        <span class="attr">filters:</span> <span class="string">stat,wall</span></span><br><span class="line">        <span class="attr">initial-size:</span> <span class="number">10</span></span><br><span class="line">        <span class="attr">max-active:</span> <span class="number">20</span></span><br><span class="line">        <span class="attr">max-pool-prepared-statement-per-connection-size:</span> <span class="number">20</span></span><br><span class="line">        <span class="attr">max-wait:</span> <span class="number">60000</span></span><br><span class="line">        <span class="comment"># 配置一个连接在池中最小生存的时间，单位是毫秒</span></span><br><span class="line">        <span class="attr">min-evictable-idle-time-millis:</span> <span class="number">300000</span></span><br><span class="line">        <span class="attr">min-idle:</span> <span class="number">10</span></span><br><span class="line">        <span class="comment"># 打开PSCache，并且指定每个连接上PSCache的大小</span></span><br><span class="line">        <span class="attr">pool-prepared-statements:</span> <span class="literal">true</span></span><br><span class="line">        <span class="attr">test-on-borrow:</span> <span class="literal">false</span></span><br><span class="line">        <span class="attr">test-on-return:</span> <span class="literal">false</span></span><br><span class="line">        <span class="attr">test-while-idle:</span> <span class="literal">true</span></span><br><span class="line">        <span class="comment"># 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒</span></span><br><span class="line">        <span class="attr">time-between-eviction-runs-millis:</span> <span class="number">60000</span></span><br><span class="line">        <span class="attr">validation-query:</span> <span class="string">SELECT</span> <span class="number">1</span> <span class="string">FROM</span> <span class="string">DUAL</span></span><br><span class="line">        <span class="comment"># 通过connectProperties属性来打开mergeSql功能；慢SQL记录</span></span><br><span class="line">        <span class="attr">connection-properties:</span> <span class="string">druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000</span></span><br></pre></td></tr></table></figure>
+
+<p>到此在本地启动项目，访问<code>http://127.0.0.1:8064/xxxx/druid/login.html</code>进入管理页，登录之后，虽然进入了管理页，但是其实只是一个空壳，执行对应的<code>SQL</code>发现，并不会在监控页面上显示出来，后经过查询资料发现，这里的<code>filter</code>为空。</p>
+<p><img src="https://s2.loli.net/2023/05/12/YQLoPJjbdrHqm3W.png" alt="druid中filter为空.png"></p>
+<p>在配置文件中明明在<code>spring.datasource.druid.filters</code>设置了<code>stat,wall</code>等过滤器，但是实际上没有读到，排查发现，在<code>1.1.22</code>上，并不是这个配置，修改了配置前缀为<code>spring.datasource.druid.filter.stat.enabled</code></p>
+<p>具体代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DruidFilterConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@ConfigurationProperties(FILTER_STAT_PREFIX)</span></span><br><span class="line">    <span class="meta">@ConditionalOnProperty(prefix = FILTER_STAT_PREFIX, name = &quot;enabled&quot;)</span></span><br><span class="line">    <span class="meta">@ConditionalOnMissingBean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> StatFilter <span class="title">statFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="comment">// 主要是为了创建这个filter</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> StatFilter();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>修改配置后，在启动项目，在管理页上就显示出了执行的<code>SQL</code>语句。</p>
+<h2 id="开发环境启用"><a href="#开发环境启用" class="headerlink" title="开发环境启用"></a>开发环境启用</h2><p>​    本以为到这里基本上已经万事大吉了，开发环境只需要复刻本地环境的配置即可。但是操作之后发现，在开发环境上访问<code>login.html</code>之后原本应该跳转到<code>druid/index.html</code>，但是<code>404</code>，看样子是<code>nginx</code>拦截处理了。</p>
+<p>​    在<code>nginx</code>中，对于<code>/index.html</code>的路径直接转发到本地的某个文件夹中，所以修改<code>nginx.conf</code>相关配置信息，是的对<code>/druid/index.html</code>不进行这个拦截处理。</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改前</span></span><br><span class="line"><span class="attribute">location</span> <span class="regexp">~ .*/index.html</span> &#123;</span><br><span class="line">    <span class="attribute">add_header</span>  Cache-Control  <span class="string">&quot;private, no-store, no-cache, must-revalidate, proxy-revalidate&quot;</span>;</span><br><span class="line">    <span class="attribute">root</span>   /opt/html;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改后</span></span><br><span class="line"><span class="attribute">location</span> <span class="regexp">~ (?!.*druid/index.html$).*/index.html</span> &#123;</span><br><span class="line">    <span class="attribute">add_header</span>  Cache-Control  <span class="string">&quot;private, no-store, no-cache, must-revalidate, proxy-revalidate&quot;</span>;</span><br><span class="line">    <span class="attribute">root</span>   /opt/html;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>重启<code>nginx</code>之后，发现还是有问题，观察发送的请求，在<code>login.html</code>提交表单之后，发起了一个<code>submitLogin</code>请求，如果用户名密码校验正确，会直接跳转到<code>druid/index.html</code>，但是这个<code>druid/index.html</code>的请求居然进行了<code>302</code>跳转，又跳回<code>druid/login.html</code>页面。通过和本地的工程发起的请求对比发现，在<code>submitLogin</code>登录之后会返回一个<code>JSESSIONID</code>的<code>cookies</code>，发起<code>druid/index.html</code>请求需要携带这个<code>cookies</code>值，但是在开发环境中不知道是<code>nginx</code>还是哪里给弄丢了，由于时间紧迫我没有细看在那个环节丢调了这个<code>cookies</code>值，我手动将这个<code>cookies</code>值打入浏览器的<code>cookies</code>中，正常访问。</p>
+<h2 id="关闭广告"><a href="#关闭广告" class="headerlink" title="关闭广告"></a>关闭广告</h2><p>​    在开源项目若依中看到，感觉挺好玩的，便记录一下，用过<code>druid</code>管理页都知道，在面板的最下方有一个阿里的横幅广告，这个广告是请求服务器的<code>common.js</code>中会添加到页脚，请求公网的<code>banner</code>连接。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">buildFooter : function() &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> html =<span class="string">&#x27;&lt;footer class=&quot;footer&quot;&gt;&#x27;</span>+</span><br><span class="line">              <span class="string">&#x27;         &lt;div class=&quot;container&quot;&gt;&#x27;</span>+</span><br><span class="line">              <span class="string">&#x27;&lt;a href=&quot;https://render.alipay.com/p/s/taobaonpm_click/druid_banner_click&quot; target=&quot;new&quot;&gt;&lt;img src=&quot;https://render.alipay.com/p/s/taobaonpm_click/druid_banner&quot;&gt;&lt;/a&gt;&lt;br/&gt;&#x27;</span> +</span><br><span class="line">              <span class="string">&#x27; powered by &lt;a href=&quot;https://github.com/alibaba/&quot; target=&quot;_blank&quot;&gt;Alibaba&lt;/a&gt; &amp; sandzhang &amp; &lt;a href=&quot;http://melin.iteye.com/&quot; target=&quot;_blank&quot;&gt;melin&lt;/a&gt; &amp; &lt;a href=&quot;https://github.com/shrekwang&quot; target=&quot;_blank&quot;&gt;shrek.wang&lt;/a&gt;&#x27;</span>+</span><br><span class="line">              <span class="string">&#x27;         &lt;/div&gt;&#x27;</span>+</span><br><span class="line">              <span class="string">&#x27; &lt;/footer&gt;&#x27;</span>;</span><br><span class="line">    $(document.body).append(html);</span><br></pre></td></tr></table></figure>
+
+<p>​    所以思路上，通过对获取<code>common.js</code>进行拦截，并将这段页脚的<code>html</code>代码重写，即可达到关闭广告的目的。</p>
+<p>1.设置一个过滤器，对<code>js/common.js</code>的请求进行拦截。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DruidConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 创建 DruidAdRemoveFilter 过滤器，过滤 common.js 的广告</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@ConditionalOnProperty(prefix = &quot;my.druid.monitor&quot;, name = &quot;enable&quot;, havingValue = &quot;true&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> FilterRegistrationBean&lt;DruidAdRemoveFilter&gt; <span class="title">druidAdRemoveFilterFilter</span><span class="params">(DruidStatProperties properties)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 获取 druid web 监控页面的参数</span></span><br><span class="line">        DruidStatProperties.StatViewServlet config = properties.getStatViewServlet();</span><br><span class="line">        <span class="comment">// 提取 common.js 的配置路径</span></span><br><span class="line">        String pattern = config.getUrlPattern() != <span class="keyword">null</span> ? config.getUrlPattern() : <span class="string">&quot;/druid/*&quot;</span>;</span><br><span class="line">        String commonJsPattern = pattern.replaceAll(<span class="string">&quot;\\*&quot;</span>, <span class="string">&quot;js/common.js&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建 DruidAdRemoveFilter Bean</span></span><br><span class="line">        FilterRegistrationBean&lt;DruidAdRemoveFilter&gt; registrationBean = <span class="keyword">new</span> FilterRegistrationBean&lt;&gt;();</span><br><span class="line">        registrationBean.setFilter(<span class="keyword">new</span> DruidAdRemoveFilter());</span><br><span class="line">        registrationBean.addUrlPatterns(commonJsPattern);</span><br><span class="line">        <span class="keyword">return</span> registrationBean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.拦截过滤器中替换这段<code>html</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DruidAdRemoveFilter</span> <span class="keyword">extends</span> <span class="title">OncePerRequestFilter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * common.js 的路径</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String COMMON_JS_ILE_PATH = <span class="string">&quot;support/http/resources/js/common.js&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doFilterInternal</span><span class="params">(HttpServletRequest request, HttpServletResponse response, FilterChain chain)</span> <span class="keyword">throws</span> ServletException, IOException </span>&#123;</span><br><span class="line">        chain.doFilter(request, response);</span><br><span class="line">        <span class="comment">// 重置缓冲区，响应头不会被重置</span></span><br><span class="line">        response.resetBuffer();</span><br><span class="line">        <span class="comment">// 获取 common.js</span></span><br><span class="line">        String text = Utils.readFromResource(COMMON_JS_ILE_PATH);</span><br><span class="line">        <span class="comment">// 正则替换 banner, 除去底部的广告信息</span></span><br><span class="line">        text = text.replaceAll(<span class="string">&quot;&lt;a.*?banner\&quot;&gt;&lt;/a&gt;&lt;br/&gt;&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">        text = text.replaceAll(<span class="string">&quot;powered.*?shrek.wang&lt;/a&gt;&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">        response.getWriter().write(text);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>替换之后的<code>html</code>变量值为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> html =<span class="string">&#x27;&lt;footer class=&quot;footer&quot;&gt;&#x27;</span>+</span><br><span class="line">                      <span class="string">&#x27;         &lt;div class=&quot;container&quot;&gt;&#x27;</span>+</span><br><span class="line">                      <span class="string">&#x27;&#x27;</span> +</span><br><span class="line">                      <span class="string">&#x27; &#x27;</span>+</span><br><span class="line">                      <span class="string">&#x27;         &lt;/div&gt;&#x27;</span>+</span><br><span class="line">                      <span class="string">&#x27; &lt;/footer&gt;&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2023/05/11/mybatis/%E5%BE%B7%E9%B2%81%E4%BC%8A%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" title="德鲁伊简单使用">http://xiaocainiaoya.github.io/2023/05/11/mybatis/德鲁伊简单使用/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mybatis/" rel="tag"><i class="fa fa-tag"></i> mybatis</a>
+              <a href="/tags/druid/" rel="tag"><i class="fa fa-tag"></i> druid</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/05/05/%E7%BC%93%E5%AD%98/redis%E5%BA%8F%E5%88%97%E5%8C%96%E9%85%8D%E7%BD%AE/" rel="prev" title="redis序列化配置">
+      <i class="fa fa-chevron-left"></i> redis序列化配置
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BE%B7%E9%B2%81%E4%BC%8A%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">德鲁伊简单使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E7%94%A8%E5%BE%B7%E9%B2%81%E4%BC%8A%E7%AE%A1%E7%90%86%E9%A1%B5"><span class="nav-number">1.1.</span> <span class="nav-text">启用德鲁伊管理页</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E5%90%AF%E7%94%A8"><span class="nav-number">1.2.</span> <span class="nav-text">开发环境启用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%97%AD%E5%B9%BF%E5%91%8A"><span class="nav-number">1.3.</span> <span class="nav-text">关闭广告</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">73</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

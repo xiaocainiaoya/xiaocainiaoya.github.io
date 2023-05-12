@@ -160,6 +160,89 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/06/27/Spring/SpringAop%E6%B5%85%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/27/Spring/SpringAop%E6%B5%85%E6%9E%90/" class="post-title-link" itemprop="url">SpringAop浅析</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-27 16:20:58" itemprop="dateCreated datePublished" datetime="2021-06-27T16:20:58+08:00">2021-06-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-04 15:44:09" itemprop="dateModified" datetime="2021-07-04T15:44:09+08:00">2021-07-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/srping/" itemprop="url" rel="index"><span itemprop="name">srping</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="SpringAop浅析"><a href="#SpringAop浅析" class="headerlink" title="SpringAop浅析"></a>SpringAop浅析</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>​    <code>AOP</code>面向切面编程。在运行时，动态的将代码织入到类的指定方法，指定位置上的思想。实际上<code>AOP</code>不一定都像<code>Spring Aop</code>那样实现，<code>Spring Aop</code>是通过在运行时生成代理对象来进行织入。还有其他的方式，比如<code>AspectJ</code>是在编译期、类加载期织入。本篇文章就来介绍，<code>Spring Aop</code>在运行时生成代理对象的时期和过程。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/06/27/Spring/SpringAop%E6%B5%85%E6%9E%90/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/06/22/java/Type%E6%8E%A5%E5%8F%A3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -898,90 +981,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/Spring/SpringBoot%E7%9A%84jar%E5%8C%85%E5%A6%82%E4%BD%95%E5%90%AF%E5%8A%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/04/13/Spring/SpringBoot%E7%9A%84jar%E5%8C%85%E5%A6%82%E4%BD%95%E5%90%AF%E5%8A%A8/" class="post-title-link" itemprop="url">SpringBoot的jar包如何启动</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2021-04-13T21:51:58+08:00">2021-04-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-14 15:38:35" itemprop="dateModified" datetime="2021-04-14T15:38:35+08:00">2021-04-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h4 id="SpringBoot的jar包如何启动"><a href="#SpringBoot的jar包如何启动" class="headerlink" title="SpringBoot的jar包如何启动"></a>SpringBoot的jar包如何启动</h4><h4 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h4><p>​    使用过<code>SprongBoot</code>打过<code>jar</code>包的都应该知道，目标文件一般都会生成两个文件，一个是以<code>.jar</code>的包，一个是<code>.jar.original</code>文件。那么使用<code>SpringBoot</code>会打出两个包，而<code>.jar.original</code>的作用是什么呢？还有就是<code>java -jar</code>是如何将一个<code>SpringBoot</code>项目启动，之间都进行了那些的操作？</p>
-<p>​    其实<code>.jar.original</code>是<code>maven</code>在<code>SpringBoot</code>重新打包之前的原始<code>jar</code>包，内部只包含了项目的用户类，不包含其他的依赖<code>jar</code>包，生成之后，<code>SpringBoot</code>重新打包之后，最后生成<code>.jar</code>包，内部包含了原始<code>jar</code>包以及其他的引用依赖。以下提及的<code>jar</code>包都是<code>SpringBoot</code>二次加工打的包。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/04/13/Spring/SpringBoot%E7%9A%84jar%E5%8C%85%E5%A6%82%E4%BD%95%E5%90%AF%E5%8A%A8/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1051,7 +1050,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">72</span>
+          <span class="site-state-item-count">73</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1064,7 +1063,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">25</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
