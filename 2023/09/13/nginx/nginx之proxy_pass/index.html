@@ -21,16 +21,16 @@
     var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="nginx之proxy_pass 往期回顾：nginx  proxy_pass是nginx中常见的反向代理指令。  格式：proxy_pass {传输协议}{主机名}{URI}   传输协议：http:&#x2F;&#x2F;或者https:&#x2F;&#x2F; 主机名：IP:PORT URI：具体的访问地址  先下结论： 当URI是\时，表示是绝对路径，则不会将location后的匹配规则路径携带到转发目标路径中。 当URI为空时">
+  <meta name="description" content="nginx之proxy_pass 往期回顾：nginx  proxy_pass是nginx中常见的反向代理指令。  格式：proxy_pass {传输协议}{主机名}{URI}   传输协议：http:&#x2F;&#x2F;或者https:&#x2F;&#x2F; 主机名：IP:PORT URI：具体的访问地址">
 <meta property="og:type" content="article">
 <meta property="og:title" content="nginx之proxy_pass">
 <meta property="og:url" content="http://xiaocainiaoya.github.io/2023/09/13/nginx/nginx%E4%B9%8Bproxy_pass/index.html">
 <meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
-<meta property="og:description" content="nginx之proxy_pass 往期回顾：nginx  proxy_pass是nginx中常见的反向代理指令。  格式：proxy_pass {传输协议}{主机名}{URI}   传输协议：http:&#x2F;&#x2F;或者https:&#x2F;&#x2F; 主机名：IP:PORT URI：具体的访问地址  先下结论： 当URI是\时，表示是绝对路径，则不会将location后的匹配规则路径携带到转发目标路径中。 当URI为空时">
+<meta property="og:description" content="nginx之proxy_pass 往期回顾：nginx  proxy_pass是nginx中常见的反向代理指令。  格式：proxy_pass {传输协议}{主机名}{URI}   传输协议：http:&#x2F;&#x2F;或者https:&#x2F;&#x2F; 主机名：IP:PORT URI：具体的访问地址">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://s2.loli.net/2023/09/18/GubszUkKHY8TRMW.png">
 <meta property="article:published_time" content="2023-09-13T13:51:58.000Z">
-<meta property="article:modified_time" content="2023-09-18T09:30:20.035Z">
+<meta property="article:modified_time" content="2023-09-19T06:26:34.901Z">
 <meta property="article:author" content="xiaocainiaoya">
 <meta property="article:tag" content="nginx">
 <meta name="twitter:card" content="summary">
@@ -196,7 +196,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-09-18 17:30:20" itemprop="dateModified" datetime="2023-09-18T17:30:20+08:00">2023-09-18</time>
+                <time title="修改时间：2023-09-19 14:26:34" itemprop="dateModified" datetime="2023-09-19T14:26:34+08:00">2023-09-19</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -238,6 +238,8 @@
 <li>主机名：<code>IP:PORT</code></li>
 <li><code>URI</code>：具体的访问地址</li>
 </ul>
+<span id="more"></span>
+
 <p>先下结论：</p>
 <p>当<code>URI</code>是<code>\</code>时，表示是绝对路径，则不会将<code>location</code>后的匹配规则路径携带到转发目标路径中。</p>
 <p>当<code>URI</code>为空时，表示是相对路径，则会将<code>location</code>后的匹配规则路径携带到转发目标路径中。</p>
