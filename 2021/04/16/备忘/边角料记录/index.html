@@ -29,7 +29,7 @@
 <meta property="og:description" content="边角料记录">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-04-16T15:04:58.000Z">
-<meta property="article:modified_time" content="2023-07-18T06:53:43.931Z">
+<meta property="article:modified_time" content="2023-07-26T03:23:07.802Z">
 <meta property="article:author" content="xiaocainiaoya">
 <meta property="article:tag" content="备忘">
 <meta name="twitter:card" content="summary">
@@ -194,7 +194,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-07-18 14:53:43" itemprop="dateModified" datetime="2023-07-18T14:53:43+08:00">2023-07-18</time>
+                <time title="修改时间：2023-07-26 11:23:07" itemprop="dateModified" datetime="2023-07-26T11:23:07+08:00">2023-07-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -237,6 +237,34 @@
 <li>在当前工程中通过<code>dependencyManagement</code>引入的<code>BOM</code>清单中的版本，当引入的多个<code>BOM</code>时，先引入的<code>BOM</code>生效</li>
 <li>依赖调解：最短路径生效。比如存在两条对<code>D</code>的依赖<code>A-&gt;B-&gt;C-D1.0</code>和<code>A-&gt;E-&gt;D1.1</code>，这里最终会引用到<code>D1.1</code>。</li>
 </ul>
+<h2 id="2-maven常用命令"><a href="#2-maven常用命令" class="headerlink" title="2.maven常用命令"></a>2.maven常用命令</h2><ul>
+<li><code>mvn clean</code>： 清除目标目录中的生成结果</li>
+<li><code>mvn package</code>： 依据项目生成 jar 文件（打包）</li>
+<li><code>mvn install</code>： 在本地 Repository 中安装 jar</li>
+<li><code>mvn -Dmaven.test.skip=true</code>： 忽略测试文档编译</li>
+<li><code>mvn clean compile</code> ：清理编译</li>
+<li><code>mvn clean test</code> ：清理测试</li>
+<li><code>mvn clean package</code> ：清理打包</li>
+<li><code>mvn clean package -Dmaven.test.skip=true</code> ：清理打包生成jar包</li>
+<li><code>mvn clean install</code> ：清理将打包好的jar存入 本地仓库 注意是本地仓库</li>
+<li><code>mvn -e</code>：显示详细错误</li>
+<li><code>mvn -U</code>：强制更新snapshot类型的插件或依赖库</li>
+<li><code>mvn -pl</code>： module_name在指定模块上执行命令</li>
+<li><code>mvn -ff</code>： 在递归执行命令过程中，一旦发生错误就直接退出</li>
+<li><code>mvn -Dxxx=yyy</code>： 指定java全局属性</li>
+<li><code>mvn -Pxxx</code>：引用profile xxx</li>
+<li><code>mvn -f pom.xml</code>：指定<code>pom</code>文件，一般在多模块工程中，指定启动类对应模块的<code>pom.xml</code></li>
+</ul>
+<p><a href="%E9%93%BE%E6%8E%A5%E5%9C%B0%E5%9D%80">maven插件整理</a></p>
+<h2 id="3-指定类路径"><a href="#3-指定类路径" class="headerlink" title="3.指定类路径"></a>3.指定类路径</h2><p><code>classpath</code>和<code>classpath*</code>的区别：</p>
+<p><code>classpath</code>：只会在当前工程/应用的类路径下匹配这个指定的类路径。</p>
+<p><code>classpath*</code>：不仅会在当前的工程/应用的类路径下匹配，也会到引用的<code>jar</code>包的类路径下匹配。</p>
+<p>比如：</p>
+<p>现在有一个应用，在当前应用中<code>resources</code>路径下有个<code>mapper/UserMapper.xml</code>文件，在引入的<code>xiaocainiao-common</code>包中的<code>resources</code>中也有一个<code>mapper/PersonMapper.xml</code>文件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">├── src</span><br><span class="line">│   └── main</span><br><span class="line">│       └── cn.com.xiaocainiaoya</span><br><span class="line">│       │   ├── Application.java</span><br><span class="line">│				├── resources</span><br><span class="line">│								├── mapper</span><br><span class="line">│ 										├── UserMapper.xml</span><br><span class="line">├── lib</span><br><span class="line">│		 ├── xiaocainiao-common</span><br><span class="line">│							├── resources</span><br><span class="line">│											├── mapper</span><br><span class="line">│ 													├── PersonMapper.xml</span><br></pre></td></tr></table></figure>
+
+<p>这时如果使用<code>classpath:mapper/*.xml</code>，那么只会加载到<code>UserMapper.xml</code>。</p>
+<p>如果使用<code>classpath*:mapper/*.xml</code>那么<code>UserMapper.xml</code>和<code>PersonMapper.xml</code>都会被加载到。</p>
 
     </div>
     <div>
@@ -345,7 +373,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BE%B9%E8%A7%92%E6%96%99%E8%AE%B0%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">边角料记录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-maven%E4%B8%AD%E7%9A%84bom"><span class="nav-number">1.1.</span> <span class="nav-text">1.maven中的bom</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BE%B9%E8%A7%92%E6%96%99%E8%AE%B0%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">边角料记录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-maven%E4%B8%AD%E7%9A%84bom"><span class="nav-number">1.1.</span> <span class="nav-text">1.maven中的bom</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-maven%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">1.2.</span> <span class="nav-text">2.maven常用命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%8C%87%E5%AE%9A%E7%B1%BB%E8%B7%AF%E5%BE%84"><span class="nav-number">1.3.</span> <span class="nav-text">3.指定类路径</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -359,20 +387,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">78</span>
+          <span class="site-state-item-count">83</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">25</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

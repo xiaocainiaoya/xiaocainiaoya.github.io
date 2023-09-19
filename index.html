@@ -274,7 +274,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-07-18 14:53:43" itemprop="dateModified" datetime="2023-07-18T14:53:43+08:00">2023-07-18</time>
+                <time title="修改时间：2023-07-26 11:23:07" itemprop="dateModified" datetime="2023-07-26T11:23:07+08:00">2023-07-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -301,6 +301,382 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/04/16/%E5%A4%87%E5%BF%98/%E8%BE%B9%E8%A7%92%E6%96%99%E8%AE%B0%E5%BD%95/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/09/13/nginx/nginx%E4%B9%8Bproxy_pass/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/13/nginx/nginx%E4%B9%8Bproxy_pass/" class="post-title-link" itemprop="url">nginx之proxy_pass</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-13 21:51:58" itemprop="dateCreated datePublished" datetime="2023-09-13T21:51:58+08:00">2023-09-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-09-18 17:30:20" itemprop="dateModified" datetime="2023-09-18T17:30:20+08:00">2023-09-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/nginx/" itemprop="url" rel="index"><span itemprop="name">nginx</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="nginx之proxy-pass"><a href="#nginx之proxy-pass" class="headerlink" title="nginx之proxy_pass"></a>nginx之proxy_pass</h1><ul>
+<li>往期回顾：<a href="https://xiaocainiaoya.github.io/2020/04/13/nginx/nginx/">nginx</a></li>
+</ul>
+<p><code>proxy_pass</code>是<code>nginx</code>中常见的反向代理指令。</p>
+<blockquote>
+<p>格式：proxy_pass {传输协议}{主机名}{URI}</p>
+</blockquote>
+<ul>
+<li>传输协议：<code>http://</code>或者<code>https://</code></li>
+<li>主机名：<code>IP:PORT</code></li>
+<li><code>URI</code>：具体的访问地址</li>
+</ul>
+<p>先下结论：</p>
+<p>当<code>URI</code>是<code>\</code>时，表示是绝对路径，则不会将<code>location</code>后的匹配规则路径携带到转发目标路径中。</p>
+<p>当<code>URI</code>为空时，表示是相对路径，则会将<code>location</code>后的匹配规则路径携带到转发目标路径中。</p>
+<p>假设访问地址是：<code>http:test.nginx.com/proxy/getUserName</code></p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1.URI=/,表示是绝对路径。所以最终的访问地址是: http://127.0.0.1:81/getUserName</span></span><br><span class="line"><span class="attribute">location</span> /proxy/ &#123;</span><br><span class="line">	<span class="attribute">proxy_pass</span> http://127.0.0.1:81/;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2.URI=空,表示是相对路径。所以最终的访问地址是: http://127.0.0.1:81/proxy/getUserName</span></span><br><span class="line"><span class="attribute">location</span> /proxy/ &#123;</span><br><span class="line">	<span class="attribute">proxy_pass</span> http://127.0.0.1:81;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3.URI=/v1,表示是相对路径。所以最终的访问地址是: http://127.0.0.1:81/v1getUserName</span></span><br><span class="line"><span class="attribute">location</span> /proxy/ &#123;</span><br><span class="line">	<span class="attribute">proxy_pass</span> http://127.0.0.1:81/v1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 4.URI=/v1/,表示是相对路径。所以最终的访问地址是: http://127.0.0.1:81/v1/getUserName</span></span><br><span class="line"><span class="attribute">location</span> /proxy/ &#123;</span><br><span class="line">	<span class="attribute">proxy_pass</span> http://127.0.0.1:81/v1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>综上所述：只有当<code>URI</code>为空时，才会将<code>location</code>后的匹配字符串带到最终的转发目标路径上。</p>
+<h2 id="proxy-set-header-排坑"><a href="#proxy-set-header-排坑" class="headerlink" title="proxy_set_header 排坑"></a>proxy_set_header 排坑</h2><p>​    这里简单描述一下我遇到的场景，在排查过程中耗费了较多的精力。这里我们需要对接外部服务，但是外部服务有一些安全策略，互联网无法直接访问，需要通过跳板机进行访问，同样”外部服务“也只能通过跳板机访问”服务集群“，这里在跳板机上部署了<code>nginx2</code>。<code>nginx1</code>是原本环境中的反向代理。</p>
+<p><img src="https://s2.loli.net/2023/09/18/GubszUkKHY8TRMW.png" alt="pass_header.png"></p>
+<p>​    在<code>nginx</code>中配置了这样一段，用于”外部服务“请求”服务集群“。用于</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span> /proxy/ &#123;</span><br><span class="line">  <span class="attribute">proxy_pass</span> https://test.service.cn/;</span><br><span class="line">  <span class="attribute">proxy_set_header</span> Host $host:$server_port;</span><br><span class="line">  <span class="attribute">proxy_hide_header</span> <span class="string">&quot;X-Frame-Options&quot;</span>;</span><br><span class="line">  <span class="attribute">proxy_set_header</span> X-Real-Ip $remote_addr;</span><br><span class="line">  <span class="attribute">proxy_set_header</span> X-Forwarded-For $remote_addr;</span><br><span class="line">  <span class="attribute">client_max_body_size</span>  <span class="number">100m</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​    在测试中发现，”外部服务“始终无法调用到”服务集群“的接口，而在<code>nginx2</code>的访问日志中显示<code>404</code>，一直以为是”服务集群“中部署有问题，但是通过<code>curl</code>又能正常访问。</p>
+<p>​    在折腾一段时间之后，发现是<code>proxy_set_header</code>这个变量设置的有问题导致请求到达<code>nginx1</code>时出现问题。在了解这个具体问题之前，先来简单解释一下<code>nginx</code>的工作方式。</p>
+<p><code>nginx</code>作为反向代理时，它是需要监听<code>service_name</code>和端口的。</p>
+<ul>
+<li><p>第一步根据请求中的<code>service_name</code>和端口先匹配到具体的代理<code>server</code>。</p>
+</li>
+<li><p>第二步才是进行路径的匹配，根据<code>location</code>的路径规则，进行具体的代理逻辑。</p>
+</li>
+</ul>
+<p>​    然而第一步中的匹配不是根据<b>请求的地址中的服务名和端口</b>，而是通过请求头中的<code>Host</code>属性进行匹配。再回到最开始出现问题的地方，由于我设置了<code>proxy_set_header Host $host:$server_port;</code>，导致到达<code>nginx1</code>的请求的请求头中的<code>Host</code>是<code>nginx1</code>本机地址，从而导致<code>nginx1</code>代理规则匹配失败，最终返回<code>404</code>。</p>
+<p>​    若没有配置则默认是：<code>proxy_set_header Host $proxy_host;</code>，表示代理的地址。</p>
+<table>
+<thead>
+<tr>
+<th>变量名</th>
+<th>端口</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$host</td>
+<td>没有端口</td>
+<td>本机地址</td>
+</tr>
+<tr>
+<td>$pass_host</td>
+<td>80不显示，其他显示</td>
+<td>被代理服务的ip和端口</td>
+</tr>
+<tr>
+<td>$http_host</td>
+<td>端口存在则显示</td>
+<td>请求时的ip和端口</td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/08/18/java/java%E5%8F%82%E6%95%B0%E5%91%BD%E4%BB%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/08/18/java/java%E5%8F%82%E6%95%B0%E5%91%BD%E4%BB%A4/" class="post-title-link" itemprop="url">java参数命令</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-18 21:51:58 / 修改时间：20:38:04" itemprop="dateCreated datePublished" datetime="2023-08-18T21:51:58+08:00">2023-08-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="java参数命令"><a href="#java参数命令" class="headerlink" title="java参数命令"></a>java参数命令</h1><h3 id="java启动命令中-D和–的区别"><a href="#java启动命令中-D和–的区别" class="headerlink" title="java启动命令中-D和–的区别"></a>java启动命令中-D和–的区别</h3><p>两种方式都可以<b>直接覆盖</b><code>yaml</code>或者<code>properties</code>配置中的同名配置项。</p>
+<ul>
+<li><code>-D</code>（包括<code>-X</code>）表示添加的参数是<code>jvm</code>虚拟机变量。<code>java</code>应用中通过<code>System.getProperties(&quot;&quot;)</code>获取。</li>
+<li><code>--</code>表示添加的参数是操作系统的环境变量。<code>java</code>应用中通过<code>System.getEnv(&quot;&quot;)</code>获取。</li>
+</ul>
+<p><code>-D</code>参数要放置在<code>-jar</code>命令之前，<code>--</code>参数要放置在<code>-jar</code>命令之后。</p>
+<blockquote>
+<p>java -Dserver.port=8080 -Xms128m <b>-jar</b> –server.name=myApp</p>
+</blockquote>
+<p>可通过<code>jps</code>命令查看<code>java</code>应用具体的参数值。</p>
+<p><code>jps -v</code>：可以查看<code>-D</code>、<code>-X</code>参数</p>
+<p>示例：<code>1 jar -Djava.util.Arrays.useLegacyMergeSort=true -Djava.security.egd=file:/dev/./urandom -Xms128m -Xmx512m</code></p>
+<ul>
+<li><code>jps -m</code>：可以查看<code>--</code>参数</li>
+</ul>
+<p>示例：<code>1 jar --spring.profiles.active=dev --logging.config=logback-spring.xml</code></p>
+<h3 id="crf反编译工具"><a href="#crf反编译工具" class="headerlink" title="crf反编译工具"></a>crf反编译工具</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="http://www.benf.org/other/cfr/">http://www.benf.org/other/cfr/</a></p>
+</blockquote>
+
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/08/16/mq/RabbitMQ%E6%B6%88%E6%81%AF%E6%8A%95%E9%80%92%E7%A1%AE%E8%AE%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/08/16/mq/RabbitMQ%E6%B6%88%E6%81%AF%E6%8A%95%E9%80%92%E7%A1%AE%E8%AE%A4/" class="post-title-link" itemprop="url">RabbitMQ消息投递确认</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-16 22:13:58 / 修改时间：16:27:11" itemprop="dateCreated datePublished" datetime="2023-08-16T22:13:58+08:00">2023-08-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/MQ/" itemprop="url" rel="index"><span itemprop="name">MQ</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="RabbitMQ消息投递确认"><a href="#RabbitMQ消息投递确认" class="headerlink" title="RabbitMQ消息投递确认"></a>RabbitMQ消息投递确认</h1><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>​    在项目中引入了<code>RabbitMQ</code>用于服务间一些解耦操作，在运行了一段时间之后，突然在某个环境中出现了一些异常情况。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/08/16/mq/RabbitMQ%E6%B6%88%E6%81%AF%E6%8A%95%E9%80%92%E7%A1%AE%E8%AE%A4/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/07/26/maven/maven%E6%8F%92%E4%BB%B6%E6%95%B4%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/07/26/maven/maven%E6%8F%92%E4%BB%B6%E6%95%B4%E7%90%86/" class="post-title-link" itemprop="url">maven插件整理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-07-26 22:13:58 / 修改时间：19:54:39" itemprop="dateCreated datePublished" datetime="2023-07-26T22:13:58+08:00">2023-07-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/maven/" itemprop="url" rel="index"><span itemprop="name">maven</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="maven插件整理"><a href="#maven插件整理" class="headerlink" title="maven插件整理"></a>maven插件整理</h1><p>​    常用<code>maven</code>插件整理，<code>maven</code>本质上是一个插件框架，它的核心并不具备执行任何构建任务的能力，所有的任务都是交由插件完成。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/07/26/maven/maven%E6%8F%92%E4%BB%B6%E6%95%B4%E7%90%86/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -648,338 +1024,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/05/11/mybatis/%E5%BE%B7%E9%B2%81%E4%BC%8A%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/05/11/mybatis/%E5%BE%B7%E9%B2%81%E4%BC%8A%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" class="post-title-link" itemprop="url">德鲁伊简单使用</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-05-11 22:13:58" itemprop="dateCreated datePublished" datetime="2023-05-11T22:13:58+08:00">2023-05-11</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-12 17:14:30" itemprop="dateModified" datetime="2023-05-12T17:14:30+08:00">2023-05-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mybatis/" itemprop="url" rel="index"><span itemprop="name">mybatis</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="德鲁伊简单使用"><a href="#德鲁伊简单使用" class="headerlink" title="德鲁伊简单使用"></a>德鲁伊简单使用</h1><p>​    在翻阅项目底层代码时发现，在底层的<code>framework</code>模块中有引入<code>druid</code>监控端，但是好像在开发环境、测试环境甚至生产环境中并没有看到有具体的使用，所以想启用一下<code>druid</code>的监控模块。并没有什么实质性内容的介绍，仅仅是踩的一些坑的记录。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/05/11/mybatis/%E5%BE%B7%E9%B2%81%E4%BC%8A%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/05/05/%E7%BC%93%E5%AD%98/redis%E5%BA%8F%E5%88%97%E5%8C%96%E9%85%8D%E7%BD%AE/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/05/05/%E7%BC%93%E5%AD%98/redis%E5%BA%8F%E5%88%97%E5%8C%96%E9%85%8D%E7%BD%AE/" class="post-title-link" itemprop="url">redis序列化配置</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-05-05 20:50:58 / 修改时间：16:42:19" itemprop="dateCreated datePublished" datetime="2023-05-05T20:50:58+08:00">2023-05-05</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="redis序列化配置"><a href="#redis序列化配置" class="headerlink" title="redis序列化配置"></a>redis序列化配置</h1><blockquote>
-<p>使用spring操作redis，一般会使用到Spring提供的RedisTemplate模板类，在使用时需要配置存入的key和value的序列化方式。</p>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/05/05/%E7%BC%93%E5%AD%98/redis%E5%BA%8F%E5%88%97%E5%8C%96%E9%85%8D%E7%BD%AE/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/04/26/Springboot/springboot%E9%83%A8%E5%88%86%E5%8A%9F%E8%83%BD%E6%B5%85%E6%9E%90/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/04/26/Springboot/springboot%E9%83%A8%E5%88%86%E5%8A%9F%E8%83%BD%E6%B5%85%E6%9E%90/" class="post-title-link" itemprop="url">springboot部分功能浅析</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-04-26 22:51:58" itemprop="dateCreated datePublished" datetime="2023-04-26T22:51:58+08:00">2023-04-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-28 10:10:47" itemprop="dateModified" datetime="2023-04-28T10:10:47+08:00">2023-04-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="springboot部分功能浅析"><a href="#springboot部分功能浅析" class="headerlink" title="springboot部分功能浅析"></a>springboot部分功能浅析</h1>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/04/26/Springboot/springboot%E9%83%A8%E5%88%86%E5%8A%9F%E8%83%BD%E6%B5%85%E6%9E%90/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/04/10/Springboot/springboot%E7%9A%84Spi%E6%9C%BA%E5%88%B6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/04/10/Springboot/springboot%E7%9A%84Spi%E6%9C%BA%E5%88%B6/" class="post-title-link" itemprop="url">springboot的Spi机制</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-04-10 22:51:58" itemprop="dateCreated datePublished" datetime="2023-04-10T22:51:58+08:00">2023-04-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-10 10:54:20" itemprop="dateModified" datetime="2023-05-10T10:54:20+08:00">2023-05-10</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="springboot的Spi机制"><a href="#springboot的Spi机制" class="headerlink" title="springboot的Spi机制"></a>springboot的Spi机制</h1><p>​    在与<code>Springboot</code>打交道的过程中，应该大家对<code>starter</code>都不会陌生，<code>springboot</code>中的各种<code>starter</code>其实就是利用了<code>springboot</code>的<code>SPI</code>机制。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/04/10/Springboot/springboot%E7%9A%84Spi%E6%9C%BA%E5%88%B6/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1045,20 +1093,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">78</span>
+          <span class="site-state-item-count">83</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">25</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
