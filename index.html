@@ -326,6 +326,83 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/10/09/Spring/Filter%E6%97%A0%E6%B3%95%E8%BF%9B%E5%85%A5%E5%85%A8%E5%B1%80%E5%BC%82%E5%B8%B8%E6%8D%95%E8%8E%B7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/09/Spring/Filter%E6%97%A0%E6%B3%95%E8%BF%9B%E5%85%A5%E5%85%A8%E5%B1%80%E5%BC%82%E5%B8%B8%E6%8D%95%E8%8E%B7/" class="post-title-link" itemprop="url">Filter无法进入全局异常捕获</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-10-09 22:20:58 / 修改时间：11:37:19" itemprop="dateCreated datePublished" datetime="2023-10-09T22:20:58+08:00">2023-10-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/srping/" itemprop="url" rel="index"><span itemprop="name">srping</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Filter无法进入全局异常捕获"><a href="#Filter无法进入全局异常捕获" class="headerlink" title="Filter无法进入全局异常捕获"></a>Filter无法进入全局异常捕获</h1><h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>​    我接手的一个服务没有依赖于公司建设项目一体化体系中的认证中心，导致这个服务自身需要支持认证授权模块，由于需求上只需要一个简单的登录模块，所以引入了<code>spring-security</code>模块来进行认证授权相关处理。早上收到一个测试提出的<code>bug</code>，服务在使用一段时间不使用后，再操作，会出现警告异常提示。定位问题发现是由于<code>token</code>失效导致后端校验报错，由于这个校验是在<code>filter</code>中处理，导致全局异常无法捕获，前端获取的异常结构与标准结构（约定异常体结构&lt;msg,code,info&gt;等）不符，导致前端也无法解析具体异常信息，所以界面上显示的是直接抛出的异常信息。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/10/09/Spring/Filter%E6%97%A0%E6%B3%95%E8%BF%9B%E5%85%A5%E5%85%A8%E5%B1%80%E5%BC%82%E5%B8%B8%E6%8D%95%E8%8E%B7/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/09/13/nginx/nginx%E4%B9%8Bproxy_pass/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -907,83 +984,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/06/02/java/CompletableFuture%E4%BB%BB%E5%8A%A1%E7%BC%96%E6%8E%92/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/06/02/java/CompletableFuture%E4%BB%BB%E5%8A%A1%E7%BC%96%E6%8E%92/" class="post-title-link" itemprop="url">CompletableFuture任务编排</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-06-02 21:51:58 / 修改时间：14:21:59" itemprop="dateCreated datePublished" datetime="2023-06-02T21:51:58+08:00">2023-06-02</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="CompletableFuture任务编排"><a href="#CompletableFuture任务编排" class="headerlink" title="CompletableFuture任务编排"></a>CompletableFuture任务编排</h1><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>​    <code>CompletableFuture</code>是对<code>Future</code>的扩展，弥补了<code>Future</code>的局限性，同时又实现了对任务进行编排的能力。    </p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/06/02/java/CompletableFuture%E4%BB%BB%E5%8A%A1%E7%BC%96%E6%8E%92/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1053,7 +1053,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">83</span>
+          <span class="site-state-item-count">84</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
