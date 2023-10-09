@@ -29,7 +29,7 @@
 <meta property="og:description" content="边角料记录">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-04-16T15:04:58.000Z">
-<meta property="article:modified_time" content="2023-10-09T07:31:50.891Z">
+<meta property="article:modified_time" content="2023-10-09T07:34:43.974Z">
 <meta property="article:author" content="xiaocainiaoya">
 <meta property="article:tag" content="备忘">
 <meta name="twitter:card" content="summary">
@@ -194,7 +194,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-10-09 15:31:50" itemprop="dateModified" datetime="2023-10-09T15:31:50+08:00">2023-10-09</time>
+                <time title="修改时间：2023-10-09 15:34:43" itemprop="dateModified" datetime="2023-10-09T15:34:43+08:00">2023-10-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -261,7 +261,7 @@
 <p><code>classpath*</code>：不仅会在当前的工程/应用的类路径下匹配，也会到引用的<code>jar</code>包的类路径下匹配。</p>
 <p>比如：</p>
 <p>现在有一个应用，在当前应用中<code>resources</code>路径下有个<code>mapper/UserMapper.xml</code>文件，在引入的<code>xiaocainiao-common</code>包中的<code>resources</code>中也有一个<code>mapper/PersonMapper.xml</code>文件。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">├── src</span><br><span class="line">│   └── main</span><br><span class="line">│       └── cn.com.xiaocainiaoya</span><br><span class="line">│       │   ├── Application.java</span><br><span class="line">│       ├── resources</span><br><span class="line">│               ├── mapper</span><br><span class="line">│                     ├── UserMapper.xml</span><br><span class="line">├── lib</span><br><span class="line">│    ├── xiaocainiao-common</span><br><span class="line">                        ├── resources</span><br><span class="line">│                               ├── mapper</span><br><span class="line">│                                     ├── PersonMapper.xml</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">├── src</span><br><span class="line">│   └── main</span><br><span class="line">│       └── cn.com.xiaocainiaoya</span><br><span class="line">│       │   ├── Application.java</span><br><span class="line">│       ├── resources</span><br><span class="line">│               ├── mapper</span><br><span class="line">│                     ├── UserMapper.xml</span><br><span class="line">├── lib</span><br><span class="line">│    ├── xiaocainiao-common</span><br><span class="line">│                       ├── resources</span><br><span class="line">│                               ├── mapper</span><br><span class="line">│                                     ├── PersonMapper.xml</span><br></pre></td></tr></table></figure>
 
 <p>这时如果使用<code>classpath:mapper/*.xml</code>，那么只会加载到<code>UserMapper.xml</code>。</p>
 <p>如果使用<code>classpath*:mapper/*.xml</code>那么<code>UserMapper.xml</code>和<code>PersonMapper.xml</code>都会被加载到。</p>
