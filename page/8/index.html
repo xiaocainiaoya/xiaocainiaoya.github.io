@@ -694,6 +694,182 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/java/ThreadLocal/FastThreadLocal/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/04/13/java/ThreadLocal/FastThreadLocal/" class="post-title-link" itemprop="url">FastThreadLocal</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2021-04-13T21:51:58+08:00">2021-04-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-14 14:08:07" itemprop="dateModified" datetime="2021-04-14T14:08:07+08:00">2021-04-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/ThreadLocal/" itemprop="url" rel="index"><span itemprop="name">ThreadLocal</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="FastThreadLocal"><a href="#FastThreadLocal" class="headerlink" title="FastThreadLocal"></a>FastThreadLocal</h3><p>[TOC]</p>
+<h4 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h4><p>​    因为需要，研究了可以通过<code>InheritableThreadLocal</code>进行父子线程中如何传递本地线程变量，通过阿里开源项目<code>TransmitableThreadLocal</code>进行进行线程池传递本地线程变量(详解可查看以往博客)。在查找资料的过程中无意发现了<code>Dobbo</code>的<code>InternalThreadLocal</code>，其实<code>Dobbo</code>的<code>InternalThreadLocal</code>和<code>netty</code>的<code>FastThreadLocal</code>有异曲同工之妙。之前学<code>netty</code>的时候有了解一点，为了加深一下<code>ThreadLocal</code>种群的了解，使用本博客记录一下。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/04/13/java/ThreadLocal/FastThreadLocal/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/java/ThreadLocal/InheritableThreadLocal/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/04/13/java/ThreadLocal/InheritableThreadLocal/" class="post-title-link" itemprop="url">InheritableThreadLocal</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2021-04-13T21:51:58+08:00">2021-04-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-14 14:08:20" itemprop="dateModified" datetime="2021-04-14T14:08:20+08:00">2021-04-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/ThreadLocal/" itemprop="url" rel="index"><span itemprop="name">ThreadLocal</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="InheritableThreadLocal"><a href="#InheritableThreadLocal" class="headerlink" title="InheritableThreadLocal"></a>InheritableThreadLocal</h3><p>[TOC]</p>
+<h5 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h5><p>​    在<code>Thread</code>中除了有属性<code>threadLocals</code>引用<code>ThreadLocal.ThreadLocalMap</code>，其实还有一个属性，也就是<code>inheritableThreadLocals</code>，<code>threadLocals</code>的作用是保存本地线程变量，而<code>inneritableThreadLocals</code>的作用是传递当前线程本地变量<code>InheritableThreadLocal</code>到子线程的本地变量<code>InheritableThreadLocal</code>中。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/04/13/java/ThreadLocal/InheritableThreadLocal/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/java/ThreadLocal/ThreadLocal/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -851,168 +1027,6 @@
             </div>
           <!--/noindex-->
         
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/java/%E6%89%AB%E5%8C%85%E8%B7%AF%E5%BE%84%E5%BC%95%E5%8F%91%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8%E5%A4%B1%E8%B4%A5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/04/13/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/java/%E6%89%AB%E5%8C%85%E8%B7%AF%E5%BE%84%E5%BC%95%E5%8F%91%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8%E5%A4%B1%E8%B4%A5/" class="post-title-link" itemprop="url">扫包路径引发项目启动失败</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2021-04-13T21:51:58+08:00">2021-04-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-14 14:04:35" itemprop="dateModified" datetime="2021-04-14T14:04:35+08:00">2021-04-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/" itemprop="url" rel="index"><span itemprop="name">超级大坑</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h5 id="指定扫包路径的坑"><a href="#指定扫包路径的坑" class="headerlink" title="指定扫包路径的坑"></a>指定扫包路径的坑</h5><p>​    由于项目包结构的修改对<code>feign</code>调用的类的编写修改了路径，原来的路径为<code>cn.com.projectname.feign</code>包下，新的<code>feign</code>需添加到<code>cn.com.projectname.common.feign</code>下。首次添加到该包下发现，新的<code>feign</code>类没有被加载到<code>spring</code>容器中，所以推测是扫包路径的问题，故通过<code>@EnableFeignClients(basePackages = &#123;&quot;cn.com.projectname.feign&quot;, &quot;cn.com.projectname.common.feign&quot;&#125;)</code>指定扫包路径，神奇的事情发生了，启动之后报错，内容为<code>cn.com.projectname.common.feign</code>下新增的那个<code>feign</code>类已经被加载到<code>spring</code>容器中，不允许二次加载！找了许久并没有找到什么问题。还尝试通过<code>@FeignClient(contextId = &quot;xxx&quot;)</code>的方式指定创建类名称，也还是失败了，最后发现玄机是在<code>@EnableFeignClients</code>的<code>basePackages</code>上，由于指定的两个包路径出现重叠部分，导致在扫包过程中重复添加某对象。</p>
-
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/java/%E7%94%B1%E6%8B%86%E7%AE%B1%E5%BC%95%E5%8F%91bug/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/04/13/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/java/%E7%94%B1%E6%8B%86%E7%AE%B1%E5%BC%95%E5%8F%91bug/" class="post-title-link" itemprop="url">由拆箱引发NPE</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2021-04-13T21:51:58+08:00">2021-04-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-14 14:06:06" itemprop="dateModified" datetime="2021-04-14T14:06:06+08:00">2021-04-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/" itemprop="url" rel="index"><span itemprop="name">超级大坑</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h5 id="由拆箱引发bug"><a href="#由拆箱引发bug" class="headerlink" title="由拆箱引发bug"></a>由拆箱引发bug</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line">  Integer b = <span class="keyword">null</span>;</span><br><span class="line">  System.out.println(a == b); <span class="comment">// Exception in thread &quot;main&quot; java.lang.NullPointerException</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>由于<code>b</code>是包装类型，而<code>a</code>是基本数据类型，在比较时对<code>b</code>进行拆箱，所以会通过<code>((Integer)null).intValue()</code>进行拆箱，从而引发<code>NPE</code>。</p>
-
       
     </div>
     <div>
