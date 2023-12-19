@@ -21,15 +21,15 @@
     var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="数据库索引字段过长​    问题：在业务场景中，某些敏感数据需加密之后保存到数据库，而加密字段刚好又是频繁触发查询的字段。在一次插入数据时引发唯一索引异常。原因是索引长度小于数据库字段长度，在比对数据唯一性时截取了该字段的前面部分长度，导致匹配成功，抛出唯一索引异常。 ​    方案：这种情况下不能随意调整索引的长度，这涉及到全局的修改。故通过新增一个字段保存改加密字段MD5值，并将索引挂在这个新">
+  <meta name="description" content="数据库索引字段过长问题：在业务场景中，某些敏感数据需加密之后保存到数据库，而加密字段刚好又是频繁触发查询的字段。在一次插入数据时引发唯一索引异常。原因是索引长度小于数据库字段长度，在比对数据唯一性时截取了该字段的前面部分长度，导致匹配成功，抛出唯一索引异常。 方案：这种情况下不能随意调整索引的长度，这涉及到全局的修改。故通过新增一个字段保存改加密字段MD5值，并将索引挂在这个新增字段上，这样既保证">
 <meta property="og:type" content="article">
 <meta property="og:title" content="数据库索引字段过长">
 <meta property="og:url" content="http://xiaocainiaoya.github.io/2021/04/13/%E9%97%AE%E9%A2%98%E5%92%8C%E6%96%B9%E6%A1%88/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95%E5%AD%97%E6%AE%B5%E8%BF%87%E9%95%BF/index.html">
 <meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
-<meta property="og:description" content="数据库索引字段过长​    问题：在业务场景中，某些敏感数据需加密之后保存到数据库，而加密字段刚好又是频繁触发查询的字段。在一次插入数据时引发唯一索引异常。原因是索引长度小于数据库字段长度，在比对数据唯一性时截取了该字段的前面部分长度，导致匹配成功，抛出唯一索引异常。 ​    方案：这种情况下不能随意调整索引的长度，这涉及到全局的修改。故通过新增一个字段保存改加密字段MD5值，并将索引挂在这个新">
+<meta property="og:description" content="数据库索引字段过长问题：在业务场景中，某些敏感数据需加密之后保存到数据库，而加密字段刚好又是频繁触发查询的字段。在一次插入数据时引发唯一索引异常。原因是索引长度小于数据库字段长度，在比对数据唯一性时截取了该字段的前面部分长度，导致匹配成功，抛出唯一索引异常。 方案：这种情况下不能随意调整索引的长度，这涉及到全局的修改。故通过新增一个字段保存改加密字段MD5值，并将索引挂在这个新增字段上，这样既保证">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-04-13T13:51:58.000Z">
-<meta property="article:modified_time" content="2021-04-14T06:07:44.459Z">
+<meta property="article:modified_time" content="2023-12-19T07:19:03.596Z">
 <meta property="article:author" content="xiaocainiaoya">
 <meta property="article:tag" content="问题和方案">
 <meta property="article:tag" content="数据库">
@@ -223,7 +223,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-14 14:07:44" itemprop="dateModified" datetime="2021-04-14T14:07:44+08:00">2021-04-14</time>
+                <time title="修改时间：2023-12-19 15:19:03" itemprop="dateModified" datetime="2023-12-19T15:19:03+08:00">2023-12-19</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -257,8 +257,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h5 id="数据库索引字段过长"><a href="#数据库索引字段过长" class="headerlink" title="数据库索引字段过长"></a>数据库索引字段过长</h5><p>​    <strong>问题</strong>：在业务场景中，某些敏感数据需加密之后保存到数据库，而加密字段刚好又是频繁触发查询的字段。在一次插入数据时引发唯一索引异常。原因是索引长度小于数据库字段长度，在比对数据唯一性时截取了该字段的前面部分长度，导致匹配成功，抛出唯一索引异常。</p>
-<p>​    <strong>方案</strong>：这种情况下不能随意调整索引的长度，这涉及到全局的修改。故通过新增一个字段保存改加密字段<code>MD5</code>值，并将索引挂在这个新增字段上，这样既保证了索引的唯一性，又可以不用修改索引长度。</p>
+        <h5 id="数据库索引字段过长"><a href="#数据库索引字段过长" class="headerlink" title="数据库索引字段过长"></a>数据库索引字段过长</h5><p><strong>问题</strong>：在业务场景中，某些敏感数据需加密之后保存到数据库，而加密字段刚好又是频繁触发查询的字段。在一次插入数据时引发唯一索引异常。原因是索引长度小于数据库字段长度，在比对数据唯一性时截取了该字段的前面部分长度，导致匹配成功，抛出唯一索引异常。</p>
+<p><strong>方案</strong>：这种情况下不能随意调整索引的长度，这涉及到全局的修改。故通过新增一个字段保存改加密字段<code>MD5</code>值，并将索引挂在这个新增字段上，这样既保证了索引的唯一性，又可以不用修改索引长度。</p>
 
     </div>
     <div>
