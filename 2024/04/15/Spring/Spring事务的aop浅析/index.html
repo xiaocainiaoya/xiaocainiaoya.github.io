@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Spring事务的aop浅析​    结合之前说到的SpringAop浅析（二）本篇将从事务的角度，来看下spring或者说springboot是如何通过一些简单的配置就可以将一些方法进行事务的管理，并了解一些事务在管理过程中的一些简单api。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring事务的aop浅析">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2024/04/15/Spring/Spring%E4%BA%8B%E5%8A%A1%E7%9A%84aop%E6%B5%85%E6%9E%90/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="Spring事务的aop浅析​    结合之前说到的SpringAop浅析（二）本篇将从事务的角度，来看下spring或者说springboot是如何通过一些简单的配置就可以将一些方法进行事务的管理，并了解一些事务在管理过程中的一些简单api。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-04-15T13:49:00.000Z">
+<meta property="article:modified_time" content="2024-04-16T13:55:49.537Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2024/04/15/Spring/Spring%E4%BA%8B%E5%8A%A1%E7%9A%84aop%E6%B5%85%E6%9E%90/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Spring事务的aop浅析 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2024/04/15/Spring/Spring%E4%BA%8B%E5%8A%A1%E7%9A%84aop%E6%B5%85%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring事务的aop浅析
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-04-15 21:49:00" itemprop="dateCreated datePublished" datetime="2024-04-15T21:49:00+08:00">2024-04-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-04-16 21:55:49" itemprop="dateModified" datetime="2024-04-16T21:55:49+08:00">2024-04-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/srping/" itemprop="url" rel="index"><span itemprop="name">srping</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Spring事务的aop浅析"><a href="#Spring事务的aop浅析" class="headerlink" title="Spring事务的aop浅析"></a>Spring事务的aop浅析</h1><p>​    结合之前说到的<a href="https://xiaocainiaoya.github.io/2021/06/27/Spring/SpringAop%E6%B5%85%E6%9E%90/" target="_blank">SpringAop浅析（二）</a>本篇将从事务的角度，来看下<code>spring</code>或者说<code>springboot</code>是如何通过一些简单的配置就可以将一些方法进行事务的管理，并了解一些事务在管理过程中的一些简单<code>api</code>。</p>
+<span id="more"></span>
+
+<h2 id="浅析"><a href="#浅析" class="headerlink" title="浅析"></a>浅析</h2><p>​    在没有<code>spring</code>之前，或者说在不引入<code>spring</code>的时候，在获取数据库访问的时候，通常是通过<code>Connection</code>来进行。通过<code>Connection</code>类来进行<code>sql</code>的执行操作，然后在<code>sql</code>执行完毕之后调用<code>commit()</code>方法，将事务提交，当然了，在借助<code>spring</code>框架之后，在编码过程中，再也没有通过这种方式来进行事务的提交。但是大差不差，这些事情是一定要做的，既然我们在编码过程中没有做，那么这件事情就一定被<code>spring</code>做了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Connection conn = getConnection();</span><br><span class="line">conn.setAutoCommit(<span class="keyword">false</span>);</span><br><span class="line"><span class="comment">//执行一系列的sql</span></span><br><span class="line">conn.commit();</span><br></pre></td></tr></table></figure>
+
+<p>​    根据上篇文章<code>springAop</code>，不难猜测，<code>spring</code>肯定是借助于<code>aop</code>，对标记了<code>@Transactional</code>的方法进行拦截并进行事务的增强。那么它是怎么实现的呢？</p>
+<p>在<code>spring</code>中开启事务需要通过<code>EnableTransactionManagement</code>注解，实际上就是通过它来进行一些开箱即用的处理。这个注解的实现上引入了<code>@Import</code>注解，这个注解的作用是为了将某些类引入到<code>Spring</code>容器中。这样做有一个好处是，在启用这个注解的情况下，才引入某些类到容器中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Import(TransactionManagementConfigurationSelector.class)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> EnableTransactionManagement &#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">boolean</span> <span class="title">proxyTargetClass</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="function">AdviceMode <span class="title">mode</span><span class="params">()</span> <span class="keyword">default</span> AdviceMode.PROXY</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">order</span><span class="params">()</span> <span class="keyword">default</span> Ordered.LOWEST_PRECEDENCE</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>进入到<code>TransactionManagementConfigurationSelector</code>类中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TransactionManagementConfigurationSelector</span> <span class="keyword">extends</span> <span class="title">AdviceModeImportSelector</span>&lt;<span class="title">EnableTransactionManagement</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 通过selectImports方法将某些类加载到容器中，这个方法返回一个字符串数组</span></span><br><span class="line"><span class="comment">	 * 这个字符串是类的全限定类名</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">protected</span> String[] selectImports(AdviceMode adviceMode) &#123;</span><br><span class="line">		<span class="keyword">switch</span> (adviceMode) &#123;</span><br><span class="line">			<span class="keyword">case</span> PROXY:</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">new</span> String[] &#123;AutoProxyRegistrar.class.getName(),</span><br><span class="line">						ProxyTransactionManagementConfiguration.class.getName()&#125;;</span><br><span class="line">			<span class="keyword">case</span> ASPECTJ:</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">new</span> String[] &#123;determineTransactionAspectClass()&#125;;</span><br><span class="line">			<span class="keyword">default</span>:</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>重点来了，这里引入了两个类：</p>
+<ol>
+<li><code>AutoProxyRegistrar</code></li>
+<li><code>ProxyTransactionManagementConfiguration</code></li>
+</ol>
+<h3 id="1-AutoProxyRegistar"><a href="#1-AutoProxyRegistar" class="headerlink" title="1.AutoProxyRegistar"></a>1.AutoProxyRegistar</h3><p>它实现了<code>ImportBeanDefinitionRegistrar</code>接口。所以它的主要作用是将<code>InfrastructureAdvisorAutoProxyCreator</code>这个后置处理器类注入到容器中，那么容器在进行每一个<code>bean</code>对象初始化时都会将这个后置处理作用在对应的<code>bean</code>上。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AutoProxyRegistrar</span> <span class="keyword">implements</span> <span class="title">ImportBeanDefinitionRegistrar</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> Log logger = LogFactory.getLog(getClass());</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 它的主要作用在AopConfigUtils.registerAutoProxyCreatorIfNecessary中，为了将org.springframework.aop.framework.autoproxy.InfrastructureAdvisorAutoProxyCreator</span></span><br><span class="line"><span class="comment">	 * 类注册到spring中，这个类实现了spring的后置处理器，主要作用是在spring的bean初始化的过程中，对bean进行检查，如果符合一定的条件</span></span><br><span class="line"><span class="comment">	 * 则把这个bean的aop代理对象注入到spring容器中。</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerBeanDefinitions</span><span class="params">(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">boolean</span> candidateFound = <span class="keyword">false</span>;</span><br><span class="line">		Set&lt;String&gt; annTypes = importingClassMetadata.getAnnotationTypes();</span><br><span class="line">		<span class="keyword">for</span> (String annType : annTypes) &#123;</span><br><span class="line">			AnnotationAttributes candidate = AnnotationConfigUtils.attributesFor(importingClassMetadata, annType);</span><br><span class="line">			<span class="keyword">if</span> (candidate == <span class="keyword">null</span>) &#123;</span><br><span class="line">				<span class="keyword">continue</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			Object mode = candidate.get(<span class="string">&quot;mode&quot;</span>);</span><br><span class="line">			Object proxyTargetClass = candidate.get(<span class="string">&quot;proxyTargetClass&quot;</span>);</span><br><span class="line">			<span class="keyword">if</span> (mode != <span class="keyword">null</span> &amp;&amp; proxyTargetClass != <span class="keyword">null</span> &amp;&amp; AdviceMode.class == mode.getClass() &amp;&amp;</span><br><span class="line">					Boolean.class == proxyTargetClass.getClass()) &#123;</span><br><span class="line">				candidateFound = <span class="keyword">true</span>;</span><br><span class="line">				<span class="keyword">if</span> (mode == AdviceMode.PROXY) &#123;</span><br><span class="line">					AopConfigUtils.registerAutoProxyCreatorIfNecessary(registry);</span><br><span class="line">					<span class="keyword">if</span> ((Boolean) proxyTargetClass) &#123;</span><br><span class="line">						AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);</span><br><span class="line">						<span class="keyword">return</span>;</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>来看一下<code>InfrastructureAdvisorAutoProxyCreator</code>类。它自己本身没有什么太多的实现，它继承与<code>AbstractAdvisorAutoProxyCreator</code>抽象类，这个抽象类实现了一些查询那些增强可以作用在目标<code>bean</code>对象上处理。本篇想聊的后置处理的实现是在它的父类<code>AbstractAutoProxyCreator</code>上。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InfrastructureAdvisorAutoProxyCreator</span> <span class="keyword">extends</span> <span class="title">AbstractAdvisorAutoProxyCreator</span> </span>&#123;</span><br><span class="line">  <span class="comment">// ...省略代码</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>AbstractAutoProxyCreator</code>中，实现了具体的后置处理的方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 后置处理器实现</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">postProcessAfterInitialization</span><span class="params">(<span class="meta">@Nullable</span> Object bean, String beanName)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (bean != <span class="keyword">null</span>) &#123;</span><br><span class="line">		Object cacheKey = getCacheKey(bean.getClass(), beanName);</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.earlyProxyReferences.remove(cacheKey) != bean) &#123;</span><br><span class="line">			<span class="keyword">return</span> wrapIfNecessary(bean, beanName, cacheKey);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> bean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 创建代理对象</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> Object <span class="title">wrapIfNecessary</span><span class="params">(Object bean, String beanName, Object cacheKey)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (StringUtils.hasLength(beanName) &amp;&amp; <span class="keyword">this</span>.targetSourcedBeans.contains(beanName)) &#123;</span><br><span class="line">		<span class="keyword">return</span> bean;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (Boolean.FALSE.equals(<span class="keyword">this</span>.advisedBeans.get(cacheKey))) &#123;</span><br><span class="line">		<span class="keyword">return</span> bean;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) &#123;</span><br><span class="line">		<span class="keyword">this</span>.advisedBeans.put(cacheKey, Boolean.FALSE);</span><br><span class="line">		<span class="keyword">return</span> bean;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 在这里获取到需要的增强链，这里会获取到刚刚最早提到的，通过@EnableTransactionManagement</span></span><br><span class="line">  <span class="comment">// 的import注解注入了两个类的第二个类，第二个配置类的作用是引入事务增强类。</span></span><br><span class="line">	Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, <span class="keyword">null</span>);</span><br><span class="line">	<span class="keyword">if</span> (specificInterceptors != DO_NOT_PROXY) &#123;</span><br><span class="line">		<span class="keyword">this</span>.advisedBeans.put(cacheKey, Boolean.TRUE);</span><br><span class="line">		Object proxy = createProxy(</span><br><span class="line">				bean.getClass(), beanName, specificInterceptors, <span class="keyword">new</span> SingletonTargetSource(bean));</span><br><span class="line">		<span class="keyword">this</span>.proxyTypes.put(cacheKey, proxy.getClass());</span><br><span class="line">		<span class="keyword">return</span> proxy;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">this</span>.advisedBeans.put(cacheKey, Boolean.FALSE);</span><br><span class="line">	<span class="keyword">return</span> bean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="1-ProxyTransactionManagementConfiguration"><a href="#1-ProxyTransactionManagementConfiguration" class="headerlink" title="1.ProxyTransactionManagementConfiguration"></a>1.ProxyTransactionManagementConfiguration</h3><p>上面已经给出了结论，这个类的作用是引入了事务处理需要使用到的增强类。使得<code>springBean</code>对象在初始化时进入到后置处理器中，后置处理器再获取到这个类通过<code>@Bean</code>注解注入到容器中的增强类，从而实现将需要进行事务处理的类进行代理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration(proxyBeanMethods = false)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProxyTransactionManagementConfiguration</span> <span class="keyword">extends</span> <span class="title">AbstractTransactionManagementConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 注入到容器中的事务增强类，它是Advisor接口的实现。它有两个参数，这两个参数也是通过容器来获取</span></span><br><span class="line"><span class="comment">	 * 也是在下方进行声明</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Bean(name = TransactionManagementConfigUtils.TRANSACTION_ADVISOR_BEAN_NAME)</span></span><br><span class="line">	<span class="meta">@Role(BeanDefinition.ROLE_INFRASTRUCTURE)</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> BeanFactoryTransactionAttributeSourceAdvisor <span class="title">transactionAdvisor</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">			TransactionAttributeSource transactionAttributeSource,</span></span></span><br><span class="line"><span class="function"><span class="params">			TransactionInterceptor transactionInterceptor)</span> </span>&#123;</span><br><span class="line">		BeanFactoryTransactionAttributeSourceAdvisor advisor = <span class="keyword">new</span> BeanFactoryTransactionAttributeSourceAdvisor();</span><br><span class="line">		advisor.setTransactionAttributeSource(transactionAttributeSource);</span><br><span class="line">		advisor.setAdvice(transactionInterceptor);</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.enableTx != <span class="keyword">null</span>) &#123;</span><br><span class="line">			advisor.setOrder(<span class="keyword">this</span>.enableTx.&lt;Integer&gt;getNumber(<span class="string">&quot;order&quot;</span>));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> advisor;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 上面增强类的第一个参数，这个bean的作用主要是用来获取事务属性的；比如配置的传播机制，异常信息等等；</span></span><br><span class="line"><span class="comment">	 * 这个bean当中提供了一个方法来获取</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Bean</span></span><br><span class="line">	<span class="meta">@Role(BeanDefinition.ROLE_INFRASTRUCTURE)</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> TransactionAttributeSource <span class="title">transactionAttributeSource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> AnnotationTransactionAttributeSource();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 上面增强类的第二个参数，这个bean的作用主要是用来拦截，拦截目标方法之后进行事务的开启、提交、回滚等动作</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Bean</span></span><br><span class="line">	<span class="meta">@Role(BeanDefinition.ROLE_INFRASTRUCTURE)</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> TransactionInterceptor <span class="title">transactionInterceptor</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">			TransactionAttributeSource transactionAttributeSource)</span> </span>&#123;</span><br><span class="line">		TransactionInterceptor interceptor = <span class="keyword">new</span> TransactionInterceptor();</span><br><span class="line">		interceptor.setTransactionAttributeSource(transactionAttributeSource);</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.txManager != <span class="keyword">null</span>) &#123;</span><br><span class="line">			interceptor.setTransactionManager(<span class="keyword">this</span>.txManager);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> interceptor;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来看一下<code>BeanFactoryTransactionAttributeSourceAdvisor</code>类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanFactoryTransactionAttributeSourceAdvisor</span> <span class="keyword">extends</span> <span class="title">AbstractBeanFactoryPointcutAdvisor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Nullable</span></span><br><span class="line">	<span class="keyword">private</span> TransactionAttributeSource transactionAttributeSource;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 这里定义了切点的查找规则，也就是说bean进入了前面提到的后置处理器之后，会取出容器中的所有增强通知，然后逐个进行匹配</span></span><br><span class="line">	<span class="comment">// 看遍历的到的通知是否需要作用到bean对象中，当遍历到这个增强时，就会通过TransactionAttributeSource类来进行匹配</span></span><br><span class="line">	<span class="comment">// 也就是导入的配置类ProxyTransactionManagementConfiguration中定义的第二个bean对象</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> TransactionAttributeSourcePointcut pointcut = <span class="keyword">new</span> TransactionAttributeSourcePointcut() &#123;</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="meta">@Nullable</span></span><br><span class="line">		<span class="function"><span class="keyword">protected</span> TransactionAttributeSource <span class="title">getTransactionAttributeSource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			<span class="keyword">return</span> transactionAttributeSource;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以这里具体的匹配规则在类<code>AnnotationTransactionAttributeSource</code>中。</p>
+<p>具体的匹配规则在它的父类<code>AbstractFallbackTransactionAttributeSource#getTransactionAttribute()</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="meta">@Nullable</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> TransactionAttribute <span class="title">getTransactionAttribute</span><span class="params">(Method method, <span class="meta">@Nullable</span> Class&lt;?&gt; targetClass)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (method.getDeclaringClass() == Object.class) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	Object cacheKey = getCacheKey(method, targetClass);</span><br><span class="line">	TransactionAttribute cached = <span class="keyword">this</span>.attributeCache.get(cacheKey);</span><br><span class="line">	<span class="keyword">if</span> (cached != <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">if</span> (cached == NULL_TRANSACTION_ATTRIBUTE) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> cached;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">// 计算是否匹配</span></span><br><span class="line">		TransactionAttribute txAttr = computeTransactionAttribute(method, targetClass);</span><br><span class="line">		<span class="comment">// ...省略代码，主要是推入缓存</span></span><br><span class="line">		<span class="keyword">return</span> txAttr;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Nullable</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> TransactionAttribute <span class="title">computeTransactionAttribute</span><span class="params">(Method method, <span class="meta">@Nullable</span> Class&lt;?&gt; targetClass)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// ..省略代码，主要是前置校验，是不是已经是代理类等等的操作</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 重点在这，通过这个方法获取到TransactionAttribute对象</span></span><br><span class="line">	<span class="comment">// 这个方法的实现由AnnotationTransactionAttributeSource自己实现</span></span><br><span class="line">	TransactionAttribute txAttr = findTransactionAttribute(specificMethod);</span><br><span class="line">	<span class="keyword">if</span> (txAttr != <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> txAttr;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// ..省略代码</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再回到<code>AnnotationTransactionAttributeSource</code>中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="meta">@Nullable</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> TransactionAttribute <span class="title">findTransactionAttribute</span><span class="params">(Method method)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> determineTransactionAttribute(method);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Nullable</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> TransactionAttribute <span class="title">determineTransactionAttribute</span><span class="params">(AnnotatedElement element)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">for</span> (TransactionAnnotationParser parser : <span class="keyword">this</span>.annotationParsers) &#123;</span><br><span class="line">		TransactionAttribute attr = parser.parseTransactionAnnotation(element);</span><br><span class="line">		<span class="keyword">if</span> (attr != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> attr;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 最终走到SpringTransactionAnnotationParser中，通过这个方法获取被@Transactional标记的方法或者类的信息</span></span><br><span class="line"><span class="comment">// 将@Transactional中定制化配置的信息读取到AnnotationAttributes对象中。</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="meta">@Nullable</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> TransactionAttribute <span class="title">parseTransactionAnnotation</span><span class="params">(AnnotatedElement element)</span> </span>&#123;</span><br><span class="line">	AnnotationAttributes attributes = AnnotatedElementUtils.findMergedAnnotationAttributes(</span><br><span class="line">			element, Transactional.class, <span class="keyword">false</span>, <span class="keyword">false</span>);</span><br><span class="line">	<span class="keyword">if</span> (attributes != <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> parseTransactionAnnotation(attributes);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>​    <code>spring</code>事务的代理是通过<code>@EnableTransactionManagement</code>注解来开启，这个注解通过<code>@Import</code>注解来导入两个类，一个类是后置处理器，它的作用是在每个<code>bean</code>对象创建之后将第二个导入类中定义的增强作用在这个对象上，并形成代理对象。第二个导入类的作用是定义了一个增强，这个增强包含了如何确定切面、切点、连接点等信息，也包含了拦截的逻辑，也就是事务的开启、提交和回滚等处理。</p>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2024/04/15/Spring/Spring%E4%BA%8B%E5%8A%A1%E7%9A%84aop%E6%B5%85%E6%9E%90/" title="Spring事务的aop浅析">http://xiaocainiaoya.github.io/2024/04/15/Spring/Spring事务的aop浅析/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/04/11/Spring/SpringAop%E6%B5%85%E6%9E%90%EF%BC%88%E4%BA%8C%EF%BC%89/" rel="prev" title="SpringAop浅析（二）">
+      <i class="fa fa-chevron-left"></i> SpringAop浅析（二）
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring%E4%BA%8B%E5%8A%A1%E7%9A%84aop%E6%B5%85%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">Spring事务的aop浅析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%85%E6%9E%90"><span class="nav-number">1.1.</span> <span class="nav-text">浅析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-AutoProxyRegistar"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.AutoProxyRegistar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-ProxyTransactionManagementConfiguration"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.ProxyTransactionManagementConfiguration</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.2.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">86</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
