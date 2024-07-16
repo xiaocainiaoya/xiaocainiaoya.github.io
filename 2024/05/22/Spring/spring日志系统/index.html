@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="spring日志系统​    spring通过门面模式来应对项目中依赖不同的组件时，各组件使用不同的日志框架，有log4j、log4j2、lockback等，门面有sl4j和commons-logging。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring日志系统">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2024/05/22/Spring/spring%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="spring日志系统​    spring通过门面模式来应对项目中依赖不同的组件时，各组件使用不同的日志框架，有log4j、log4j2、lockback等，门面有sl4j和commons-logging。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2024/05/22/KxUy7luX86DkjCB.png">
+<meta property="og:image" content="https://s2.loli.net/2024/06/03/sJRqwL2lvr1TkGO.png">
+<meta property="og:image" content="https://s2.loli.net/2024/06/03/f7j52o8GTA6bdFM.png">
+<meta property="og:image" content="https://s2.loli.net/2024/06/03/M6NR7afJlAHk5Xn.png">
+<meta property="article:published_time" content="2024-05-22T12:53:58.000Z">
+<meta property="article:modified_time" content="2024-06-04T07:50:07.018Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2024/05/22/KxUy7luX86DkjCB.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2024/05/22/Spring/spring%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>spring日志系统 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2024/05/22/Spring/spring%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          spring日志系统
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-05-22 20:53:58" itemprop="dateCreated datePublished" datetime="2024-05-22T20:53:58+08:00">2024-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-06-04 15:50:07" itemprop="dateModified" datetime="2024-06-04T15:50:07+08:00">2024-06-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/srping/" itemprop="url" rel="index"><span itemprop="name">srping</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="spring日志系统"><a href="#spring日志系统" class="headerlink" title="spring日志系统"></a>spring日志系统</h1><p>​    <code>spring</code>通过门面模式来应对项目中依赖不同的组件时，各组件使用不同的日志框架，有<code>log4j</code>、<code>log4j2</code>、<code>lockback</code>等，门面有<code>sl4j</code>和<code>commons-logging</code>。</p>
+<span id="more"></span>
+
+<p><img src="https://s2.loli.net/2024/05/22/KxUy7luX86DkjCB.png" alt=".png"></p>
+<p>在开发的过程中，经常需要使用到日志框架来打印一些信息，来帮助开发者定位产生的相关问题等，在使用时只需要通过<code>log.info()</code>等方式就可以打印出一条日志信息，但是这条日志是如何打印出来，理清日志框架的工作过程及原理，能有效帮助开发者扩展日志功能以及优雅的进行日志打印等级切换等等。</p>
+<h2 id="springboot日志框架"><a href="#springboot日志框架" class="headerlink" title="springboot日志框架"></a>springboot日志框架</h2><p><code>springboot</code>的默认日志框架是<code>logback</code>。具官网介绍<code>logback</code>的性能高于<code>log4j</code>，而<code>log4j2</code>是在<code>logback</code>之后诞生的，性能高于<code>logback</code>。<code>springboot</code>中默认引入的是<code>logback</code>日志框架，如果需要在<code>springboot</code>项目中使用<code>sl4j2</code>作为日志框架，需要将原生框架中的<code>logback</code>依赖排除。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">exclusions</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">exclusion</span>&gt;</span></span><br><span class="line">			<span class="comment">&lt;!--排除lockback的依赖--&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-logging<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--引入log4j2依赖--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-log4j2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>​    然后就可以在<code>resource</code>下创建<code>sl4j2.xml</code>配置文件，配置一些打印相关操作，比如指定多个打印器，指定打印路径，指定打印格式、打印等级等等。当然，也可以不创建这个配置文件，在<code>springboot</code>有兜底配置。</p>
+<p>​    接着一步步来了解一下，以及<code>springboot</code>是如果设计，达到可以自由切换日志框架的目的。以及<code>sl4j2</code>的一些工作原理。</p>
+<p>​    如果项目中结合了<code>lombok</code>可以发现，在实体上标记了<code>@Slf4j</code>之后，就可以通过<code>log</code>对象来打印日志，而这个打印日志的<code>log</code>对象就是<code>org.slf4j.Logger</code>类对象，它仅仅是定义了一系列的日志打印接口。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Logger</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">info</span><span class="params">(String msg)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">info</span><span class="params">(String format, Object arg)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">info</span><span class="params">(String format, Object... arguments)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">error</span><span class="params">(String format, Object... arguments)</span></span>;</span><br><span class="line">	</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">error</span><span class="params">(String msg, Throwable t)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 省略代码...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果工程是使用<code>sl4j2</code>，那么此时就会进入到<code>org.apache.logging.slf4j.Log4jLogger</code>，它是<code>org.slf4j.Logger</code>门面接口的实现，它是在依赖<code>org.apache.logging.log4j:log4j-slf4j-impl</code>中。</p>
+<p>如果工程是使用<code>logback</code>，那么此时就会进入到<code>ch.qos.logback.classic.Logger</code>，它也是<code>org.slf4j.Logger</code>门面对象的实现，他是在依赖<code>ch.qos.logback:logback-classis</code>中，这里要注意，<code>loback</code>对门面接口类的实现的类的名称也是叫<code>Logger</code>。</p>
+<h2 id="log4j2的简单工作原理"><a href="#log4j2的简单工作原理" class="headerlink" title="log4j2的简单工作原理"></a>log4j2的简单工作原理</h2><p>从上述可以知道，其实打印日志都是获取<code>Logger</code>对象，通过它来进行日志打印操作。在<code>log4j2</code>中的<code>Logger</code>对象有两个属性<code>PrivateConfig</code>和<code>LoggerContext</code>。</p>
+<ul>
+<li><code>PrivateConfig</code>中包含了通过<code>log4j2.xml</code>文件解析出来的<code>appender</code>和具体的<code>logger</code>。</li>
+<li><code>LoggerContext</code>是根据配置规则，缓存了每个类打印时需要使用到的<code>logger</code>和<code>appender</code>的关系。</li>
+</ul>
+<p><img src="https://s2.loli.net/2024/06/03/sJRqwL2lvr1TkGO.png" alt="logger.png"></p>
+<p>在配置文件中的&lt;Appenders&gt;标签下每增加一项，解析得到的<code>Configuration</code>中的<code>Appenders</code>就多一个<code>Appender</code>。在&lt;Loggers&gt;标签下每增加一项，解析得到的<code>Configuration</code>中的<code>loggerConfigs</code>就多一项。</p>
+<p>在<code>LoggerConfig</code>中持有所有<code>Appender</code>的引用，而解析后的<code>Configuration</code>中的<code>loggerConfigs</code>表示的是某一个<code>logger</code>持有的<code>Appender</code>引用。</p>
+<p>如果需要使用到打印，都会先到<code>LoggerContext</code>的注册器<code>LoggerRegistry</code>中获取，如果没有，则会创建出一个<code>Logger</code>并注册到<code>LoggerRegistry</code>中。</p>
+<p><img src="https://s2.loli.net/2024/06/03/f7j52o8GTA6bdFM.png" alt="loggerRegistry.png"></p>
+<p>比方说我这个工程中的这个类<code>cn.com.xiaocainiaoya.common.CustomizeConfiguration</code>，如果需要打印就会从这个注册器中获取到这个<code>Logger</code>，然后通过这个<code>Logger</code>的日志等级配置以及<code>Appender</code>等等进行打印操作。</p>
+<h2 id="Springboot日志启动机制"><a href="#Springboot日志启动机制" class="headerlink" title="Springboot日志启动机制"></a>Springboot日志启动机制</h2><p><code>Springboot</code>的日志启动依赖于<code>springboot</code>的事件监听机制，在<code>spring</code>的启动过程中，需要进行一系列的准备、加载等动作，所以<code>Spring</code>在对容器最终加载完成的整个生命周期中，设置了很多监听事件，比如刚刚启动容器、<code>Enviroment</code>准备完成、<code>ApplicatonContext</code>准备完成等等。日志启动是依赖于<code>LoggingApplicationListener</code>类，它实现了<code>ApplicationListener</code>的封装类<code>GenericApplicationListener</code>，所以它能接收到多种消息事件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onApplicationEvent</span><span class="params">(ApplicationEvent event)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 在启动SpringApplicatioin之后就发布了事件，先于Environment和ApplicationContext可用之前发布</span></span><br><span class="line">    <span class="keyword">if</span> (event <span class="keyword">instanceof</span> ApplicationStartingEvent) &#123;</span><br><span class="line">        onApplicationStartingEvent((ApplicationStartingEvent) event);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Environment加载完成之后立即发布</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (event <span class="keyword">instanceof</span> ApplicationEnvironmentPreparedEvent) &#123;</span><br><span class="line">        onApplicationEnvironmentPreparedEvent((ApplicationEnvironmentPreparedEvent) event);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ApplicationContext准备好后但是刷新容器之前发布</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (event <span class="keyword">instanceof</span> ApplicationPreparedEvent) &#123;</span><br><span class="line">        onApplicationPreparedEvent((ApplicationPreparedEvent) event);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (event <span class="keyword">instanceof</span> ContextClosedEvent</span><br><span class="line">            &amp;&amp; ((ContextClosedEvent) event).getApplicationContext().getParent() == <span class="keyword">null</span>) &#123;</span><br><span class="line">        onContextClosedEvent();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (event <span class="keyword">instanceof</span> ApplicationFailedEvent) &#123;</span><br><span class="line">        onApplicationFailedEvent();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><b>1.监听到<code>ApplicationStartingEvent</code>事件</b></p>
+<p>在<code>Springboot</code>中操作日志最关键的一个对象就是<code>LoggingSystem</code>，这个对象在整个生命周期中掌握着日志。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">onApplicationStartingEvent</span><span class="params">(ApplicationStartingEvent event)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.loggingSystem = LoggingSystem.get(event.getSpringApplication().getClassLoader());</span><br><span class="line">    <span class="keyword">this</span>.loggingSystem.beforeInitialize();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里在接收到这个事件通知之后，就到系统属性中去读取<code>LoggingSystem</code>具体的实现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    Map&lt;String, String&gt; systems = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line">    systems.put(<span class="string">&quot;ch.qos.logback.core.Appender&quot;</span>, <span class="string">&quot;org.springframework.boot.logging.logback.LogbackLoggingSystem&quot;</span>);</span><br><span class="line">    systems.put(<span class="string">&quot;org.apache.logging.log4j.core.impl.Log4jContextFactory&quot;</span>,</span><br><span class="line">            <span class="string">&quot;org.springframework.boot.logging.log4j2.Log4J2LoggingSystem&quot;</span>);</span><br><span class="line">    systems.put(<span class="string">&quot;java.util.logging.LogManager&quot;</span>, <span class="string">&quot;org.springframework.boot.logging.java.JavaLoggingSystem&quot;</span>);</span><br><span class="line">    SYSTEMS = Collections.unmodifiableMap(systems);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 首次加载的时候会从以上的SYSTEMS的map中去找，通过类加载器，逐个查找，看哪一个类是在类路径中，就启用哪一个LoggingSystem。我这里使用的是Log4j日志框架，那么这里就会找到并加载Log4J2LoggingSystem。如果使用的是logback，那么加载的就是LogbackLoggingSystem。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> LoggingSystem <span class="title">get</span><span class="params">(ClassLoader classLoader)</span> </span>&#123;</span><br><span class="line">    String loggingSystem = System.getProperty(SYSTEM_PROPERTY);</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.hasLength(loggingSystem)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (NONE.equals(loggingSystem)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> NoOpLoggingSystem();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> get(classLoader, loggingSystem);</span><br><span class="line">    &#125;</span><br><span class="line">  <span class="comment">// 通过类加载器来找有没有引入对应的类，第一个匹配到谁就是谁</span></span><br><span class="line">    <span class="keyword">return</span> SYSTEMS.entrySet().stream().filter((entry) -&gt; ClassUtils.isPresent(entry.getKey(), classLoader))</span><br><span class="line">            .map((entry) -&gt; get(classLoader, entry.getValue())).findFirst()</span><br><span class="line">            .orElseThrow(() -&gt; <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;No suitable logging system located&quot;</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>拿到<code>LogginSystem</code>之后，就会调用它的<code>beforeInitialize()</code>，这个方法的主要作用就是进行一些事前初始化动作，这里添加了一个日志过滤器，但实际上是一个阻断器，这个阻断器拒绝了所有的日志打印。所以到达这一步，仍然是无法打印出日志的，就算日志框架接收到需要打印日志的请求，也会被阻断器拒绝。这样的设计是为了防止日志系统在完成初始化之前打印出不可控的日志信息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">beforeInitialize</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    LoggerContext loggerContext = getLoggerContext();</span><br><span class="line">    <span class="keyword">if</span> (isAlreadyInitialized(loggerContext)) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">super</span>.beforeInitialize();</span><br><span class="line">    loggerContext.getConfiguration().addFilter(FILTER);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><b>2.监听到<code>ApplicationEnvironmentPreparedEvent</code>事件</b></p>
+<p>当<code>Environment</code>准备完成之后，继续进行日志框架的初始化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">onApplicationEnvironmentPreparedEvent</span><span class="params">(ApplicationEnvironmentPreparedEvent event)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.loggingSystem == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.loggingSystem = LoggingSystem.get(event.getSpringApplication().getClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 使用enviroment中配置的信息对日志框架进行初始化</span></span><br><span class="line">    initialize(event.getEnvironment(), event.getSpringApplication().getClassLoader());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">(ConfigurableEnvironment environment, ClassLoader classLoader)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 把在enviroment中的配置信息读取出来，并设置到system中，比如有打印文件的路径</span></span><br><span class="line">    <span class="comment">// 文件大小、打印格式等等</span></span><br><span class="line">    <span class="keyword">new</span> LoggingSystemProperties(environment).apply();</span><br><span class="line">    <span class="keyword">this</span>.logFile = LogFile.get(environment);</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.logFile != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.logFile.applyToSystemProperties();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 将预制的web和sql日志打印初始化LoggerGroups</span></span><br><span class="line">    <span class="keyword">this</span>.loggerGroups = <span class="keyword">new</span> LoggerGroups(DEFAULT_GROUP_LOGGERS);</span><br><span class="line">    <span class="comment">// 读取系统级别的debug或者trace是否设置为true</span></span><br><span class="line">    <span class="comment">// 哪个类型为true就将springbootLogging的级别设置为那个</span></span><br><span class="line">    <span class="comment">// trace的优先级高于debug</span></span><br><span class="line">    initializeEarlyLoggingLevel(environment);</span><br><span class="line">    <span class="comment">// 执行loggingSystem.initialize()初始化方法</span></span><br><span class="line">    initializeSystem(environment, <span class="keyword">this</span>.loggingSystem, <span class="keyword">this</span>.logFile);</span><br><span class="line">    <span class="comment">// 完成日志打印组和日志打印器的级别的设置</span></span><br><span class="line">    initializeFinalLoggingLevels(environment, <span class="keyword">this</span>.loggingSystem);</span><br><span class="line">    registerShutdownHookIfNecessary(environment, <span class="keyword">this</span>.loggingSystem);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>重点来看下<code>LoggingSystem</code>的初始化方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initializeSystem</span><span class="params">(ConfigurableEnvironment environment, LoggingSystem system, LogFile logFile)</span> </span>&#123;</span><br><span class="line">    LoggingInitializationContext initializationContext = <span class="keyword">new</span> LoggingInitializationContext(environment);</span><br><span class="line">    <span class="comment">// 从系统变量中获取logging.config</span></span><br><span class="line">    String logConfig = environment.getProperty(CONFIG_PROPERTY);</span><br><span class="line">    <span class="comment">// 如果没有就根据规则从类路径中找</span></span><br><span class="line">    <span class="keyword">if</span> (ignoreLogConfig(logConfig)) &#123;</span><br><span class="line">        system.initialize(initializationContext, <span class="keyword">null</span>, logFile);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="comment">//如果有，就直接加载指定的文件。所以如果通过yaml直接配置，或者通过jar启动命令指定</span></span><br><span class="line">        <span class="comment">// 就直接走到这里</span></span><br><span class="line">        <span class="comment">// ... 省略代码</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ... 省略代码</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 到达Log4J2LoggingSystem的初始化方法</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">(LoggingInitializationContext initializationContext, String configLocation, LogFile logFile)</span> </span>&#123;</span><br><span class="line">    LoggerContext loggerContext = getLoggerContext();</span><br><span class="line">    <span class="keyword">if</span> (isAlreadyInitialized(loggerContext)) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 这里移除了前面设置的日志阻断器</span></span><br><span class="line">    loggerContext.getConfiguration().removeFilter(FILTER);</span><br><span class="line">    <span class="comment">// 调用父类方法找到log4j2的配置文件，并进行初始化</span></span><br><span class="line">    <span class="keyword">super</span>.initialize(initializationContext, configLocation, logFile);</span><br><span class="line">    <span class="comment">// 标记初始化完成</span></span><br><span class="line">    markAsInitialized(loggerContext);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 父类方法最终会走到这里，按类路径查找，</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initializeWithConventions</span><span class="params">(LoggingInitializationContext initializationContext, LogFile logFile)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 逻辑上是要找到一个 classpath:xxxx的地址</span></span><br><span class="line">    String config = getSelfInitializationConfig();</span><br><span class="line">    <span class="keyword">if</span> (config != <span class="keyword">null</span> &amp;&amp; logFile == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 把这个配置文件中的东西解析出来为Configuration</span></span><br><span class="line">        reinitialize(initializationContext);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (config == <span class="keyword">null</span>) &#123;</span><br><span class="line">        config = getSpringInitializationConfig();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (config != <span class="keyword">null</span>) &#123;</span><br><span class="line">        loadConfiguration(initializationContext, config, logFile);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    loadDefaults(initializationContext, logFile);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之后就会将日志打印器<code>logger</code>进行分组。这样做的好处是便于管理，分组之后，如果需要对某个组改日志级别，只需要将这个组的日志级别进行修改，就不需要逐个去找打印器并进行修改。</p>
+<p><img src="https://s2.loli.net/2024/06/03/M6NR7afJlAHk5Xn.png" alt="loggerGroups.png"></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 可以通过yaml进行设置</span></span><br><span class="line"><span class="attr">logging:</span></span><br><span class="line">  <span class="attr">level:</span></span><br><span class="line">    <span class="attr">common:</span> <span class="string">debug</span></span><br><span class="line">    <span class="attr">user:</span> <span class="string">info</span></span><br><span class="line">  <span class="attr">group:</span></span><br><span class="line">    <span class="attr">common:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">cn.com.xiaocainiaoya.common</span></span><br><span class="line">    <span class="attr">user:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">com.lee.xiaocainiaoya.user</span></span><br></pre></td></tr></table></figure>
+
+<p>如果设置了<code>trace=true</code>或者是<code>bebud=true</code>，那么<code>springboot</code>会将自己的某些类的打印开启。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initializeFinalLoggingLevels</span><span class="params">(ConfigurableEnvironment environment, LoggingSystem system)</span> </span>&#123;</span><br><span class="line">    bindLoggerGroups(environment);</span><br><span class="line">    <span class="comment">// 只要trace=true 或者是 debug=true就开启springbootlogging</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.springBootLogging != <span class="keyword">null</span>) &#123;</span><br><span class="line">        initializeLogLevel(system, <span class="keyword">this</span>.springBootLogging);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 设置用户自定义的打印器的日志级别</span></span><br><span class="line">    setLogLevels(system, environment);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initializeLogLevel</span><span class="params">(LoggingSystem system, LogLevel springBootLogging)</span> </span>&#123;</span><br><span class="line">    initializeSpringBootLogging(system, springBootLogging);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initializeSpringBootLogging</span><span class="params">(LoggingSystem system, LogLevel springBootLogging)</span> </span>&#123;</span><br><span class="line">    BiConsumer&lt;String, LogLevel&gt; configurer = getLogLevelConfigurer(system);</span><br><span class="line">    SPRING_BOOT_LOGGING_LOGGERS.getOrDefault(springBootLogging, Collections.emptyList())</span><br><span class="line">            .forEach((name) -&gt; configureLogLevel(name, springBootLogging, configurer));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    MultiValueMap&lt;LogLevel, String&gt; loggers = <span class="keyword">new</span> LinkedMultiValueMap&lt;&gt;();</span><br><span class="line">    <span class="comment">// 如果是debug就开这些</span></span><br><span class="line">    loggers.add(LogLevel.DEBUG, <span class="string">&quot;sql&quot;</span>);</span><br><span class="line">    loggers.add(LogLevel.DEBUG, <span class="string">&quot;web&quot;</span>);</span><br><span class="line">    loggers.add(LogLevel.DEBUG, <span class="string">&quot;org.springframework.boot&quot;</span>);</span><br><span class="line">    <span class="comment">// 如果是trace 就开这些</span></span><br><span class="line">    loggers.add(LogLevel.TRACE, <span class="string">&quot;org.springframework&quot;</span>);</span><br><span class="line">    loggers.add(LogLevel.TRACE, <span class="string">&quot;org.apache.tomcat&quot;</span>);</span><br><span class="line">    loggers.add(LogLevel.TRACE, <span class="string">&quot;org.apache.catalina&quot;</span>);</span><br><span class="line">    loggers.add(LogLevel.TRACE, <span class="string">&quot;org.eclipse.jetty&quot;</span>);</span><br><span class="line">    loggers.add(LogLevel.TRACE, <span class="string">&quot;org.hibernate.tool.hbm2ddl&quot;</span>);</span><br><span class="line">    SPRING_BOOT_LOGGING_LOGGERS = Collections.unmodifiableMap(loggers);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 能按组设置就按组设置，不能按组设置就单独设置</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">configureLogLevel</span><span class="params">(String name, LogLevel level, BiConsumer&lt;String, LogLevel&gt; configurer)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.loggerGroups != <span class="keyword">null</span>) &#123;</span><br><span class="line">        LoggerGroup group = <span class="keyword">this</span>.loggerGroups.get(name);</span><br><span class="line">        <span class="keyword">if</span> (group != <span class="keyword">null</span> &amp;&amp; group.hasMembers()) &#123;</span><br><span class="line">            group.configureLogLevel(level, configurer);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    configurer.accept(name, level);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><b>3.监听到<code>ApplicationPreparedEvent</code>事件</b></p>
+<h3 id="日志级别热更新"><a href="#日志级别热更新" class="headerlink" title="日志级别热更新"></a>日志级别热更新</h3><p>其实对应的日志框架都已经提供了对应的日志级别更新方法，只需要获取到<code>LoggingSystem</code>类，并调用<code>setLogLevel</code>方法即可。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loggingSystem.setLogLevel(<span class="string">&quot;cn.com.xiaocainiaoya.BootStrap&quot;</span>, LogLevel.DEBUG);</span><br></pre></td></tr></table></figure>
+
+<p>这里简单分析一下过程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setLogLevel</span><span class="params">(String loggerName, LogLevel logLevel)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 转换为log4j对应的日志级别枚举类</span></span><br><span class="line">	Level level = LEVELS.convertSystemToNative(logLevel);</span><br><span class="line">	<span class="comment">// 到Configuration中去找这个loggerName的LoggerConfig(初始化之后所有的LoggerConfig都在这里)</span></span><br><span class="line">	LoggerConfig loggerConfig = getLoggerConfig(loggerName);</span><br><span class="line">	<span class="comment">// 如果不存在，则需要创建这个LoggerConfig，并添加到Configuration的ConcurrentMap&lt;String, LoggerConfig&gt; loggerConfigs中。</span></span><br><span class="line">	<span class="keyword">if</span> (loggerConfig == <span class="keyword">null</span>) &#123;</span><br><span class="line">		loggerConfig = <span class="keyword">new</span> LoggerConfig(loggerName, level, <span class="keyword">true</span>);</span><br><span class="line">		getLoggerContext().getConfiguration().addLogger(loggerName, loggerConfig);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">// 如果存在，则直接更新这个loggerConfig的日志级别</span></span><br><span class="line">		loggerConfig.setLevel(level);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// ⭐️逐个更新loagger</span></span><br><span class="line">	getLoggerContext().updateLoggers();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">updateLoggers</span><span class="params">(<span class="keyword">final</span> Configuration config)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Configuration old = <span class="keyword">this</span>.configuration;</span><br><span class="line">    <span class="comment">// 逐个更新loagger</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">final</span> Logger logger : loggerRegistry.getLoggers()) &#123;</span><br><span class="line">        logger.updateConfiguration(config);</span><br><span class="line">    &#125;</span><br><span class="line">    firePropertyChangeEvent(<span class="keyword">new</span> PropertyChangeEvent(<span class="keyword">this</span>, PROPERTY_CONFIG, old, config));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">updateConfiguration</span><span class="params">(<span class="keyword">final</span> Configuration newConfig)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.privateConfig = <span class="keyword">new</span> PrivateConfig(newConfig, <span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其实我刚看到这个地方时候，我是有点困惑的，在我标记⭐️的地方。在更新完<code>loggerConfig</code>的的日志级别之后，尽然需要将所有的<code>loggerRegistry</code>都取出来进行重新创建<code>PrivateConfig</code>。难道不是<code>loggerConfig</code>的日志级别修改了之后持有这个对象的引用获取到信息也是更新之后的值。但是其实这里是有可能获取不到<code>loggerConfig</code>，那么就需要创建一个新的<code>loggerConfig</code>到<code>Configuration</code>池子里。根据日志名称匹配规则，新增了一个<code>loggerConfig</code>那么其实对缓存中的所有信息有所影响，比如某个类的全限定类名是<code>cn.com.xiaocainiao.FeignUtil</code>，原本它是使用名称为<code>root</code>的打印器，但是我调用<code>setLogLevel(&quot;cn.com.xiaocainiao&quot;, &quot;DEBUG&quot;)</code>那么这时会创建一个新的打印器器，也就导致了<code>cn.com.xiaocainiao.FeignUtil</code>应该使用新创建的这个打印器，而不是根打印器，所以这里的将所有的<code>logger</code>进行了更新。</p>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2024/05/22/Spring/spring%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/" title="spring日志系统">http://xiaocainiaoya.github.io/2024/05/22/Spring/spring日志系统/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/04/15/Spring/Spring%E4%BA%8B%E5%8A%A1%E7%9A%84aop%E6%B5%85%E6%9E%90/" rel="prev" title="Spring事务的aop浅析">
+      <i class="fa fa-chevron-left"></i> Spring事务的aop浅析
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/06/13/k8s/k8s%E5%85%A5%E9%97%A8/" rel="next" title="">
+       <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#spring%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.</span> <span class="nav-text">spring日志系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#springboot%E6%97%A5%E5%BF%97%E6%A1%86%E6%9E%B6"><span class="nav-number">1.1.</span> <span class="nav-text">springboot日志框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#log4j2%E7%9A%84%E7%AE%80%E5%8D%95%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">log4j2的简单工作原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Springboot%E6%97%A5%E5%BF%97%E5%90%AF%E5%8A%A8%E6%9C%BA%E5%88%B6"><span class="nav-number">1.3.</span> <span class="nav-text">Springboot日志启动机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E7%BA%A7%E5%88%AB%E7%83%AD%E6%9B%B4%E6%96%B0"><span class="nav-number">1.3.1.</span> <span class="nav-text">日志级别热更新</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">89</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
