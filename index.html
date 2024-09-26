@@ -354,6 +354,89 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2024/09/21/Springboot/dubbo%E7%9A%84spi%E6%9C%BA%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/09/21/Springboot/dubbo%E7%9A%84spi%E6%9C%BA%E5%88%B6/" class="post-title-link" itemprop="url">springboot的Spi机制</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-09-21 14:13:58" itemprop="dateCreated datePublished" datetime="2024-09-21T14:13:58+08:00">2024-09-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-09-26 17:11:11" itemprop="dateModified" datetime="2024-09-26T17:11:11+08:00">2024-09-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/doubbo/" itemprop="url" rel="index"><span itemprop="name">doubbo</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="springboot的Spi机制"><a href="#springboot的Spi机制" class="headerlink" title="springboot的Spi机制"></a>springboot的Spi机制</h1><p>结合之前说到的<a href="https://xiaocainiaoya.github.io/2023/04/10/Springboot/springboot%E7%9A%84Spi%E6%9C%BA%E5%88%B6/" target="_blank">springboot的Spi机制</a>本篇将简单介绍一下<code>Doubbo</code>的SPI机制，<code>Dobbo</code>没有使用<code>jdk</code>的这套<code>SPI</code>机制，而是自己实现了一套，提供了一些更灵活、更易于使用的方式。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/09/21/Springboot/dubbo%E7%9A%84spi%E6%9C%BA%E5%88%B6/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2024/07/29/k8s/k8s%E5%85%A5%E9%97%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -454,10 +537,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2024-07-29 21:43:58 / 修改时间：22:13:23" itemprop="dateCreated datePublished" datetime="2024-07-29T21:43:58+08:00">2024-07-29</time>
+              <time title="创建时间：2024-07-29 21:43:58" itemprop="dateCreated datePublished" datetime="2024-07-29T21:43:58+08:00">2024-07-29</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-08-07 23:57:43" itemprop="dateModified" datetime="2024-08-07T23:57:43+08:00">2024-08-07</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -479,7 +568,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="KubeSphere入门"><a href="#KubeSphere入门" class="headerlink" title="KubeSphere入门"></a>KubeSphere入门</h1><p>全栈的 Kubernetes 容器云 PaaS 解决方案：<a target="_blank" rel="noopener" href="https://kubesphere.io/zh/">https://kubesphere.io/zh/</a></p>
+          <p>[TOC]</p>
+<h1 id="KubeSphere入门"><a href="#KubeSphere入门" class="headerlink" title="KubeSphere入门"></a>KubeSphere入门</h1><p>全栈的 Kubernetes 容器云 PaaS 解决方案：<a target="_blank" rel="noopener" href="https://kubesphere.io/zh/">https://kubesphere.io/zh/</a></p>
 <p>KubeSphere 是在 Kubernetes 之上构建的以应用为中心的多租户容器平台，提供全栈的 IT 自动化运维的能力，简化企业的 DevOps 工作流。KubeSphere 提供了运维友好的向导式操作界面，帮助企业快速构建一个强大和功能丰富的容器云平台。</p>
           <!--noindex-->
             <div class="post-button">
@@ -914,104 +1004,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2023/09/13/nginx/nginx%E4%B9%8Bproxy_pass/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/13/nginx/nginx%E4%B9%8Bproxy_pass/" class="post-title-link" itemprop="url">nginx之proxy_pass</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-09-13 21:51:58" itemprop="dateCreated datePublished" datetime="2023-09-13T21:51:58+08:00">2023-09-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-10-09 15:45:09" itemprop="dateModified" datetime="2023-10-09T15:45:09+08:00">2023-10-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/nginx/" itemprop="url" rel="index"><span itemprop="name">nginx</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="nginx之proxy-pass"><a href="#nginx之proxy-pass" class="headerlink" title="nginx之proxy_pass"></a>nginx之proxy_pass</h1><ul>
-<li>往期回顾：<a href="https://xiaocainiaoya.github.io/2020/04/13/nginx/nginx/">nginx</a></li>
-</ul>
-<p><code>proxy_pass</code>是<code>nginx</code>中常见的反向代理指令。</p>
-<blockquote>
-<p>格式：proxy_pass {传输协议}{主机名}{URI}</p>
-</blockquote>
-<ul>
-<li>传输协议：<code>http://</code>或者<code>https://</code></li>
-<li>主机名：<code>IP:PORT</code></li>
-<li><code>URI</code>：具体的访问地址</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/09/13/nginx/nginx%E4%B9%8Bproxy_pass/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1077,20 +1073,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-count">91</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">30</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
