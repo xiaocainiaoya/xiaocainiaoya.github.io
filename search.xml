@@ -477,10 +477,76 @@
 <p><strong>注意：</strong>二者之前的差别就是提前暴露的对象是不是代理对象。获取说是代理对象的暴露时机有所不同。那么为什么二者暴露代理对象的时机有所不同？二者都是通过<code>BeanPostProcessor</code>的实现进行处理，<code>AOP</code>实现类和<code>@Async</code>的实现类<code>AnnotationAwareAspectJAutoProxyCreator</code>和<code>AsyncAnnotationBeanPostProcessor</code>有一个很大的区别是前者实现了<code>SmartInstantiationAwareBeanPostProcessor</code>接口，在提前暴露对象工厂中，只会执行实现了这个接口的<code>getEarlyBeanReference</code>方法来获取提前暴露对象。</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Object <span class="title">getEarlyBeanReference</span><span class="params">(String beanName, RootBeanDefinition mbd, Object bean)</span> </span>&#123;</span><br><span class="line">    Object exposedObject = bean;</span><br><span class="line">    <span class="keyword">if</span> (!mbd.isSynthetic() &amp;&amp; hasInstantiationAwareBeanPostProcessors()) &#123;</span><br><span class="line">        <span class="keyword">for</span> (BeanPostProcessor bp : getBeanPostProcessors()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (bp <span class="keyword">instanceof</span> SmartInstantiationAwareBeanPostProcessor) &#123;</span><br><span class="line">                SmartInstantiationAwareBeanPostProcessor ibp = (SmartInstantiationAwareBeanPostProcessor) bp;</span><br><span class="line">                exposedObject = ibp.getEarlyBeanReference(exposedObject, beanName);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> exposedObject;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-
-
-
-
+<h3 id="关键区别"><a href="#关键区别" class="headerlink" title="关键区别"></a>关键区别</h3><h4 id="1-代理对象的作用范围"><a href="#1-代理对象的作用范围" class="headerlink" title="1. 代理对象的作用范围"></a>1. <strong>代理对象的作用范围</strong></h4><ul>
+<li><strong><code>AsyncAnnotationBeanPostProcessor</code></strong>:<ul>
+<li>它为标注了 <code>@Async</code> 的方法创建代理对象，仅拦截这些方法的调用。</li>
+<li>代理的目标是实现异步执行，与整个 bean 的生命周期管理无关。</li>
+<li>代理对象的创建发生在 bean 初始化后，仅用于增强方法行为，不影响依赖注入。</li>
+</ul>
+</li>
+<li><strong><code>AbstractAutoProxyCreator</code></strong>:<ul>
+<li>它的代理通常覆盖整个 bean，拦截所有方法调用。</li>
+<li>它的目的是实现 AOP 功能（如事务管理、权限验证等），可能影响依赖注入。</li>
+<li>代理对象需要提前暴露，以确保循环依赖场景下，其他 bean 引用的是代理对象。</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-代理创建时机"><a href="#2-代理创建时机" class="headerlink" title="2. 代理创建时机"></a>2. <strong>代理创建时机</strong></h4><ul>
+<li><strong><code>AsyncAnnotationBeanPostProcessor</code></strong>:<ul>
+<li>创建代理发生在 <code>postProcessAfterInitialization</code> 阶段。此时，bean 已经完成了依赖注入和初始化。</li>
+<li>不涉及循环依赖，因为它仅修改方法调用，不影响 bean 的结构或生命周期。</li>
+</ul>
+</li>
+<li><strong><code>AbstractAutoProxyCreator</code></strong>:<ul>
+<li>代理创建发生在 <code>postProcessBeforeInstantiation</code> 或 <code>getEarlyBeanReference</code> 阶段，以确保在循环依赖场景下，能够提前暴露代理对象。</li>
+<li>需要通过 <code>SmartInstantiationAwareBeanPostProcessor</code> 来参与三级缓存的管理，确保依赖注入过程中代理对象被正确使用。</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-是否需要支持循环依赖"><a href="#3-是否需要支持循环依赖" class="headerlink" title="3. 是否需要支持循环依赖"></a>3. <strong>是否需要支持循环依赖</strong></h4><ul>
+<li><strong><code>AsyncAnnotationBeanPostProcessor</code></strong>:<ul>
+<li>不需要支持循环依赖。异步方法的功能是在运行时拦截，而不是在依赖注入阶段。</li>
+<li>因此，它无需实现 <code>SmartInstantiationAwareBeanPostProcessor</code> 或 <code>getEarlyBeanReference</code>。</li>
+</ul>
+</li>
+<li><strong><code>AbstractAutoProxyCreator</code></strong>:<ul>
+<li>必须支持循环依赖，确保代理对象在注入过程中被正确引用。</li>
+<li>如果不实现 <code>SmartInstantiationAwareBeanPostProcessor</code>，在循环依赖场景中，注入的对象将是原始对象而非代理对象，从而导致 AOP 功能失效。</li>
+</ul>
+</li>
+</ul>
+<h4 id="4-功能的复杂性和设计目标"><a href="#4-功能的复杂性和设计目标" class="headerlink" title="4. 功能的复杂性和设计目标"></a>4. <strong>功能的复杂性和设计目标</strong></h4><ul>
+<li><strong><code>AsyncAnnotationBeanPostProcessor</code></strong>:<ul>
+<li>其设计目标是简单、专注于异步方法的增强。它不需要处理复杂的依赖注入逻辑，也不需要参与 Spring 的三级缓存机制。</li>
+<li>通过后处理阶段（<code>postProcessAfterInitialization</code>）创建代理，已经足够满足其功能需求。</li>
+</ul>
+</li>
+<li><strong><code>AbstractAutoProxyCreator</code></strong>:<ul>
+<li>它是 Spring AOP 的核心组件，必须适应各种复杂场景，包括循环依赖、动态代理、BeanFactory 后处理等。</li>
+<li>实现 <code>SmartInstantiationAwareBeanPostProcessor</code> 是为了更通用地处理代理对象的提前暴露问题。</li>
+</ul>
+</li>
+</ul>
+<h3 id="为什么设计如此"><a href="#为什么设计如此" class="headerlink" title="为什么设计如此"></a>为什么设计如此</h3><p><code>AsyncAnnotationBeanPostProcessor</code> 的设计默认假设使用异步方法的场景通常不会涉及循环依赖。这种假设在大多数实际应用中是成立的：</p>
+<ul>
+<li>通常，<code>@Async</code> 的方法会在较独立的组件中定义，而这些组件一般不会与其他 bean 存在复杂的相互依赖关系。</li>
+<li>异步方法的调用者和被调用者通常是解耦的，调用者通过 Spring 的线程池机制执行异步任务，而不是直接依赖被调用者。</li>
+</ul>
+<h3 id="3-如何解决循环依赖问题"><a href="#3-如何解决循环依赖问题" class="headerlink" title="3. 如何解决循环依赖问题"></a>3. 如何解决循环依赖问题</h3><p>如果在使用 <code>@Async</code> 时确实遇到循环依赖的问题，有几种解决方法：</p>
+<h4 id="方法-1-通过重构解除循环依赖"><a href="#方法-1-通过重构解除循环依赖" class="headerlink" title="方法 1: 通过重构解除循环依赖"></a>方法 1: 通过重构解除循环依赖</h4><ul>
+<li>重新设计 bean 的依赖关系，减少相互依赖。</li>
+<li>将 <code>@Async</code> 方法抽取到一个独立的组件中，确保其与其他依赖分离。</li>
+</ul>
+<h4 id="方法-2-手动提前暴露代理对象"><a href="#方法-2-手动提前暴露代理对象" class="headerlink" title="方法 2: 手动提前暴露代理对象"></a>方法 2: 手动提前暴露代理对象</h4><ul>
+<li>使用 <code>@Lazy</code> 注解延迟加载其中一个依赖，避免循环依赖。</li>
+<li>或者在某些特殊情况下，可以通过自定义 <code>BeanPostProcessor</code> 提前创建代理对象，但这种做法会增加复杂性。</li>
+</ul>
+<h4 id="方法-3-使用其他异步实现"><a href="#方法-3-使用其他异步实现" class="headerlink" title="方法 3: 使用其他异步实现"></a>方法 3: 使用其他异步实现</h4><ul>
+<li>如果循环依赖问题无法避免，可以考虑使用其他异步调用机制（如直接使用 <code>ExecutorService</code>），避免 <code>@Async</code> 带来的代理问题。</li>
+</ul>
+<h4 id="方法-4-引入显式的分层设计"><a href="#方法-4-引入显式的分层设计" class="headerlink" title="方法 4: 引入显式的分层设计"></a>方法 4: 引入显式的分层设计</h4><ul>
+<li>将异步逻辑和依赖逻辑分离到不同的服务层，减少交叉依赖。</li>
+</ul>
 ]]></content>
       <categories>
         <category>srping</category>
@@ -6837,9 +6903,9 @@
       </tags>
   </entry>
   <entry>
-    <title>springboot的Spi机制</title>
+    <title>dubbo的Spi机制</title>
     <url>/2024/09/21/Springboot/dubbo%E7%9A%84spi%E6%9C%BA%E5%88%B6/</url>
-    <content><![CDATA[<h1 id="springboot的Spi机制"><a href="#springboot的Spi机制" class="headerlink" title="springboot的Spi机制"></a>springboot的Spi机制</h1><p>结合之前说到的<a href="https://xiaocainiaoya.github.io/2023/04/10/Springboot/springboot%E7%9A%84Spi%E6%9C%BA%E5%88%B6/" target="_blank">springboot的Spi机制</a>本篇将简单介绍一下<code>Doubbo</code>的SPI机制，<code>Dobbo</code>没有使用<code>jdk</code>的这套<code>SPI</code>机制，而是自己实现了一套，提供了一些更灵活、更易于使用的方式。</p>
+    <content><![CDATA[<h1 id="dubbo的Spi机制"><a href="#dubbo的Spi机制" class="headerlink" title="dubbo的Spi机制"></a>dubbo的Spi机制</h1><p>结合之前说到的<a href="https://xiaocainiaoya.github.io/2023/04/10/Springboot/springboot%E7%9A%84Spi%E6%9C%BA%E5%88%B6/" target="_blank">springboot的Spi机制</a>本篇将简单介绍一下<code>Doubbo</code>的SPI机制，<code>Dobbo</code>没有使用<code>jdk</code>的这套<code>SPI</code>机制，而是自己实现了一套，提供了一些更灵活、更易于使用的方式。</p>
 <span id="more"></span>
 
 <p>​    简单回顾下，SPI全称（Service Provider Interface）是一种服务发现机制，本质上是将接口的实现类的全限定类名写在配置文件中，并由类加载器读取配置文件，这样可以在运行时，动态为接口替换实现类，所以一般用这种方式来为服务提供扩展能力。</p>
