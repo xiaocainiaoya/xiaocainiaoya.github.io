@@ -1655,12 +1655,20 @@
 <p><code>git push -u origin master</code>：首次推送添加<code>-u</code>参数，<code>git</code>会将本地<code>master</code>分支内容推送到远程的<code>master</code>分支，同时将本地<code>master</code>分支与远程<code>master</code>分支关联，之后的推送仅通过<code>git push</code>即可。(这里忽略了<code>:&lt;远程分支名&gt;</code>的情况下，默认远程分支名与本地分支名一致)</p>
 <h4 id="7-跟换项目的远程仓库"><a href="#7-跟换项目的远程仓库" class="headerlink" title="7.跟换项目的远程仓库"></a>7.跟换项目的远程仓库</h4><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment">##查看当前远程仓库</span></span><br><span class="line">git remote -v </span><br><span class="line"><span class="comment">## 删除远程仓库</span></span><br><span class="line">git remote rm origin</span><br><span class="line"><span class="comment">## 查看删除远程仓库操作是否成功</span></span><br><span class="line">git remote -v</span><br><span class="line"><span class="comment">## 把远程仓库和本地同步，并消除差异</span></span><br><span class="line">git pull origin master --allow-unrelated-histories</span><br></pre></td></tr></table></figure>
 
+<h4 id="8-清理本地仓库中远程仓库已经删除的分支"><a href="#8-清理本地仓库中远程仓库已经删除的分支" class="headerlink" title="8.清理本地仓库中远程仓库已经删除的分支"></a>8.清理本地仓库中远程仓库已经删除的分支</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 仅预览待清理分支（不实际执行）</span></span><br><span class="line">git remote prune origin --dry-run</span><br><span class="line"></span><br><span class="line"><span class="comment"># 同步并清理无效远程追踪分支（推荐）</span></span><br><span class="line">git fetch --prune</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
 
 
 
 
 <p>博客地址：<a href="https://xiaocainiaoya.github.io/">https://xiaocainiaoya.github.io/</a></p>
-<p>联系方式：<a href="mailto:&#x78;&#105;&#97;&#x6f;&#99;&#x61;&#105;&#x6e;&#105;&#x61;&#111;&#121;&#x61;&#64;&#x66;&#x6f;&#x78;&#x6d;&#97;&#x69;&#108;&#x2e;&#99;&#111;&#109;">&#x78;&#105;&#97;&#x6f;&#99;&#x61;&#105;&#x6e;&#105;&#x61;&#111;&#121;&#x61;&#64;&#x66;&#x6f;&#x78;&#x6d;&#97;&#x69;&#108;&#x2e;&#99;&#111;&#109;</a></p>
+<p>联系方式：<a href="mailto:&#x78;&#x69;&#x61;&#111;&#x63;&#97;&#x69;&#x6e;&#105;&#x61;&#111;&#121;&#x61;&#64;&#x66;&#x6f;&#120;&#109;&#x61;&#105;&#108;&#46;&#x63;&#x6f;&#109;">&#x78;&#x69;&#x61;&#111;&#x63;&#97;&#x69;&#x6e;&#105;&#x61;&#111;&#121;&#x61;&#64;&#x66;&#x6f;&#120;&#109;&#x61;&#105;&#108;&#46;&#x63;&#x6f;&#109;</a></p>
 ]]></content>
       <categories>
         <category>git</category>
