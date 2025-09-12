@@ -188,6 +188,90 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/Spring/SpringBoot%E7%9A%84jar%E5%8C%85%E5%A6%82%E4%BD%95%E5%90%AF%E5%8A%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/04/13/Spring/SpringBoot%E7%9A%84jar%E5%8C%85%E5%A6%82%E4%BD%95%E5%90%AF%E5%8A%A8/" class="post-title-link" itemprop="url">SpringBoot的jar包如何启动</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2021-04-13T21:51:58+08:00">2021-04-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-14 15:38:35" itemprop="dateModified" datetime="2021-04-14T15:38:35+08:00">2021-04-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h4 id="SpringBoot的jar包如何启动"><a href="#SpringBoot的jar包如何启动" class="headerlink" title="SpringBoot的jar包如何启动"></a>SpringBoot的jar包如何启动</h4><h4 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h4><p>​    使用过<code>SprongBoot</code>打过<code>jar</code>包的都应该知道，目标文件一般都会生成两个文件，一个是以<code>.jar</code>的包，一个是<code>.jar.original</code>文件。那么使用<code>SpringBoot</code>会打出两个包，而<code>.jar.original</code>的作用是什么呢？还有就是<code>java -jar</code>是如何将一个<code>SpringBoot</code>项目启动，之间都进行了那些的操作？</p>
+<p>​    其实<code>.jar.original</code>是<code>maven</code>在<code>SpringBoot</code>重新打包之前的原始<code>jar</code>包，内部只包含了项目的用户类，不包含其他的依赖<code>jar</code>包，生成之后，<code>SpringBoot</code>重新打包之后，最后生成<code>.jar</code>包，内部包含了原始<code>jar</code>包以及其他的引用依赖。以下提及的<code>jar</code>包都是<code>SpringBoot</code>二次加工打的包。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/04/13/Spring/SpringBoot%E7%9A%84jar%E5%8C%85%E5%A6%82%E4%BD%95%E5%90%AF%E5%8A%A8/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/Spring/lombok%E7%9A%84@SneakyThrows%E8%AF%A6%E8%A7%A3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -955,88 +1039,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2021/04/13/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/java/%E7%94%B1%E6%8B%86%E7%AE%B1%E5%BC%95%E5%8F%91bug/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/04/13/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/java/%E7%94%B1%E6%8B%86%E7%AE%B1%E5%BC%95%E5%8F%91bug/" class="post-title-link" itemprop="url">由拆箱引发NPE</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-04-13 21:51:58" itemprop="dateCreated datePublished" datetime="2021-04-13T21:51:58+08:00">2021-04-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-14 14:06:06" itemprop="dateModified" datetime="2021-04-14T14:06:06+08:00">2021-04-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/" itemprop="url" rel="index"><span itemprop="name">超级大坑</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%B6%85%E7%BA%A7%E5%A4%A7%E5%9D%91/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h5 id="由拆箱引发bug"><a href="#由拆箱引发bug" class="headerlink" title="由拆箱引发bug"></a>由拆箱引发bug</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line">  Integer b = <span class="keyword">null</span>;</span><br><span class="line">  System.out.println(a == b); <span class="comment">// Exception in thread &quot;main&quot; java.lang.NullPointerException</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>由于<code>b</code>是包装类型，而<code>a</code>是基本数据类型，在比较时对<code>b</code>进行拆箱，所以会通过<code>((Integer)null).intValue()</code>进行拆箱，从而引发<code>NPE</code>。</p>
-
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1106,20 +1108,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">92</span>
+          <span class="site-state-item-count">93</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-count">33</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

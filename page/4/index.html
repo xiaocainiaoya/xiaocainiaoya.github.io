@@ -188,6 +188,89 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/11/13/mybatis/mybatis%E6%8E%A7%E5%88%B6%E9%83%A8%E5%88%86%E5%AD%97%E6%AE%B5%E4%B8%8D%E6%89%93%E5%8D%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/11/13/mybatis/mybatis%E6%8E%A7%E5%88%B6%E9%83%A8%E5%88%86%E5%AD%97%E6%AE%B5%E4%B8%8D%E6%89%93%E5%8D%B0/" class="post-title-link" itemprop="url">mybatis控制部分字段不打印</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-11-13 22:13:58" itemprop="dateCreated datePublished" datetime="2022-11-13T22:13:58+08:00">2022-11-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-11-14 09:39:24" itemprop="dateModified" datetime="2022-11-14T09:39:24+08:00">2022-11-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mybatis/" itemprop="url" rel="index"><span itemprop="name">mybatis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="mybatis控制部分字段不打印"><a href="#mybatis控制部分字段不打印" class="headerlink" title="mybatis控制部分字段不打印"></a>mybatis控制部分字段不打印</h1><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>​    最近遇到生产环境的运维反馈，每天的生成的日志信息占用较大的磁盘空间，希望研发能减少部分无效日志信息，把日志文件拉回来看了一下，主要是在<code>MySQL</code>的一些执行打印了<code>text</code>等大字段的数据，当这些表频繁进行插入、修改动作时，导致一直打印这些大字段数据，从而导致占用较大的磁盘空间，但是我们又不能直接关闭<code>mybatis</code>的执行打印日志，在生产环境出现异常时，我们还是需要根据这写执行日志来定位问题，所以最后想是否能将打印的控制逻辑细化到字段上，也就是说对于类型为<code>text</code>等类型的大字段不输出，简单使用一个占位符替代，从而达到既不影响异常问题的定位，也减少了一些无用日志信息。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/11/13/mybatis/mybatis%E6%8E%A7%E5%88%B6%E9%83%A8%E5%88%86%E5%AD%97%E6%AE%B5%E4%B8%8D%E6%89%93%E5%8D%B0/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    <div>
+      
+    </div>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/10/27/nacos/nacos%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -919,89 +1002,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2022/09/13/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/markdown%E8%AE%B0%E5%BD%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="xiaocainiaoya">
-      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="xiaocainiaoya's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/09/13/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/markdown%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">markdown记录</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-13 21:51:58" itemprop="dateCreated datePublished" datetime="2022-09-13T21:51:58+08:00">2022-09-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-17 17:28:39" itemprop="dateModified" datetime="2023-04-17T17:28:39+08:00">2023-04-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/" itemprop="url" rel="index"><span itemprop="name">杂七杂八</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="箭头"><a href="#箭头" class="headerlink" title="箭头"></a>箭头</h1>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/09/13/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/markdown%E8%AE%B0%E5%BD%95/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    <div>
-      
-    </div>
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1071,20 +1071,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">92</span>
+          <span class="site-state-item-count">93</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-count">33</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
