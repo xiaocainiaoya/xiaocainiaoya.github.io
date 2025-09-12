@@ -7126,6 +7126,8 @@
 </blockquote>
 <h2 id="2-引入maven依赖"><a href="#2-引入maven依赖" class="headerlink" title="2. 引入maven依赖"></a>2. 引入maven依赖</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.shardingsphere<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>shardingsphere-jdbc-core-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.2.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
+<span id="more"></span>
+
 <h2 id="3-设置分片配置"><a href="#3-设置分片配置" class="headerlink" title="3. 设置分片配置"></a>3. 设置分片配置</h2><ul>
 <li><p>application-dev.yml：引入application-sharding.yml配置文件，并屏蔽mybatis-flex的数据源设置</p>
 <figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">config:</span></span><br><span class="line">    <span class="attr">import:</span> <span class="string">classpath:application-sharding.yml</span>  <span class="comment"># 引入ShardingSphere分片配置</span></span><br></pre></td></tr></table></figure></li>
@@ -7182,7 +7184,7 @@
 <p>AOT 如何进行优化</p>
 </blockquote>
 <p>AOT（Ahead-Of-Time）优化是从Spring Framework 6开始引入的一个新特性，用于提升应用的启动性能和运行时效率。</p>
-<p>可以简单理解为 ：在编译阶段就把以往一些运行时的数据编译成静态代码，减少运行时开销，从而加快启动速度并降低内存使用。</p>
+<p>可以简单理解为 ：在编译阶段就把以往一些运行时的数据编译成静态代码，减少运行时开销，从而加快启动速度并降低内存使用。<span id="more"></span></p>
 <p><strong>比如核心功能有：</strong></p>
 <ul>
 <li><strong>Bean 定义预解析</strong>：编译期解析 <code>@Configuration</code> 类、<code>@Bean</code> 方法，生成静态化的 Bean 定义元数据，避免运行时扫描。</li>
