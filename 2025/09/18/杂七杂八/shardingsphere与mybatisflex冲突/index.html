@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="​    最近在看shardingsphere分表相关实现，做了一个示例，将shardingsphere引入到之前一直用的以springboot3为基础的ruoyi-flex项目，引入之后，启动一直报一个错误。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="shardingsphere与mybatisflex冲突">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2025/09/18/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/shardingsphere%E4%B8%8Emybatisflex%E5%86%B2%E7%AA%81/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="​    最近在看shardingsphere分表相关实现，做了一个示例，将shardingsphere引入到之前一直用的以springboot3为基础的ruoyi-flex项目，引入之后，启动一直报一个错误。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2025/09/18/qD5chBotZEkHdva.png">
+<meta property="article:published_time" content="2025-09-18T13:51:58.000Z">
+<meta property="article:modified_time" content="2025-09-18T02:47:18.778Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta property="article:tag" content="杂七杂八">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2025/09/18/qD5chBotZEkHdva.png">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2025/09/18/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/shardingsphere%E4%B8%8Emybatisflex%E5%86%B2%E7%AA%81/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>shardingsphere与mybatisflex冲突 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2025/09/18/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/shardingsphere%E4%B8%8Emybatisflex%E5%86%B2%E7%AA%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          shardingsphere与mybatisflex冲突
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-09-18 21:51:58 / 修改时间：10:47:18" itemprop="dateCreated datePublished" datetime="2025-09-18T21:51:58+08:00">2025-09-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/" itemprop="url" rel="index"><span itemprop="name">杂七杂八</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>​    最近在看shardingsphere分表相关实现，做了一个示例，将shardingsphere引入到之前一直用的以springboot3为基础的ruoyi-flex项目，引入之后，启动一直报一个错误。</p>
+<span id="more"></span>
+
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><blockquote>
+<p>Caused by: java.lang.NullPointerException: Properties <code>strategy</code> can not be null when uses class based sharding strategy.<br>    at com.google.common.base.Preconditions.checkNotNull(Preconditions.java:1010)<br>    at org.apache.shardingsphere.sharding.algorithm.sharding.classbased.ClassBasedShardingAlgorithm.getStrategy(ClassBasedShardingAlgorithm.java:66)<br>    at org.apache.shardingsphere.sharding.algorithm.sharding.classbased.ClassBasedShardingAlgorithm.init(ClassBasedShardingAlgorithm.java:59)<br>    at org.apache.shardingsphere.infra.util.spi.type.typed.TypedSPIRegistry.findRegisteredService(TypedSPIRegistry.java:66)<br>    at org.apache.shardingsphere.infra.util.spi.type.typed.TypedSPIRegistry.getRegisteredService(TypedSPIRegistry.java:113)<br>    at org.apache.shardingsphere.infra.config.algorithm.ShardingSphereAlgorithmFactory.createAlgorithm(ShardingSphereAlgorithmFactory.java:40)<br>    at org.apache.shardingsphere.sharding.factory.ShardingAlgorithmFactory.newInstance(ShardingAlgorithmFactory.java:45)<br>    at org.apache.shardingsphere.sharding.rule.ShardingRule.lambda$new$0(ShardingRule.java:120)<br>    at java.base/java.util.LinkedHashMap.forEach(LinkedHashMap.java:986)<br>    at org.apache.shardingsphere.sharding.rule.ShardingRule.<init>(ShardingRule.java:120)<br>    at org.apache.shardingsphere.sharding.rule.builder.ShardingRuleBuilder.build(ShardingRuleBuilder.java:41)<br>    at org.apache.shardingsphere.sharding.rule.builder.ShardingRuleBuilder.build(ShardingRuleBuilder.java:35)<br>    at org.apache.shardingsphere.infra.rule.builder.database.DatabaseRulesBuilder.build(DatabaseRulesBuilder.java:58)<br>    at org.apache.shardingsphere.infra.metadata.database.ShardingSphereDatabase.create(ShardingSphereDatabase.java:87)<br>    at org.apache.shardingsphere.infra.metadata.database.ShardingSphereDatabasesFactory.createGenericDatabases(ShardingSphereDatabasesFactory.java:81)<br>    at org.apache.shardingsphere.infra.metadata.database.ShardingSphereDatabasesFactory.create(ShardingSphereDatabasesFactory.java:69)<br>    at org.apache.shardingsphere.mode.metadata.MetaDataContextsFactory.create(MetaDataContextsFactory.java:91)<br>    at org.apache.shardingsphere.mode.metadata.MetaDataContextsFactory.create(MetaDataContextsFactory.java:69)<br>    at org.apache.shardingsphere.mode.manager.standalone.StandaloneContextManagerBuilder.build(StandaloneContextManagerBuilder.java:49)<br>    at org.apache.shardingsphere.driver.jdbc.core.datasource.ShardingSphereDataSource.createContextManager(ShardingSphereDataSource.java:76)<br>    at org.apache.shardingsphere.driver.jdbc.core.datasource.ShardingSphereDataSource.<init>(ShardingSphereDataSource.java:64)<br>    at org.apache.shardingsphere.driver.api.ShardingSphereDataSourceFactory.createDataSource(ShardingSphereDataSourceFactory.java:93)<br>    at org.apache.shardingsphere.spring.boot.ShardingSphereAutoConfiguration.shardingSphereDataSource(ShardingSphereAutoConfiguration.java:91)<br>    at org.apache.shardingsphere.spring.boot.ShardingSphereAutoConfiguration$$SpringCGLIB$$0.CGLIB$shardingSphereDataSource$3(<generated>)<br>    at org.apache.shardingsphere.spring.boot.ShardingSphereAutoConfiguration$$SpringCGLIB$$FastClass$$1.invoke(<generated>)<br>    at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:258)<br>    at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:331)<br>    at org.apache.shardingsphere.spring.boot.ShardingSphereAutoConfiguration$$SpringCGLIB$$0.shardingSphereDataSource(<generated>)<br>    at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)<br>    at java.base/java.lang.reflect.Method.invoke(Method.java:580)<br>    at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:140)<br>    … 44 common frames omitted</p>
+</blockquote>
+<p>断点打在报错点之后，向上跟踪堆栈后发现，是由于创建<code>shardingsphereDataSource</code>时取用的<code>ruleConfiguration</code>中无法获取到strategy。从断点可知，几乎所有字段都是空值。</p>
+<p><img src="https://s2.loli.net/2025/09/18/qD5chBotZEkHdva.png" alt="shardingsphere.png"></p>
+<p>所以近一步就去排查为什么参数<code>ObjectProvider&lt;List&lt;RuleConfiguration&gt;&gt; rules</code>里的这些参数为空。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="meta">@Conditional(LocalRulesCondition.class)</span></span><br><span class="line"><span class="meta">@Autowired(required = false)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> DataSource <span class="title">shardingSphereDataSource</span><span class="params">(<span class="keyword">final</span> ObjectProvider&lt;List&lt;RuleConfiguration&gt;&gt; rules, <span class="keyword">final</span> ObjectProvider&lt;ModeConfiguration&gt; modeConfig)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    Collection&lt;RuleConfiguration&gt; ruleConfigs = Optional.ofNullable(rules.getIfAvailable()).orElseGet(Collections::emptyList);</span><br><span class="line">    <span class="keyword">return</span> ShardingSphereDataSourceFactory.createDataSource(databaseName, modeConfig.getIfAvailable(), dataSourceMap, ruleConfigs, props.getProps());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>跟踪<code>shardingsphereDataSource</code>的bean创建流程，发现这块确实的数据是通过注入对象<code>shardingRuleConfiguration</code>中获得，所以再次跟踪<code>shardingRuleConfiguration</code>的bean创建流程。</p>
+<p>它的初始化方法在：<code>ShardingRuleSpringBootConfiguration</code>配置类中，这里通过<code>ObjectProvider</code>注入了<code>Map&lt;String, ShardingAlgorithm&gt;</code>对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> RuleConfiguration <span class="title">shardingRuleConfiguration</span><span class="params">(<span class="keyword">final</span> ObjectProvider&lt;Map&lt;String, ShardingAlgorithm&gt;&gt; shardingAlgorithmProvider,</span></span></span><br><span class="line"><span class="function"><span class="params">                                                   <span class="keyword">final</span> ObjectProvider&lt;Map&lt;String, KeyGenerateAlgorithm&gt;&gt; keyGenerateAlgorithmProvider,</span></span></span><br><span class="line"><span class="function"><span class="params">                                                   <span class="keyword">final</span> ObjectProvider&lt;Map&lt;String, ShardingAuditAlgorithm&gt;&gt; shardingAuditAlgorithmProvider)</span> </span>&#123;</span><br><span class="line">    Map&lt;String, ShardingAlgorithm&gt; shardingAlgorithmMap = Optional.ofNullable(shardingAlgorithmProvider.getIfAvailable()).orElse(Collections.emptyMap());</span><br><span class="line">    Map&lt;String, KeyGenerateAlgorithm&gt; keyGenerateAlgorithmMap = Optional.ofNullable(keyGenerateAlgorithmProvider.getIfAvailable()).orElse(Collections.emptyMap());</span><br><span class="line">    Map&lt;String, ShardingAuditAlgorithm&gt; shardingAuditAlgorithmMap = Optional.ofNullable(shardingAuditAlgorithmProvider.getIfAvailable()).orElse(Collections.emptyMap());</span><br><span class="line">    AlgorithmProvidedShardingRuleConfiguration result = swapper.swapToObject(yamlConfig.getSharding());</span><br><span class="line">    result.setShardingAlgorithms(shardingAlgorithmMap);</span><br><span class="line">    result.setKeyGenerators(keyGenerateAlgorithmMap);</span><br><span class="line">    result.setAuditors(shardingAuditAlgorithmMap);</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>org.springframework.beans.factory.ObjectProvider</code> 是 Spring 框架提供的一个功能接口，主要用于<strong>依赖注入时的灵活获取 Bean</strong>，它是对传统 <code>BeanFactory.getBean()</code> 方法的增强，提供了更安全、更便捷的 Bean 查找和注入方式。如果获取不到，它会返回null，不会抛异常<strong>NoSuchBeanDefinitionException</strong></p>
+</blockquote>
+<p>进入<code>shardingAlgorithmProvider.getIfAvailable()</code>方法，实际上它也是springbean的创建流程，它尝试获取在spring容器中的<code>ShardingAlgorithm</code>的实现类，通过断点跟踪发现，这里从容器中获取到的<code>shardingAlgorithm</code>对象的相关参数就是空的。</p>
+<p>到这里，简单复个盘：</p>
+<p>报错的原因是创建<code>shardingsphereDataSource</code>时，其中的<code>algorithm</code>相关参数为空&rarr; 跟踪<code>shardingRuleConfiguration</code>，发现是从<code>ObjectProvider&lt;Map&lt;String, ShardingAlgorithm&gt;&gt;</code>来的 &rarr;跟踪<code>shardingAlgorithmProvider.getIfAvailable()</code>发现，这时从容器中获取到的<code>ShardingAlgorithm</code>实现就是空的。</p>
+<p>所以现在就变成了新的问题：为什么从容器中获取到的<code>ShardingAlgorithm</code>对象，值都是空的？</p>
+<p>创建一个新的工程，不包含<code>mybatis-flex</code>，观察<code>ShardingAlgorithm</code>的创建流程，通过跟踪发现，<code>ShardingAlgorithm</code>对象的值的填充时机，是在后置接口<code>ShardingAlgorithmProvidedBeanRegistry</code>中，当<code>ShardingAlgorithmProvidedBeanRegistry</code>后置接口方法触发时，才会将相关配置项的值填充到<code>ShardingAlgorithm</code>对象中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">registerBean</span><span class="params">(<span class="keyword">final</span> String prefix, <span class="keyword">final</span> Class&lt;T&gt; algorithmClass, <span class="keyword">final</span> BeanDefinitionRegistry registry)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!PropertyUtil.containPropertyPrefix(environment, prefix)) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Map&lt;String, Object&gt; parameterMap = PropertyUtil.handle(environment, prefix, Map.class);</span><br><span class="line">    Collection&lt;String&gt; algorithmNames = parameterMap.keySet().stream().map(key -&gt; key.contains(POINT) ? key.substring(<span class="number">0</span>, key.indexOf(POINT)) : key).collect(Collectors.toSet());</span><br><span class="line">    Map&lt;String, AlgorithmConfiguration&gt; algorithmConfigs = createAlgorithmConfigurations(prefix, algorithmNames);</span><br><span class="line">    ShardingSphereServiceLoader.register(algorithmClass);</span><br><span class="line">    <span class="comment">// 把相关配置项填充到当前对象中</span></span><br><span class="line">    <span class="keyword">for</span> (Entry&lt;String, AlgorithmConfiguration&gt; entry : algorithmConfigs.entrySet()) &#123;</span><br><span class="line">        AlgorithmConfiguration algorithmConfig = entry.getValue();</span><br><span class="line">        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(ShardingSphereAlgorithmFactory.createAlgorithm(algorithmConfig, algorithmClass).getClass());</span><br><span class="line">        registry.registerBeanDefinition(entry.getKey(), builder.getBeanDefinition());</span><br><span class="line">        propsMap.put(entry.getKey(), algorithmConfig.getProps());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以跟踪原工程的<code>PostProcessorRegistrationDelegate</code>类，观察后置处理接口的执行情况，果然发现了一个不一样的后置处理器<code>JobRegistryBeanPostProcessor</code>，这个后置处理器在<code>ShardingAlgorithmProvidedBeanRegistry</code>之前，也就是说，一个bean会先经过<code>job</code>的这个后置处理，再经过<code>shardingAlgorithm</code>后置处理器。</p>
+<p>继续跟踪<code>JobRegistryBeanPostProcessor</code>，在注册<code>JobRegistryBeanPostProcessor</code>置后置处理器列表中时，触发了它的初始化类<code>BatchAutoConfiguration#SpringBootBatchConfiguration</code>，而它的参数中包含了<code>DataSource dataSource</code>。</p>
+<p>综上：因为<code>JobRegistryBeanPostProcessor</code>比<code>ShardingAlgorithmProvidedBeanRegistry</code>在后置处理器列表靠前，导致<code>JobRegistryBeanPostProcessor</code>先进入初始化流程，而它需要<code>dataSource</code>，则进入了<code>dataSource</code>的初始化流程，而<code>dataSource</code>的初始化会触发到<code>shardingsphereDataSource</code>初始化，而<code>shardingsphereDataSource</code>初始化会获取<code>ShardingAlgorithm</code>，这时因为<code>ShardingAlgorithmProvidedBeanRegistry</code>还没执行，导致相关值还没填充，导致报错。</p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>查询相关文档发现，官方貌似也发现存在这个问题，<code>JobRegistryBeanPostProcessor</code>注入的时机过早会导致一些问题，所以官方注明了替代方案<code>JobRegistrySmartInitializingSingleton</code></p>
+<p>但是在工程里，<code>JobRegistryBeanPostProcessor</code>是在<code>spring-batch-core</code>包中的类<code>DefaultBatchConfiguration</code>声明</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> JobRegistryBeanPostProcessor <span class="title">jobRegistryBeanPostProcessor</span><span class="params">()</span> <span class="keyword">throws</span> BatchConfigurationException </span>&#123;</span><br><span class="line">	JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = <span class="keyword">new</span> JobRegistryBeanPostProcessor();</span><br><span class="line">	jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		jobRegistryBeanPostProcessor.afterPropertiesSet();</span><br><span class="line">		<span class="keyword">return</span> jobRegistryBeanPostProcessor;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> BatchConfigurationException(<span class="string">&quot;Unable to configure the default job registry BeanPostProcessor&quot;</span>, e);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以，解决方案就是覆盖这个类，并对这部分代码注释，不声明<code>JobRegistryBeanPostProcessor</code>这个bean，同事声明替代方案<code>JobRegistrySmartInitializingSingleton</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">	* 注册JobRegistrySmartInitializingSingleton（关键：不使用JobRegistryBeanPostProcessor）</span></span><br><span class="line"><span class="comment">	*/</span></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> JobRegistrySmartInitializingSingleton <span class="title">jobRegistrySmartInitializingSingleton</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 初始化并设置参数</span></span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> JobRegistrySmartInitializingSingleton(jobRegistry);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2025/09/18/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/shardingsphere%E4%B8%8Emybatisflex%E5%86%B2%E7%AA%81/" title="shardingsphere与mybatisflex冲突">http://xiaocainiaoya.github.io/2025/09/18/杂七杂八/shardingsphere与mybatisflex冲突/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/" rel="tag"><i class="fa fa-tag"></i> 杂七杂八</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/09/12/Springboot/springboot3%E7%9A%84aot%E5%AE%9E%E8%B7%B5/" rel="prev" title="springboot3的aot实践">
+      <i class="fa fa-chevron-left"></i> springboot3的aot实践
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3"><span class="nav-number">2.</span> <span class="nav-text">解决</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">94</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
