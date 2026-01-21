@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-4mO0jSwPt5">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.cat.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xiaocainiaoya.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Spring启动相关BeanFactoryPostProcessor（Bean 工厂后置处理器）和BeanPostProcessor（Bean 后置处理器）是什么，有什么区别？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring启动相关">
+<meta property="og:url" content="http://xiaocainiaoya.github.io/2026/01/21/Spring/Spring%E5%90%AF%E5%8A%A8%E7%9B%B8%E5%85%B3/index.html">
+<meta property="og:site_name" content="xiaocainiaoya&#39;s blog">
+<meta property="og:description" content="Spring启动相关BeanFactoryPostProcessor（Bean 工厂后置处理器）和BeanPostProcessor（Bean 后置处理器）是什么，有什么区别？">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-01-21T14:20:58.000Z">
+<meta property="article:modified_time" content="2026-01-21T03:20:23.260Z">
+<meta property="article:author" content="xiaocainiaoya">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://xiaocainiaoya.github.io/2026/01/21/Spring/Spring%E5%90%AF%E5%8A%A8%E7%9B%B8%E5%85%B3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Spring启动相关 | xiaocainiaoya's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="xiaocainiaoya's blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">xiaocainiaoya's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">日常积累</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaocainiaoya.github.io/2026/01/21/Spring/Spring%E5%90%AF%E5%8A%A8%E7%9B%B8%E5%85%B3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="xiaocainiaoya">
+      <meta itemprop="description" content="穷则独善其身，达则兼济天下">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xiaocainiaoya's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring启动相关
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2026-01-21 22:20:58 / 修改时间：11:20:23" itemprop="dateCreated datePublished" datetime="2026-01-21T22:20:58+08:00">2026-01-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/srping/" itemprop="url" rel="index"><span itemprop="name">srping</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Spring启动相关"><a href="#Spring启动相关" class="headerlink" title="Spring启动相关"></a>Spring启动相关</h1><h3 id="BeanFactoryPostProcessor（Bean-工厂后置处理器）和BeanPostProcessor（Bean-后置处理器）是什么，有什么区别？"><a href="#BeanFactoryPostProcessor（Bean-工厂后置处理器）和BeanPostProcessor（Bean-后置处理器）是什么，有什么区别？" class="headerlink" title="BeanFactoryPostProcessor（Bean 工厂后置处理器）和BeanPostProcessor（Bean 后置处理器）是什么，有什么区别？"></a>BeanFactoryPostProcessor（Bean 工厂后置处理器）和BeanPostProcessor（Bean 后置处理器）是什么，有什么区别？</h3><span id="more"></span>
+
+<ul>
+<li>BeanFactoryPostProcessor：在创建 Bean之前，先修改Bean 的定义信息，不直接接触实体。</li>
+<li>BeanPostProcessor：在Bean 实例化完成后，修改 Bean 实例，直接操作实体。</li>
+</ul>
+<h3 id="Spring-容器执行流程（辅助理解）"><a href="#Spring-容器执行流程（辅助理解）" class="headerlink" title="Spring 容器执行流程（辅助理解）"></a>Spring 容器执行流程（辅助理解）</h3><ol>
+<li>加载配置文件 / 注解，生成所有 BeanDefinition；</li>
+<li>执行所有 <code>BeanFactoryPostProcessor</code>（修改 BeanDefinition）；</li>
+<li>遍历 BeanDefinition，实例化 Bean（调用构造方法创建对象）；</li>
+<li>对每个 Bean 执行 <code>BeanPostProcessor.postProcessBeforeInitialization</code>；</li>
+<li>执行 Bean 的初始化方法（@PostConstruct、init-method）；</li>
+<li>对每个 Bean 执行 <code>BeanPostProcessor.postProcessAfterInitialization</code>；</li>
+<li>Bean 加入容器，完成初始化。</li>
+</ol>
+<h3 id="FactoryBean和BeanFactory是什么，有什么区别？"><a href="#FactoryBean和BeanFactory是什么，有什么区别？" class="headerlink" title="FactoryBean和BeanFactory是什么，有什么区别？"></a>FactoryBean和BeanFactory是什么，有什么区别？</h3><ul>
+<li><p><code>BeanFactory</code>：是 Spring 容器的<strong>核心接口</strong>，相当于整个「工厂」的总控台，负责管理所有 Bean 的创建、存储、获取，是所有 Bean 的「大管家」。</p>
+</li>
+<li><p><code>FactoryBean</code>：是一个<strong>特殊的 Bean</strong>，相当于工厂里的「特殊工人」—— 这个工人不直接生产产品，而是专门负责创建某一类特定的 Bean 实例，是创建 Bean 的「专用工具」。</p>
+</li>
+</ul>
+<h5 id="核心方法"><a href="#核心方法" class="headerlink" title="核心方法"></a>核心方法</h5><p><code>FactoryBean</code> 接口定义了 3 个核心方法：</p>
+<ol>
+<li><code>T getObject()</code>：返回创建的目标 Bean 实例；</li>
+<li><code>Class&lt;?&gt; getObjectType()</code>：返回目标 Bean 的类型；</li>
+<li><code>boolean isSingleton()</code>：返回目标 Bean 是否是单例（默认 true）。</li>
+</ol>
+<p><strong>FactoryBean 的特殊获取规则</strong>：</p>
+<ul>
+<li>直接通过 <code>getBean(&quot;beanName&quot;)</code> 获取的是 <code>FactoryBean.getObject()</code> 返回的<strong>目标 Bean</strong>；</li>
+<li>要获取 <code>FactoryBean</code> 本身，需要在名称前加 <code>&amp;</code>，即 <code>getBean(&quot;&amp;beanName&quot;)</code>。</li>
+</ul>
+<h3 id="ApplicationContext-和-BeanFactory-的关系"><a href="#ApplicationContext-和-BeanFactory-的关系" class="headerlink" title="ApplicationContext 和 BeanFactory 的关系"></a>ApplicationContext 和 BeanFactory 的关系</h3><p><code>ApplicationContext</code> <strong>继承并扩展</strong>了 <code>BeanFactory</code> 接口，是 Spring 对基础 IoC 容器的增强实现。可以理解为：</p>
+<ul>
+<li><code>BeanFactory</code> = Spring 容器的「基础版」（只实现核心 IoC 功能）；</li>
+<li><code>ApplicationContext</code> = Spring 容器的「完整版」（包含基础版所有功能 + 丰富的扩展功能）。</li>
+</ul>
+
+    </div>
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>xiaocainiaoya
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaocainiaoya.github.io/2026/01/21/Spring/Spring%E5%90%AF%E5%8A%A8%E7%9B%B8%E5%85%B3/" title="Spring启动相关">http://xiaocainiaoya.github.io/2026/01/21/Spring/Spring启动相关/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/10/14/Spring/seata/" rel="prev" title="seata入门">
+      <i class="fa fa-chevron-left"></i> seata入门
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring%E5%90%AF%E5%8A%A8%E7%9B%B8%E5%85%B3"><span class="nav-number">1.</span> <span class="nav-text">Spring启动相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#BeanFactoryPostProcessor%EF%BC%88Bean-%E5%B7%A5%E5%8E%82%E5%90%8E%E7%BD%AE%E5%A4%84%E7%90%86%E5%99%A8%EF%BC%89%E5%92%8CBeanPostProcessor%EF%BC%88Bean-%E5%90%8E%E7%BD%AE%E5%A4%84%E7%90%86%E5%99%A8%EF%BC%89%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%8C%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="nav-number">1.0.1.</span> <span class="nav-text">BeanFactoryPostProcessor（Bean 工厂后置处理器）和BeanPostProcessor（Bean 后置处理器）是什么，有什么区别？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Spring-%E5%AE%B9%E5%99%A8%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%EF%BC%88%E8%BE%85%E5%8A%A9%E7%90%86%E8%A7%A3%EF%BC%89"><span class="nav-number">1.0.2.</span> <span class="nav-text">Spring 容器执行流程（辅助理解）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FactoryBean%E5%92%8CBeanFactory%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%8C%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="nav-number">1.0.3.</span> <span class="nav-text">FactoryBean和BeanFactory是什么，有什么区别？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%96%B9%E6%B3%95"><span class="nav-number">1.0.3.0.1.</span> <span class="nav-text">核心方法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ApplicationContext-%E5%92%8C-BeanFactory-%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">1.0.4.</span> <span class="nav-text">ApplicationContext 和 BeanFactory 的关系</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">xiaocainiaoya</p>
+  <div class="site-description" itemprop="description">穷则独善其身，达则兼济天下</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">96</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaocainiaoya" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaocainiaoya" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xiaocainiaoya@foxmail.com" title="E-Mail → mailto:xiaocainiaoya@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/csdnjiamin" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;csdnjiamin" rel="noopener" target="_blank"><i class="fa fa-fw fa-bookmark fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.cnblogs.com/acmaner" title="博客园 → https:&#x2F;&#x2F;www.cnblogs.com&#x2F;acmaner" rel="noopener" target="_blank"><i class="fa fa-fw fa-book fa-fw"></i>博客园</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaocainiaoya</span>
+</div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
